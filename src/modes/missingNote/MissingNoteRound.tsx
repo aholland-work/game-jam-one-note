@@ -199,7 +199,8 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
         startMidi={pianoStartMidi(song)}
         selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
         selectedTone={isOver ? resultTone : 'selected'}
-        playingMidi={playingMidi}
+        // Lighting keys while guessing would give the answer away, so only show it in the result.
+        playingMidi={isOver ? playingMidi : null}
         onPress={pressKey}
       />
     </section>
