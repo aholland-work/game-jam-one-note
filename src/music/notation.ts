@@ -5,6 +5,8 @@ export interface Note {
   pitch: string | null
   /** Length in beats, where a quarter note is 1. */
   beats: number
+  /** Tied into the next note (same pitch): the two sound as one held note. */
+  tie?: boolean
 }
 
 const LETTER_SEMITONES: Record<string, number> = {
@@ -72,7 +74,8 @@ export function parseDuration(token: string): number {
 
 /**
  * Parses a melody written as space-separated `pitch/duration` tokens, e.g.
- * `E4/q E4/q F4/q G4/q | G4/q F4/q E4/q D4/q`. Use `r` as the pitch for a rest.
+ * `E4/q E4/q F4/q G4/q | G4/q F4/q E4/q D4/q`. Use `r` as the pitch for a rest and
+ * end a duration with `~` to tie the note into the next one (`C5/s~ C5/q.`).
  * Bar lines (`|`) are only there to make songs readable and are ignored.
  */
 export function parseMelody(text: string): Note[] {
@@ -80,13 +83,17 @@ export function parseMelody(text: string): Note[] {
     .split(/\s+/)
     .filter((token) => token !== '' && token !== '|')
     .map((token) => {
-      const [pitch, duration] = token.split('/')
-      if (!duration) throw new Error(`Missing duration in "${token}"`)
+      const [pitch, rawDuration] = token.split('/')
+      if (!rawDuration) throw new Error(`Missing duration in "${token}"`)
+      const tie = rawDuration.endsWith('~')
+      const duration = tie ? rawDuration.slice(0, -1) : rawDuration
       const isRest = pitch === 'r'
-      return {
+      const note: Note = {
         midi: isRest ? null : pitchToMidi(pitch),
         pitch: isRest ? null : pitch,
         beats: parseDuration(duration),
       }
+      if (tie) note.tie = true
+      return note
     })
 }

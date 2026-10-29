@@ -6,6 +6,7 @@ export const odeToJoy: Song = {
   id: 'ode-to-joy',
   title: 'Ode to Joy',
   genre: 'Classical',
+  difficulty: 'Easy',
   bpm: 112,
   beatsPerBar: 4,
   melody: parseMelody(`

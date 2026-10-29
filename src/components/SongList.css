@@ -1,0 +1,81 @@
+.song-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.song-list h2 {
+  margin: 0;
+}
+
+.song-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.song-list-filter {
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.song-list-filter[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.song-list-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.song-card {
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+}
+
+.song-card-title {
+  font-weight: 600;
+}
+
+.song-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.song-card-difficulty {
+  font-size: 0.75rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.song-card-difficulty.is-easy {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.song-card-difficulty.is-medium {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.song-card-difficulty.is-hard {
+  color: var(--warning);
+  border-color: var(--warning);
+}

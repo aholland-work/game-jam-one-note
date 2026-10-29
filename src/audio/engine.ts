@@ -58,12 +58,17 @@ class AudioEngine {
     const starts: number[] = []
     const sources: OscillatorNode[] = []
     let time = origin
-    for (const note of notes) {
+    notes.forEach((note, i) => {
       starts.push(time)
-      const duration = note.beats * secondsPerBeat
-      if (note.midi !== null) sources.push(...this.scheduleVoice(note.midi, time, duration))
-      time += duration
-    }
+      const tiedFromPrevious = i > 0 && notes[i - 1].tie && notes[i - 1].midi === note.midi
+      if (note.midi !== null && !tiedFromPrevious) {
+        // A tied chain sounds as one held note.
+        let beats = note.beats
+        for (let j = i; notes[j].tie && notes[j + 1]?.midi === note.midi; j++) beats += notes[j + 1].beats
+        sources.push(...this.scheduleVoice(note.midi, time, beats * secondsPerBeat))
+      }
+      time += note.beats * secondsPerBeat
+    })
     const end = time
 
     let nextIndex = 0

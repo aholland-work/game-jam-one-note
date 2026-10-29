@@ -47,7 +47,20 @@
   flex: 1;
 }
 
-.round-lock {
+.round-back {
+  justify-self: start;
+  padding: 0.25rem 0.6rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+}
+
+.round-back:hover {
+  color: var(--accent);
+}
+
+.round-lock,
+.round-next {
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 600;

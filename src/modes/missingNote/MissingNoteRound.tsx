@@ -14,11 +14,13 @@ const CORRECTION_PAUSE_MS = 700
 
 interface MissingNoteRoundProps {
   song: Song
-  onRestart: () => void
+  onBack: () => void
+  /** Goes to the next song, or null when this is the last one in the list. */
+  onNext: (() => void) | null
 }
 
 /** One Missing Note puzzle: listen, test keys, use up to three tries, lock in one answer. */
-export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
+export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
@@ -138,6 +140,9 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
 
   return (
     <section className="round" aria-labelledby="round-title">
+      <button type="button" className="round-back" onClick={onBack}>
+        ← Songs
+      </button>
       <header className="round-header">
         <h2 id="round-title">{song.title}</h2>
         <p className="round-genre">{song.genre}</p>
@@ -150,6 +155,7 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
             : song.melody
         }
         beatsPerBar={song.beatsPerBar}
+        pickupBeats={song.pickupBeats}
         gapIndex={song.missingIndex}
         revealedCount={revealedCount}
         showAnswer={isOver}
@@ -166,14 +172,16 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
           <button type="button" onClick={playComplete} disabled={resultPlaying}>
             Play the whole song
           </button>
-          <button type="button" onClick={onRestart} disabled={resultPlaying}>
-            Play this puzzle again
-          </button>
           {resultPlaying && (
             <button type="button" onClick={stopResult}>
-              Stop
+              Skip
             </button>
           )}
+          <span className="round-spacer" />
+          {/* Leaving unmounts the round, which stops any playback. */}
+          <button type="button" className="round-next" onClick={onNext ?? onBack}>
+            {onNext ? 'Next song →' : 'Back to songs'}
+          </button>
         </div>
       ) : (
         <div className="round-controls">
