@@ -1,3 +1,4 @@
+import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
 import './SongList.css'
 
@@ -16,6 +17,12 @@ export function SongList({ songs, genre, onGenreChange, onSelect }: SongListProp
   return (
     <section className="song-list" aria-labelledby="song-list-title">
       <h2 id="song-list-title">Pick a song</h2>
+      {!hasSeenTutorial() && (
+        <p className="song-list-tip">
+          New here? Each melody is missing one note, and your first song walks you through finding it.
+          Twinkle, Twinkle is a gentle place to start.
+        </p>
+      )}
       <div className="song-list-filters" role="group" aria-label="Filter by genre">
         {[null, ...genres].map((option) => (
           <button

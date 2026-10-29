@@ -3,6 +3,7 @@ import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
+import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import type { Note } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import './MissingNoteRound.css'
@@ -11,6 +12,18 @@ type Status = 'guessing' | 'found' | 'missed'
 
 // Pause between hearing a wrong answer and hearing the right one.
 const CORRECTION_PAUSE_MS = 700
+
+const DEFAULT_HINT = 'Listen to the melody, then find the missing note on the piano.'
+
+// First-time players are walked through one round, one step at a time.
+type TutorialStep = 'play' | 'keys' | 'lock' | 'done'
+
+const TUTORIAL_TEXT: Record<TutorialStep, string> = {
+  play: 'Press ▶ Play to hear the melody. The dashed box on the staff is the missing note.',
+  keys: 'Tap the piano keys (or type A S D F G H J) to hear notes. Look for the one that fills the gap, and replay the melody as often as you like.',
+  lock: "Found it? Make sure that key is selected, then press Lock in. You only get one answer, so take your time.",
+  done: "That's the game! The notes slide to their real spots as the song plays. Pick another song whenever you're ready.",
+}
 
 interface MissingNoteRoundProps {
   song: Song
@@ -26,7 +39,8 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
-  const [hint, setHint] = useState('Listen to the melody, then find the missing note on the piano.')
+  const [hint, setHint] = useState(DEFAULT_HINT)
+  const [tutorialStep, setTutorialStep] = useState<TutorialStep | null>(() => (hasSeenTutorial() ? null : 'play'))
   // After a miss, the player's wrong note is shown and played first, then the right one.
   const [showingWrongNote, setShowingWrongNote] = useState(false)
   const [awaitingCorrection, setAwaitingCorrection] = useState(false)
@@ -69,6 +83,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   }
 
   const playWithGap = () => {
+    if (tutorialStep === 'play') setTutorialStep('keys')
     setPaused(null)
     setPlayingTry(false)
     play(withGap(song.melody, song.missingIndex))
@@ -126,7 +141,9 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
 
   const pressKey = (midi: number) => {
     audioEngine.playNote(midi)
-    if (!isOver) setSelectedMidi(midi)
+    if (isOver) return
+    setSelectedMidi(midi)
+    if (tutorialStep === 'keys') setTutorialStep('lock')
   }
 
   const tryIt = () => {
@@ -143,6 +160,10 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const lockIn = () => {
     if (selectedMidi === null) return setHint('Pick a piano key before you lock in.')
     setPaused(null)
+    if (tutorialStep) {
+      setTutorialStep('done')
+      markTutorialSeen()
+    }
     if (selectedMidi === answer) {
       setStatus('found')
       setHint('You found it!')
@@ -161,6 +182,14 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
       },
     })
   }
+
+  const skipTutorial = () => {
+    setTutorialStep(null)
+    markTutorialSeen()
+  }
+
+  /** Class that makes a control pulse while the tutorial is pointing at it. */
+  const coached = (step: TutorialStep) => (tutorialStep === step ? 'is-coached' : '')
 
   // Space acts on the melody, unless a button has focus (it handles Space itself).
   useEffect(() => {
@@ -202,9 +231,23 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
         activeIndex={activeIndex}
       />
 
-      <p className={`round-hint${isOver ? ` is-${resultTone}` : ''}`} role="status">
-        {hint}
-      </p>
+      {/* While coaching, the generic hint would repeat the tutorial, so only show real messages. */}
+      {!(tutorialStep && hint === DEFAULT_HINT) && (
+        <p className={`round-hint${isOver ? ` is-${resultTone}` : ''}`} role="status">
+          {hint}
+        </p>
+      )}
+
+      {tutorialStep && (
+        <div className="round-coach" role="note">
+          <p>{TUTORIAL_TEXT[tutorialStep]}</p>
+          {tutorialStep !== 'done' && (
+            <button type="button" className="round-coach-skip" onClick={skipTutorial}>
+              Skip tutorial
+            </button>
+          )}
+        </div>
+      )}
 
       {isOver ? (
         <div className="round-controls">
@@ -238,7 +281,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
               </button>
             </>
           ) : (
-            <button type="button" onClick={playWithGap}>
+            <button type="button" className={coached('play')} onClick={playWithGap}>
               ▶ Play
             </button>
           )}
@@ -255,20 +298,22 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
             </>
           )}
           <span className="round-spacer" />
-          <button type="button" className="round-lock" onClick={lockIn}>
+          <button type="button" className={`round-lock ${coached('lock')}`} onClick={lockIn}>
             Lock in
           </button>
         </div>
       )}
 
-      <Piano
-        startMidi={pianoStartMidi(song)}
-        selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
-        selectedTone={isOver ? resultTone : 'selected'}
-        // Lighting keys while guessing would give the answer away, so only show it in the result.
-        playingMidi={isOver ? playingMidi : null}
-        onPress={pressKey}
-      />
+      <div className={`round-piano ${coached('keys')}`}>
+        <Piano
+          startMidi={pianoStartMidi(song)}
+          selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
+          selectedTone={isOver ? resultTone : 'selected'}
+          // Lighting keys while guessing would give the answer away, so only show it in the result.
+          playingMidi={isOver ? playingMidi : null}
+          onPress={pressKey}
+        />
+      </div>
     </section>
   )
 }
