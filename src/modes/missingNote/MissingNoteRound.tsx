@@ -27,15 +27,21 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
   const [hint, setHint] = useState('Listen to the melody, then find the missing note on the piano.')
   // After a miss, the player's wrong note is shown and played first, then the right one.
   const [showingWrongNote, setShowingWrongNote] = useState(false)
+  const [awaitingCorrection, setAwaitingCorrection] = useState(false)
   const correctionTimer = useRef(0)
+  // The melody currently sounding, so the piano can light up each note as it plays.
+  const [playingNotes, setPlayingNotes] = useState<Note[] | null>(null)
 
   const answer = answerMidi(song)
   const isOver = status !== 'guessing'
   // Once the round is over, the piano and message follow what's on the staff:
   // orange while the wrong note plays, green once the right note is shown.
   const resultTone = showingWrongNote ? 'missed' : 'found'
+  const resultPlaying = isOver && (playingNotes !== null || awaitingCorrection)
+  const playingMidi = playingNotes && activeIndex !== null ? playingNotes[activeIndex]?.midi ?? null : null
 
   const play = (notes: Note[], { reveal = false, onComplete }: { reveal?: boolean; onComplete?: () => void } = {}) => {
+    // Starting a melody stops the previous one, whose onEnd clears state; set ours afterwards.
     audioEngine.playMelody(notes, {
       bpm: song.bpm,
       onNote: (index) => {
@@ -44,9 +50,11 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
       },
       onEnd: (completed) => {
         setActiveIndex(null)
+        setPlayingNotes(null)
         if (completed) onComplete?.()
       },
     })
+    setPlayingNotes(notes)
   }
 
   const playWithGap = () => play(withGap(song.melody, song.missingIndex))
@@ -61,8 +69,21 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
 
   const playCorrection = () => {
     setShowingWrongNote(false)
+    setAwaitingCorrection(false)
     setHint("…and here's how it really goes.")
     play(song.melody)
+  }
+
+  /** Cuts the result playback short and jumps to the finished, corrected staff. */
+  const stopResult = () => {
+    window.clearTimeout(correctionTimer.current)
+    audioEngine.stop()
+    if (showingWrongNote || awaitingCorrection) {
+      setShowingWrongNote(false)
+      setAwaitingCorrection(false)
+      setHint("…and here's how it really goes.")
+    }
+    setRevealedCount(song.melody.length)
   }
 
   const pressKey = (midi: number) => {
@@ -89,6 +110,7 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
     }
     setStatus('missed')
     setShowingWrongNote(true)
+    setAwaitingCorrection(true)
     setHint("Not quite. Here's how your note sounds…")
     setRevealedCount(0)
     play(withGuess(song.melody, song.missingIndex, selectedMidi), {
@@ -141,12 +163,17 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
 
       {isOver ? (
         <div className="round-controls">
-          <button type="button" onClick={playComplete}>
+          <button type="button" onClick={playComplete} disabled={resultPlaying}>
             Play the whole song
           </button>
-          <button type="button" onClick={onRestart}>
+          <button type="button" onClick={onRestart} disabled={resultPlaying}>
             Play this puzzle again
           </button>
+          {resultPlaying && (
+            <button type="button" onClick={stopResult}>
+              Stop
+            </button>
+          )}
         </div>
       ) : (
         <div className="round-controls">
@@ -172,6 +199,7 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
         startMidi={pianoStartMidi(song)}
         selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
         selectedTone={isOver ? resultTone : 'selected'}
+        playingMidi={playingMidi}
         onPress={pressKey}
       />
     </section>

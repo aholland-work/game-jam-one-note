@@ -77,6 +77,34 @@
   border-color: #3b6d11;
 }
 
+.piano-white.is-playing {
+  background: #e7e5fb;
+}
+
+.piano-black.is-playing {
+  background: #7f77dd;
+}
+
+.piano-white.is-selected.is-playing {
+  background: #afa9ec;
+}
+
+.piano-white.is-missed.is-playing {
+  background: #f0b48c;
+}
+
+.piano-white.is-found.is-playing {
+  background: #b5d68c;
+}
+
+.piano-black.is-missed.is-playing {
+  background: #d8742f;
+}
+
+.piano-black.is-found.is-playing {
+  background: #639922;
+}
+
 .piano-white.is-pressed {
   background: #afa9ec;
 }
