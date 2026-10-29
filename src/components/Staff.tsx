@@ -109,7 +109,8 @@ export function Staff({
         const revealed = isAnswer || index < revealedCount
         return (
           <NoteGlyph
-            key={index}
+            // Re-mount the answer when its pitch changes so it drops in again.
+            key={isAnswer ? `${index}-${note.pitch}` : index}
             note={note}
             x={x}
             y={yFor(system, diatonicStep(note.pitch))}

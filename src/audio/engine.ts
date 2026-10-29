@@ -4,8 +4,8 @@ export interface PlayMelodyOptions {
   bpm: number
   /** Called when each note (rests included) starts sounding, in sync with the audio. */
   onNote?: (index: number) => void
-  /** Called once the melody has finished or been stopped. */
-  onEnd?: () => void
+  /** Called once, when the melody finishes (`completed`) or is stopped early. */
+  onEnd?: (completed: boolean) => void
 }
 
 export interface Playback {
@@ -69,12 +69,12 @@ class AudioEngine {
     let nextIndex = 0
     let frame = 0
     let finished = false
-    const finish = () => {
+    const finish = (completed: boolean) => {
       if (finished) return
       finished = true
       cancelAnimationFrame(frame)
       if (this.current === playback) this.current = null
-      onEnd?.()
+      onEnd?.(completed)
     }
     const tick = () => {
       // Visuals lag by the output latency so highlights land when the note is heard.
@@ -83,7 +83,7 @@ class AudioEngine {
         onNote?.(nextIndex)
         nextIndex++
       }
-      if (heardTime >= end) finish()
+      if (heardTime >= end) finish(true)
       else frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
@@ -97,7 +97,7 @@ class AudioEngine {
             // Already stopped.
           }
         }
-        finish()
+        finish(false)
       },
     }
     this.current = playback

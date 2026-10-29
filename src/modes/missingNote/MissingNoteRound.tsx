@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
 import { Staff } from '../../components/Staff'
@@ -8,6 +8,9 @@ import type { Song } from '../../songs/types'
 import './MissingNoteRound.css'
 
 type Status = 'guessing' | 'found' | 'missed'
+
+// Pause between hearing a wrong answer and hearing the right one.
+const CORRECTION_PAUSE_MS = 700
 
 interface MissingNoteRoundProps {
   song: Song
@@ -22,18 +25,24 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState('Listen to the melody, then find the missing note on the piano.')
+  // After a miss, the player's wrong note is shown and played first, then the right one.
+  const [showingWrongNote, setShowingWrongNote] = useState(false)
+  const correctionTimer = useRef(0)
 
   const answer = answerMidi(song)
   const isOver = status !== 'guessing'
 
-  const play = (notes: Note[], reveal = false) => {
+  const play = (notes: Note[], { reveal = false, onComplete }: { reveal?: boolean; onComplete?: () => void } = {}) => {
     audioEngine.playMelody(notes, {
       bpm: song.bpm,
       onNote: (index) => {
         setActiveIndex(index)
         if (reveal) setRevealedCount(index + 1)
       },
-      onEnd: () => setActiveIndex(null),
+      onEnd: (completed) => {
+        setActiveIndex(null)
+        if (completed) onComplete?.()
+      },
     })
   }
 
@@ -41,8 +50,16 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
   const onSpace = useEffectEvent(playWithGap)
 
   const playComplete = () => {
+    window.clearTimeout(correctionTimer.current)
+    setShowingWrongNote(false)
     setRevealedCount(0)
-    play(song.melody, true)
+    play(song.melody, { reveal: true })
+  }
+
+  const playCorrection = () => {
+    setShowingWrongNote(false)
+    setHint("…and here's how it really goes.")
+    play(song.melody)
   }
 
   const pressKey = (midi: number) => {
@@ -61,10 +78,22 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
 
   const lockIn = () => {
     if (selectedMidi === null) return setHint('Pick a piano key before you lock in.')
-    const found = selectedMidi === answer
-    setStatus(found ? 'found' : 'missed')
-    setHint(found ? 'You found it!' : "Not quite. Here's how it goes.")
-    playComplete()
+    if (selectedMidi === answer) {
+      setStatus('found')
+      setHint('You found it!')
+      playComplete()
+      return
+    }
+    setStatus('missed')
+    setShowingWrongNote(true)
+    setHint("Not quite. Here's how your note sounds…")
+    setRevealedCount(0)
+    play(withGuess(song.melody, song.missingIndex, selectedMidi), {
+      reveal: true,
+      onComplete: () => {
+        correctionTimer.current = window.setTimeout(playCorrection, CORRECTION_PAUSE_MS)
+      },
+    })
   }
 
   // Space replays the melody, unless a button has focus (it handles Space itself).
@@ -77,6 +106,7 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
     window.addEventListener('keydown', onKeyDown)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
+      window.clearTimeout(correctionTimer.current)
       audioEngine.stop()
     }
   }, [])
@@ -89,12 +119,16 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
       </header>
 
       <Staff
-        notes={song.melody}
+        notes={
+          showingWrongNote && selectedMidi !== null
+            ? withGuess(song.melody, song.missingIndex, selectedMidi)
+            : song.melody
+        }
         beatsPerBar={song.beatsPerBar}
         gapIndex={song.missingIndex}
         revealedCount={revealedCount}
         showAnswer={isOver}
-        answerTone={status === 'missed' ? 'missed' : 'found'}
+        answerTone={showingWrongNote ? 'missed' : 'found'}
         activeIndex={activeIndex}
       />
 
