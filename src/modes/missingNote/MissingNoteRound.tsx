@@ -3,6 +3,7 @@ import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
+import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import type { Note } from '../../music/notation'
 import type { Song } from '../../songs/types'
@@ -14,13 +15,14 @@ type Status = 'guessing' | 'found' | 'missed'
 const CORRECTION_PAUSE_MS = 700
 
 const DEFAULT_HINT = 'Listen to the melody, then find the missing note on the piano.'
+const SHORTCUTS_KEY = 'one-note:show-shortcuts'
 
 // First-time players are walked through one round, one step at a time.
 type TutorialStep = 'play' | 'keys' | 'lock' | 'done'
 
 const TUTORIAL_TEXT: Record<TutorialStep, string> = {
   play: 'Press ▶ Play to hear the melody. The dashed box on the staff is the missing note.',
-  keys: 'Tap the piano keys, or type the letters shown on them, to hear notes. Look for the one that fills the gap, and replay the melody as often as you like.',
+  keys: 'Tap the piano keys to hear notes and look for the one that fills the gap. Replay the melody as often as you like. Prefer your keyboard? Open "Keyboard shortcuts" below the piano.',
   lock: "Found it? Make sure that key is selected, then press Lock in. You only get one answer, so take your time.",
   done: "That's the game! The notes slide to their real spots as the song plays. Pick another song whenever you're ready.",
 }
@@ -40,6 +42,8 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState(DEFAULT_HINT)
+  // Remembered across songs, so players who like the shortcuts keep seeing them.
+  const [showShortcuts, setShowShortcuts] = useState(() => readFlag(SHORTCUTS_KEY))
   const [tutorialStep, setTutorialStep] = useState<TutorialStep | null>(() => (hasSeenTutorial() ? null : 'play'))
   // After a miss, the player's wrong note is shown and played first, then the right one.
   const [showingWrongNote, setShowingWrongNote] = useState(false)
@@ -311,18 +315,27 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
           selectedTone={isOver ? resultTone : 'selected'}
           // Lighting keys while guessing would give the answer away, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}
+          showShortcuts={showShortcuts}
           onPress={pressKey}
         />
       </div>
-      <p className="round-shortcuts">
-        Keyboard: press the letter on a key to play it
-        {!isOver && (
-          <>
-            {' · '}
-            <kbd>Space</kbd> plays and pauses the melody
-          </>
-        )}
-      </p>
+      <details
+        className="round-shortcuts"
+        open={showShortcuts}
+        onToggle={(event) => {
+          const open = event.currentTarget.open
+          setShowShortcuts(open)
+          writeFlag(SHORTCUTS_KEY, open)
+        }}
+      >
+        <summary>Keyboard shortcuts</summary>
+        <ul>
+          <li>Press the letter shown on a piano key to play it.</li>
+          <li>
+            <kbd>Space</kbd> plays, pauses and resumes the melody.
+          </li>
+        </ul>
+      </details>
     </section>
   )
 }
