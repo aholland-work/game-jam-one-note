@@ -31,6 +31,9 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
 
   const answer = answerMidi(song)
   const isOver = status !== 'guessing'
+  // Once the round is over, the piano and message follow what's on the staff:
+  // orange while the wrong note plays, green once the right note is shown.
+  const resultTone = showingWrongNote ? 'missed' : 'found'
 
   const play = (notes: Note[], { reveal = false, onComplete }: { reveal?: boolean; onComplete?: () => void } = {}) => {
     audioEngine.playMelody(notes, {
@@ -128,11 +131,11 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
         gapIndex={song.missingIndex}
         revealedCount={revealedCount}
         showAnswer={isOver}
-        answerTone={showingWrongNote ? 'missed' : 'found'}
+        answerTone={resultTone}
         activeIndex={activeIndex}
       />
 
-      <p className={`round-hint is-${status}`} role="status">
+      <p className={`round-hint${isOver ? ` is-${resultTone}` : ''}`} role="status">
         {hint}
       </p>
 
@@ -165,7 +168,12 @@ export function MissingNoteRound({ song, onRestart }: MissingNoteRoundProps) {
         </div>
       )}
 
-      <Piano startMidi={pianoStartMidi(song)} selectedMidi={selectedMidi} onPress={pressKey} />
+      <Piano
+        startMidi={pianoStartMidi(song)}
+        selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
+        selectedTone={isOver ? resultTone : 'selected'}
+        onPress={pressKey}
+      />
     </section>
   )
 }

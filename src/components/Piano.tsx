@@ -5,6 +5,8 @@ interface PianoProps {
   /** MIDI number of the leftmost key, a C. The piano spans one octave from there. */
   startMidi: number
   selectedMidi: number | null
+  /** How to color the selected key: the player's pick, a wrong answer, or the right one. */
+  selectedTone?: 'selected' | 'missed' | 'found'
   onPress: (midi: number) => void
 }
 
@@ -23,7 +25,7 @@ const SPOKEN_NAMES = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 
 const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
 /** A one-octave piano with note names on the keys. */
-export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
+export function Piano({ startMidi, selectedMidi, selectedTone = 'selected', onPress }: PianoProps) {
   const [pressed, setPressed] = useState<number | null>(null)
   const releaseTimer = useRef(0)
 
@@ -49,7 +51,7 @@ export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
   }, [])
 
   const keyClass = (base: string, midi: number) =>
-    [base, midi === selectedMidi && 'is-selected', midi === pressed && 'is-pressed'].filter(Boolean).join(' ')
+    [base, midi === selectedMidi && `is-${selectedTone}`, midi === pressed && 'is-pressed'].filter(Boolean).join(' ')
 
   return (
     <div className="piano" role="group" aria-label="Piano">

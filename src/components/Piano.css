@@ -57,6 +57,26 @@
   border-color: #534ab7;
 }
 
+.piano-white.is-missed {
+  background: #f6d5bf;
+  border-color: #b4560f;
+}
+
+.piano-black.is-missed {
+  background: #b4560f;
+  border-color: #b4560f;
+}
+
+.piano-white.is-found {
+  background: #d4e8b8;
+  border-color: #3b6d11;
+}
+
+.piano-black.is-found {
+  background: #3b6d11;
+  border-color: #3b6d11;
+}
+
 .piano-white.is-pressed {
   background: #afa9ec;
 }
