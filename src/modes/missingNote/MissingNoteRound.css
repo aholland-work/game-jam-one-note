@@ -135,3 +135,27 @@
     box-shadow: 0 0 0 3px var(--accent);
   }
 }
+
+.round-shortcuts {
+  margin: -0.25rem 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.round-shortcuts kbd {
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+@media (hover: none) {
+  .round-shortcuts {
+    display: none;
+  }
+}

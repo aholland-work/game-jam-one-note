@@ -26,7 +26,7 @@ const SPOKEN_NAMES = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 
 // Computer keyboard shortcuts, in semitone order (the usual music-app layout).
 const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
-/** A one-octave piano with note names on the keys. */
+/** A one-octave piano with note names and computer-keyboard shortcuts on the keys. */
 export function Piano({ startMidi, selectedMidi, selectedTone = 'selected', playingMidi = null, onPress }: PianoProps) {
   const [pressed, setPressed] = useState<number | null>(null)
   const releaseTimer = useRef(0)
@@ -87,6 +87,7 @@ export function Piano({ startMidi, selectedMidi, selectedTone = 'selected', play
             }}
             style={{ left: `${(i / 7) * 100}%` }}
           >
+            <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>
             <span className="piano-label">{NOTE_NAMES[semitone]}</span>
           </button>
         )
@@ -112,6 +113,7 @@ export function Piano({ startMidi, selectedMidi, selectedTone = 'selected', play
             }}
             style={{ left: `${(afterWhite / 7) * 100}%` }}
           >
+            <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>
             <span className="piano-label">{NOTE_NAMES[semitone]}</span>
           </button>
         )

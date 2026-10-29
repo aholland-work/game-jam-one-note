@@ -20,7 +20,7 @@ type TutorialStep = 'play' | 'keys' | 'lock' | 'done'
 
 const TUTORIAL_TEXT: Record<TutorialStep, string> = {
   play: 'Press ▶ Play to hear the melody. The dashed box on the staff is the missing note.',
-  keys: 'Tap the piano keys (or type A S D F G H J) to hear notes. Look for the one that fills the gap, and replay the melody as often as you like.',
+  keys: 'Tap the piano keys, or type the letters shown on them, to hear notes. Look for the one that fills the gap, and replay the melody as often as you like.',
   lock: "Found it? Make sure that key is selected, then press Lock in. You only get one answer, so take your time.",
   done: "That's the game! The notes slide to their real spots as the song plays. Pick another song whenever you're ready.",
 }
@@ -314,6 +314,15 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
           onPress={pressKey}
         />
       </div>
+      <p className="round-shortcuts">
+        Keyboard: press the letter on a key to play it
+        {!isOver && (
+          <>
+            {' · '}
+            <kbd>Space</kbd> plays and pauses the melody
+          </>
+        )}
+      </p>
     </section>
   )
 }

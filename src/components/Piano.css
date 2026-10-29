@@ -13,8 +13,10 @@
   top: 0;
   padding: 0 0 10px;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
   transition:
     background-color 120ms,
     transform 80ms;
@@ -123,4 +125,29 @@
 .piano-black .piano-label {
   font-size: 11px;
   color: #d3d1c7;
+}
+
+/* Faint keycap showing which computer key plays this piano key. */
+.piano-kbd {
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 1;
+  min-width: 16px;
+  padding: 2px 3px;
+  border: 1px solid #d3d1c7;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: #888780;
+  pointer-events: none;
+}
+
+.piano-black .piano-kbd {
+  border-color: #5f5e5a;
+  color: #b4b2a9;
+}
+
+@media (hover: none) {
+  .piano-kbd {
+    display: none;
+  }
 }
