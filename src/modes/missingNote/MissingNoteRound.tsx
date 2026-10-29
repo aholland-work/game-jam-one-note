@@ -33,6 +33,10 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const correctionTimer = useRef(0)
   // The melody currently sounding, so the piano can light up each note as it plays.
   const [playingNotes, setPlayingNotes] = useState<Note[] | null>(null)
+  const [playingTry, setPlayingTry] = useState(false)
+  // A melody paused while guessing. A paused try keeps its own note, so resuming it
+  // can't be used to test a different key for free.
+  const [paused, setPaused] = useState<{ notes: Note[]; index: number; isTry: boolean } | null>(null)
 
   const answer = answerMidi(song)
   const isOver = status !== 'guessing'
@@ -41,11 +45,16 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const resultTone = showingWrongNote ? 'missed' : 'found'
   const resultPlaying = isOver && (playingNotes !== null || awaitingCorrection)
   const playingMidi = playingNotes && activeIndex !== null ? playingNotes[activeIndex]?.midi ?? null : null
+  const guessPlaying = !isOver && playingNotes !== null
 
-  const play = (notes: Note[], { reveal = false, onComplete }: { reveal?: boolean; onComplete?: () => void } = {}) => {
+  const play = (
+    notes: Note[],
+    { reveal = false, startIndex = 0, onComplete }: { reveal?: boolean; startIndex?: number; onComplete?: () => void } = {},
+  ) => {
     // Starting a melody stops the previous one, whose onEnd clears state; set ours afterwards.
     audioEngine.playMelody(notes, {
       bpm: song.bpm,
+      startIndex,
       onNote: (index) => {
         setActiveIndex(index)
         if (reveal) setRevealedCount(index + 1)
@@ -59,8 +68,35 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     setPlayingNotes(notes)
   }
 
-  const playWithGap = () => play(withGap(song.melody, song.missingIndex))
-  const onSpace = useEffectEvent(playWithGap)
+  const playWithGap = () => {
+    setPaused(null)
+    setPlayingTry(false)
+    play(withGap(song.melody, song.missingIndex))
+  }
+
+  const pause = () => {
+    if (!playingNotes) return
+    const index = activeIndex ?? 0
+    audioEngine.stop()
+    setPaused({ notes: playingNotes, index, isTry: playingTry })
+    // Keep the highlight on the note where playback stopped.
+    setActiveIndex(index)
+  }
+
+  const resume = (fromStart = false) => {
+    if (!paused) return
+    setPaused(null)
+    setPlayingTry(paused.isTry)
+    play(paused.notes, { startIndex: fromStart ? 0 : paused.index })
+  }
+
+  // Space plays, pauses and resumes while guessing.
+  const onSpace = useEffectEvent(() => {
+    if (isOver) return
+    if (guessPlaying) pause()
+    else if (paused) resume()
+    else playWithGap()
+  })
 
   const playComplete = () => {
     window.clearTimeout(correctionTimer.current)
@@ -99,11 +135,14 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     const remaining = triesLeft - 1
     setTriesLeft(remaining)
     setHint(remaining === 0 ? 'That was your last try.' : `Tries left: ${remaining}`)
+    setPaused(null)
+    setPlayingTry(true)
     play(withGuess(song.melody, song.missingIndex, selectedMidi))
   }
 
   const lockIn = () => {
     if (selectedMidi === null) return setHint('Pick a piano key before you lock in.')
+    setPaused(null)
     if (selectedMidi === answer) {
       setStatus('found')
       setHint('You found it!')
@@ -123,7 +162,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     })
   }
 
-  // Space replays the melody, unless a button has focus (it handles Space itself).
+  // Space acts on the melody, unless a button has focus (it handles Space itself).
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== ' ' || event.target instanceof HTMLButtonElement) return
@@ -185,9 +224,24 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
         </div>
       ) : (
         <div className="round-controls">
-          <button type="button" onClick={playWithGap}>
-            Play
-          </button>
+          {guessPlaying ? (
+            <button type="button" onClick={pause}>
+              ⏸ Pause
+            </button>
+          ) : paused ? (
+            <>
+              <button type="button" onClick={() => resume()}>
+                {paused.isTry ? '▶ Resume try' : '▶ Resume'}
+              </button>
+              <button type="button" onClick={() => resume(true)}>
+                {paused.isTry ? '⟲ Restart try' : '⟲ From the start'}
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={playWithGap}>
+              ▶ Play
+            </button>
+          )}
           <button type="button" onClick={tryIt}>
             Try it
           </button>

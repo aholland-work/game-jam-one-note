@@ -2,6 +2,8 @@ import { midiToFrequency, type Note } from '../music/notation'
 
 export interface PlayMelodyOptions {
   bpm: number
+  /** Start partway through, at this note index (e.g. to resume after pausing). */
+  startIndex?: number
   /** Called when each note (rests included) starts sounding, in sync with the audio. */
   onNote?: (index: number) => void
   /** Called once, when the melody finishes (`completed`) or is stopped early. */
@@ -49,7 +51,7 @@ class AudioEngine {
   }
 
   /** Plays a melody, stopping anything already playing. */
-  playMelody(notes: Note[], { bpm, onNote, onEnd }: PlayMelodyOptions): Playback {
+  playMelody(notes: Note[], { bpm, startIndex = 0, onNote, onEnd }: PlayMelodyOptions): Playback {
     this.current?.stop()
     const { context } = this.ensureContext()
 
@@ -59,8 +61,12 @@ class AudioEngine {
     const sources: OscillatorNode[] = []
     let time = origin
     notes.forEach((note, i) => {
+      if (i < startIndex) {
+        starts.push(-Infinity)
+        return
+      }
       starts.push(time)
-      const tiedFromPrevious = i > 0 && notes[i - 1].tie && notes[i - 1].midi === note.midi
+      const tiedFromPrevious = i > startIndex && notes[i - 1].tie && notes[i - 1].midi === note.midi
       if (note.midi !== null && !tiedFromPrevious) {
         // A tied chain sounds as one held note.
         let beats = note.beats
@@ -71,7 +77,7 @@ class AudioEngine {
     })
     const end = time
 
-    let nextIndex = 0
+    let nextIndex = startIndex
     let frame = 0
     let finished = false
     const finish = (completed: boolean) => {
