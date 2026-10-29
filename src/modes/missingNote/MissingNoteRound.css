@@ -1,0 +1,72 @@
+.round {
+  display: grid;
+  gap: 1rem;
+}
+
+.round-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.round-header h2 {
+  margin: 0;
+}
+
+.round-genre {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.round-hint {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--text-muted);
+}
+
+.round-hint.is-found {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.round-hint.is-missed {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.round-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.round-spacer {
+  flex: 1;
+}
+
+.round-lock {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.round-tries {
+  display: inline-flex;
+  gap: 5px;
+  margin-left: 4px;
+}
+
+.round-tries span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+.round-tries span.is-left {
+  background: var(--accent);
+  border-color: var(--accent);
+}

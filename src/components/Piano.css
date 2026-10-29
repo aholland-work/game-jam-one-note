@@ -1,0 +1,82 @@
+.piano {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: 170px;
+  margin: 0 auto;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.piano-key {
+  position: absolute;
+  top: 0;
+  padding: 0 0 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition:
+    background-color 120ms,
+    transform 80ms;
+}
+
+.piano-white {
+  width: calc(100% / 7);
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #888780;
+  border-radius: 0 0 8px 8px;
+  z-index: 1;
+}
+
+.piano-black {
+  width: calc(100% / 7 * 0.6);
+  height: 60%;
+  transform: translateX(-50%);
+  background: #2c2c2a;
+  border: 1px solid #2c2c2a;
+  border-radius: 0 0 6px 6px;
+  z-index: 2;
+}
+
+.piano-white:hover {
+  background: #f4f3ef;
+}
+
+.piano-black:hover {
+  background: #444441;
+}
+
+.piano-white.is-selected {
+  background: #cecbf6;
+  border-color: #534ab7;
+}
+
+.piano-black.is-selected {
+  background: #534ab7;
+  border-color: #534ab7;
+}
+
+.piano-white.is-pressed {
+  background: #afa9ec;
+}
+
+.piano-black.is-pressed {
+  background: #7f77dd;
+}
+
+.piano-shortcut {
+  font-size: 11px;
+  color: #888780;
+  pointer-events: none;
+}
+
+.piano-black .piano-shortcut {
+  color: #b4b2a9;
+}
+
+@media (hover: none) {
+  .piano-shortcut {
+    display: none;
+  }
+}

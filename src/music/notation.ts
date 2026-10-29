@@ -1,6 +1,8 @@
 export interface Note {
   /** MIDI note number (60 = middle C), or null for a rest. */
   midi: number | null
+  /** Spelled pitch as written ("D#5"), used to place the note on the staff. Null for a rest. */
+  pitch: string | null
   /** Length in beats, where a quarter note is 1. */
   beats: number
 }
@@ -23,13 +25,37 @@ const DURATION_BEATS: Record<string, number> = {
   s: 0.25,
 }
 
-/** Converts scientific pitch notation ("C4", "D#5", "Bb3") to a MIDI number. */
-export function pitchToMidi(pitch: string): number {
+const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+export interface PitchParts {
+  letter: string
+  accidental: '#' | 'b' | ''
+  octave: number
+}
+
+export function parsePitch(pitch: string): PitchParts {
   const match = /^([A-G])(#|b)?(\d)$/.exec(pitch)
   if (!match) throw new Error(`Invalid pitch "${pitch}"`)
-  const [, letter, accidental, octave] = match
+  const [, letter, accidental = '', octave] = match
+  return { letter, accidental: accidental as PitchParts['accidental'], octave: Number(octave) }
+}
+
+/** Converts scientific pitch notation ("C4", "D#5", "Bb3") to a MIDI number. */
+export function pitchToMidi(pitch: string): number {
+  const { letter, accidental, octave } = parsePitch(pitch)
   const offset = accidental === '#' ? 1 : accidental === 'b' ? -1 : 0
-  return (Number(octave) + 1) * 12 + LETTER_SEMITONES[letter] + offset
+  return (octave + 1) * 12 + LETTER_SEMITONES[letter] + offset
+}
+
+/** Spells a MIDI number with sharps, e.g. 63 -> "D#4". */
+export function midiToPitch(midi: number): string {
+  return `${SHARP_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`
+}
+
+/** Position on the staff counted in letter steps (C4 = 28, E4 = 30), ignoring accidentals. */
+export function diatonicStep(pitch: string): number {
+  const { letter, octave } = parsePitch(pitch)
+  return octave * 7 + 'CDEFGAB'.indexOf(letter)
 }
 
 export function midiToFrequency(midi: number): number {
@@ -56,8 +82,10 @@ export function parseMelody(text: string): Note[] {
     .map((token) => {
       const [pitch, duration] = token.split('/')
       if (!duration) throw new Error(`Missing duration in "${token}"`)
+      const isRest = pitch === 'r'
       return {
-        midi: pitch === 'r' ? null : pitchToMidi(pitch),
+        midi: isRest ? null : pitchToMidi(pitch),
+        pitch: isRest ? null : pitch,
         beats: parseDuration(duration),
       }
     })
