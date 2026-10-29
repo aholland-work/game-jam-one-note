@@ -242,14 +242,18 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
               ▶ Play
             </button>
           )}
-          <button type="button" onClick={tryIt}>
-            Try it
-          </button>
-          <span className="round-tries" aria-label={`${triesLeft} of ${MAX_TRIES} tries left`}>
-            {Array.from({ length: MAX_TRIES }, (_, i) => (
-              <span key={i} className={i < triesLeft ? 'is-left' : ''} />
-            ))}
-          </span>
+          {MAX_TRIES > 0 && (
+            <>
+              <button type="button" onClick={tryIt}>
+                Try it
+              </button>
+              <span className="round-tries" aria-label={`${triesLeft} of ${MAX_TRIES} tries left`}>
+                {Array.from({ length: MAX_TRIES }, (_, i) => (
+                  <span key={i} className={i < triesLeft ? 'is-left' : ''} />
+                ))}
+              </span>
+            </>
+          )}
           <span className="round-spacer" />
           <button type="button" className="round-lock" onClick={lockIn}>
             Lock in
