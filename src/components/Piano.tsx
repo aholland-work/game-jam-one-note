@@ -17,10 +17,12 @@ const BLACK_KEYS = [
   { semitone: 8, afterWhite: 5 },
   { semitone: 10, afterWhite: 6 },
 ]
+const NOTE_NAMES = ['C', 'C\u266F', 'D', 'D\u266F', 'E', 'F', 'F\u266F', 'G', 'G\u266F', 'A', 'A\u266F', 'B']
+const SPOKEN_NAMES = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 'G sharp', 'A', 'A sharp', 'B']
 // Computer keyboard shortcuts, in semitone order (the usual music-app layout).
 const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
-/** A one-octave piano. Keys carry no note names; players go by ear. */
+/** A one-octave piano with note names on the keys. */
 export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
   const [pressed, setPressed] = useState<number | null>(null)
   const releaseTimer = useRef(0)
@@ -58,7 +60,7 @@ export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
             key={semitone}
             type="button"
             className={keyClass('piano-key piano-white', midi)}
-            aria-label={`Piano key ${semitone + 1}`}
+            aria-label={SPOKEN_NAMES[semitone]}
             aria-pressed={midi === selectedMidi}
             onPointerDown={(event) => {
               event.preventDefault()
@@ -72,7 +74,7 @@ export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
             }}
             style={{ left: `${(i / 7) * 100}%` }}
           >
-            <span className="piano-shortcut">{SHORTCUTS[semitone].toUpperCase()}</span>
+            <span className="piano-label">{NOTE_NAMES[semitone]}</span>
           </button>
         )
       })}
@@ -83,7 +85,7 @@ export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
             key={semitone}
             type="button"
             className={keyClass('piano-key piano-black', midi)}
-            aria-label={`Piano key ${semitone + 1}`}
+            aria-label={SPOKEN_NAMES[semitone]}
             aria-pressed={midi === selectedMidi}
             onPointerDown={(event) => {
               event.preventDefault()
@@ -97,7 +99,7 @@ export function Piano({ startMidi, selectedMidi, onPress }: PianoProps) {
             }}
             style={{ left: `${(afterWhite / 7) * 100}%` }}
           >
-            <span className="piano-shortcut">{SHORTCUTS[semitone].toUpperCase()}</span>
+            <span className="piano-label">{NOTE_NAMES[semitone]}</span>
           </button>
         )
       })}

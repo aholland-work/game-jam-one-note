@@ -65,18 +65,14 @@
   background: #7f77dd;
 }
 
-.piano-shortcut {
-  font-size: 11px;
-  color: #888780;
+.piano-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5f5e5a;
   pointer-events: none;
 }
 
-.piano-black .piano-shortcut {
-  color: #b4b2a9;
-}
-
-@media (hover: none) {
-  .piano-shortcut {
-    display: none;
-  }
+.piano-black .piano-label {
+  font-size: 11px;
+  color: #d3d1c7;
 }
