@@ -4,6 +4,29 @@ A music puzzle game for the "Only One" game jam. A short, well-known melody is m
 
 All songs are public-domain melodies.
 
+## The jam theme: "Only One"
+
+> Your game is built around something there's **only one** of — only one life, one button, one room, one enemy, one color... whatever you dream up.
+
+**Why this theme**
+
+- A single word that's easy to grasp — no staring at a blank page trying to decode it.
+- It naturally keeps scope small, which is exactly what you want in a single day.
+- It rewards a clever idea over technical firepower, so anyone can shine.
+- Easy floor, high ceiling — a first-timer can finish something, and an ambitious take can still wow.
+
+**Ways people might interpret it**
+
+- **Only one life** — permadeath; one mistake and it's over.
+- **Only one button** — the whole game controlled by a single key.
+- **Only one enemy** — a boss fight that's the entire game.
+- **Only one room** — everything happens on a single screen.
+- **Only one color** — a monochrome visual constraint.
+- **Only one bullet** — fire once, then chase it down to reuse it.
+- **Only one of you** — no clones or reinforcements; the last one standing.
+
+**Our take: only one note.** Each melody is missing exactly one note, and you get exactly one answer to find it.
+
 ## Run it
 
 ```bash
