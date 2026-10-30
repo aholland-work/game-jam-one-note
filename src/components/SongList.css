@@ -33,10 +33,10 @@
 .song-card:hover:not(:disabled) { background: var(--accent-soft); border-bottom-color: var(--accent); }
 .song-card-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.88rem; font-weight: 600; }
 .song-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); }
-.song-card-difficulty { font-size: 0.7rem; }
-.song-card-difficulty.is-easy { color: var(--success); }
-.song-card-difficulty.is-medium { color: var(--accent); }
-.song-card-difficulty.is-hard { color: var(--warning); }
+.song-card-difficulty { display: inline-flex; align-items: center; flex: none; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; line-height: 1.5; }
+.song-card-difficulty.is-easy { color: var(--success); background: var(--success-soft); }
+.song-card-difficulty.is-medium { color: var(--accent); background: var(--accent-soft); }
+.song-card-difficulty.is-hard { color: var(--warning); background: var(--warning-soft); }
 .song-card-solved { color: var(--success); font-weight: 700; }
 .song-card.is-solved::before { color: var(--success); }
 .song-list-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
