@@ -8,9 +8,13 @@
 }
 
 .echo-tip {
-  margin: -0.5rem 0 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  margin: 0;
+  padding: 10px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  background: var(--accent-soft);
+  font-size: 0.95rem;
+  font-style: italic;
 }
 
 .echo-new-key {

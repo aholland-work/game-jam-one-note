@@ -279,7 +279,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
 
       <p className={`round-hint${result ? ` is-${result}` : ''}`} role="status">
         {hint ??
-          `The ${keyName(key)} chord sets home base (the 1). Which number is the mystery note? Tap keys to compare, then lock in.`}
+          `The ${keyName(key)} chord sets home base (the 1). Which number is the mystery note?`}
       </p>
 
       <div className="round-controls">
