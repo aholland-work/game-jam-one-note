@@ -1,16 +1,19 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
+import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
-import { usesFlats, type Note } from '../../music/notation'
+import { usesFlats } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import '../round.css'
 
 type Status = 'guessing' | 'found' | 'missed'
+// What's playing: the melody with its gap, a try with the player's note, or the result.
+type Playback = 'gap' | 'try' | 'result'
 
 // Pause between hearing a wrong answer and hearing the right one.
 const CORRECTION_PAUSE_MS = 700
@@ -35,12 +38,11 @@ interface MissingNoteRoundProps {
   onNext: (() => void) | null
 }
 
-/** One Missing Note puzzle: listen, test keys, use up to three tries, lock in one answer. */
+/** One Missing Note puzzle: listen, test keys on the piano, lock in one answer. */
 export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState(DEFAULT_HINT)
   // Remembered across songs, so players who like the shortcuts keep seeing them.
@@ -50,71 +52,29 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const [showingWrongNote, setShowingWrongNote] = useState(false)
   const [awaitingCorrection, setAwaitingCorrection] = useState(false)
   const correctionTimer = useRef(0)
-  // The melody currently sounding, so the piano can light up each note as it plays.
-  const [playingNotes, setPlayingNotes] = useState<Note[] | null>(null)
-  const [playingTry, setPlayingTry] = useState(false)
-  // A melody paused while guessing. A paused try keeps its own note, so resuming it
-  // can't be used to test a different key for free.
-  const [paused, setPaused] = useState<{ notes: Note[]; index: number; isTry: boolean } | null>(null)
+  // A paused try keeps its own melody, so resuming it can't test a different key for free.
+  const player = useMelodyPlayer<Playback>(song.bpm)
 
   const answer = answerMidi(song)
   const isOver = status !== 'guessing'
   // Once the round is over, the piano and message follow what's on the staff:
   // orange while the wrong note plays, green once the right note is shown.
   const resultTone = showingWrongNote ? 'missed' : 'found'
-  const resultPlaying = isOver && (playingNotes !== null || awaitingCorrection)
-  const playingMidi = playingNotes && activeIndex !== null ? playingNotes[activeIndex]?.midi ?? null : null
-  const guessPlaying = !isOver && playingNotes !== null
-
-  const play = (
-    notes: Note[],
-    { reveal = false, startIndex = 0, onComplete }: { reveal?: boolean; startIndex?: number; onComplete?: () => void } = {},
-  ) => {
-    // Starting a melody stops the previous one, whose onEnd clears state; set ours afterwards.
-    audioEngine.playMelody(notes, {
-      bpm: song.bpm,
-      startIndex,
-      onNote: (index) => {
-        setActiveIndex(index)
-        if (reveal) setRevealedCount(index + 1)
-      },
-      onEnd: (completed) => {
-        setActiveIndex(null)
-        setPlayingNotes(null)
-        if (completed) onComplete?.()
-      },
-    })
-    setPlayingNotes(notes)
-  }
+  const resultPlaying = isOver && (player.playing !== null || awaitingCorrection)
+  const playingMidi =
+    player.playingNotes && player.activeIndex !== null ? player.playingNotes[player.activeIndex]?.midi ?? null : null
+  const guessPlaying = !isOver && player.playing !== null
 
   const playWithGap = () => {
     if (tutorialStep === 'play') setTutorialStep('keys')
-    setPaused(null)
-    setPlayingTry(false)
-    play(withGap(song.melody, song.missingIndex))
-  }
-
-  const pause = () => {
-    if (!playingNotes) return
-    const index = activeIndex ?? 0
-    audioEngine.stop()
-    setPaused({ notes: playingNotes, index, isTry: playingTry })
-    // Keep the highlight on the note where playback stopped.
-    setActiveIndex(index)
-  }
-
-  const resume = (fromStart = false) => {
-    if (!paused) return
-    setPaused(null)
-    setPlayingTry(paused.isTry)
-    play(paused.notes, { startIndex: fromStart ? 0 : paused.index })
+    player.play('gap', withGap(song.melody, song.missingIndex))
   }
 
   // Space plays, pauses and resumes while guessing.
   const onSpace = useEffectEvent(() => {
     if (isOver) return
-    if (guessPlaying) pause()
-    else if (paused) resume()
+    if (guessPlaying) player.pause()
+    else if (player.paused) player.resume()
     else playWithGap()
   })
 
@@ -122,20 +82,20 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     window.clearTimeout(correctionTimer.current)
     setShowingWrongNote(false)
     setRevealedCount(0)
-    play(song.melody, { reveal: true })
+    player.play('result', song.melody, { onNote: (index) => setRevealedCount(index + 1) })
   }
 
   const playCorrection = () => {
     setShowingWrongNote(false)
     setAwaitingCorrection(false)
     setHint("…and here's how it really goes.")
-    play(song.melody)
+    player.play('result', song.melody)
   }
 
   /** Cuts the result playback short and jumps to the finished, corrected staff. */
   const stopResult = () => {
     window.clearTimeout(correctionTimer.current)
-    audioEngine.stop()
+    player.stop()
     if (showingWrongNote || awaitingCorrection) {
       setShowingWrongNote(false)
       setAwaitingCorrection(false)
@@ -157,14 +117,11 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     const remaining = triesLeft - 1
     setTriesLeft(remaining)
     setHint(remaining === 0 ? 'That was your last try.' : `Tries left: ${remaining}`)
-    setPaused(null)
-    setPlayingTry(true)
-    play(withGuess(song.melody, song.missingIndex, selectedMidi))
+    player.play('try', withGuess(song.melody, song.missingIndex, selectedMidi))
   }
 
   const lockIn = () => {
     if (selectedMidi === null) return setHint('Pick a piano key before you lock in.')
-    setPaused(null)
     if (tutorialStep) {
       setTutorialStep('done')
       markTutorialSeen()
@@ -180,8 +137,8 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     setAwaitingCorrection(true)
     setHint("Not quite. Here's how your note sounds…")
     setRevealedCount(0)
-    play(withGuess(song.melody, song.missingIndex, selectedMidi), {
-      reveal: true,
+    player.play('result', withGuess(song.melody, song.missingIndex, selectedMidi), {
+      onNote: (index) => setRevealedCount(index + 1),
       onComplete: () => {
         correctionTimer.current = window.setTimeout(playCorrection, CORRECTION_PAUSE_MS)
       },
@@ -197,6 +154,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
   const coached = (step: TutorialStep) => (tutorialStep === step ? 'is-coached' : '')
 
   // Space acts on the melody, unless a button has focus (it handles Space itself).
+  // The player stops any sound when the round closes.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== ' ' || event.target instanceof HTMLButtonElement) return
@@ -207,7 +165,6 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.clearTimeout(correctionTimer.current)
-      audioEngine.stop()
     }
   }, [])
 
@@ -233,7 +190,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
         revealedCount={revealedCount}
         showAnswer={isOver}
         answerTone={resultTone}
-        activeIndex={activeIndex}
+        activeIndex={player.activeIndex}
       />
 
       {/* While coaching, the generic hint would repeat the tutorial, so only show real messages. */}
@@ -273,16 +230,16 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
       ) : (
         <div className="round-controls">
           {guessPlaying ? (
-            <button type="button" onClick={pause}>
+            <button type="button" onClick={player.pause}>
               ⏸ Pause <PlayingBars />
             </button>
-          ) : paused ? (
+          ) : player.paused ? (
             <>
-              <button type="button" onClick={() => resume()}>
-                {paused.isTry ? '▶ Resume try' : '▶ Resume'}
+              <button type="button" onClick={() => player.resume()}>
+                {player.paused === 'try' ? '▶ Resume try' : '▶ Resume'}
               </button>
-              <button type="button" onClick={() => resume(true)}>
-                {paused.isTry ? '⟲ Restart try' : '⟲ From the start'}
+              <button type="button" onClick={() => player.resume(true)}>
+                {player.paused === 'try' ? '⟲ Restart try' : '⟲ From the start'}
               </button>
             </>
           ) : (
