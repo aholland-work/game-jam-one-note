@@ -173,7 +173,10 @@
 }
 
 .round-shortcuts-option input {
-  margin: 0.2rem 0 0;
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin: 0.3rem 0 0;
   accent-color: var(--accent);
 }
 
