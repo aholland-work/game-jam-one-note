@@ -74,13 +74,9 @@
   .song-card { padding-left: 27px; }
 }
 
-/* Larger home controls; keep the round's compact instrument header unchanged. */
+/* Larger home controls. MIDI sizing is shared in MidiControl.css. */
 .song-list .icon { width: 1.125rem; height: 1.125rem; vertical-align: -0.2em; }
 .song-list .settings-button { font-size: 0.875rem; }
-.app:has(.song-list) .midi-button { display: inline-flex; align-items: center; gap: 8px; font-size: 0.8125rem; text-align: left; }
-.app:has(.song-list) .midi-button .icon { width: 18px; height: 18px; flex: none; margin: 0; }
-.app:has(.song-list) .midi-heard { margin-left: 0; }
-.app:has(.song-list) .midi-panel { font-size: 0.875rem; }
 .app:has(.song-list) .app-footer { font-size: 0.875rem; }
 @media (min-width: 650px) {
   .app:has(.song-list) .app-brand { font-size: 1.125rem; }
