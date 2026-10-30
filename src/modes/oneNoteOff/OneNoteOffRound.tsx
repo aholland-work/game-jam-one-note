@@ -1,8 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import { audioEngine } from '../../audio/engine'
+import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { Icon } from '../../components/Icon'
+import { MidiControl } from '../../components/MidiControl'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff, type NoteMark } from '../../components/Staff'
@@ -292,9 +293,10 @@ export function OneNoteOffRound({
           selectedMidi={null}
           // Lighting keys while guessing would point at the changed note, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}
-          onPress={(midi) => audioEngine.playNote(midi)}
+          onPress={(midi, fromMidi) => midiInput.playKey(midi, fromMidi)}
         />
       </div>
+      <MidiControl />
     </section>
   )
 }

@@ -8,6 +8,8 @@ A music puzzle game for the "Only One" game jam, with three modes:
 
 When a round ends, the staff turns into the real sheet music as the melody plays.
 
+You can play the piano with the mouse, your computer keyboard, or a MIDI instrument (keyboard or wind controller) in Chrome, Edge or Firefox: press **Connect a MIDI instrument** under the piano. For a transposing instrument like a saxophone, choose the key it reads music in so your notes land on the right piano key. On a Mac, pair Bluetooth MIDI instruments first in Audio MIDI Setup (Window → Show MIDI Studio → Bluetooth).
+
 All songs are public-domain melodies. The musical note icon is from [Twemoji](https://github.com/twitter/twemoji) (© Twitter, Inc and other contributors), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The piano sound uses samples from the [Salamander Grand Piano](https://github.com/sfzinstruments/SalamanderGrandPiano) by Alexander Holm, licensed under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) (MP3 versions from [Tone.js](https://github.com/Tonejs/audio)), in `public/samples/piano/`.
 
 ## The jam theme: "Only One"

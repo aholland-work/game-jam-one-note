@@ -1,0 +1,47 @@
+.midi-control {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.midi-control button {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.midi-control select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+.midi-control-note {
+  margin: 0;
+  text-align: center;
+}
+
+.midi-control-device {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.midi-control-heard {
+  margin-left: 8px;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.midi-control .midi-control-off {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--text-muted);
+  text-decoration: underline;
+}

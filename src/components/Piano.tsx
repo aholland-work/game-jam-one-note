@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from 'react'
+import { foldIntoPiano, useMidiNotes } from '../audio/midi'
 import './Piano.css'
 
 /** A number shown on a key, e.g. its step in a scale, and whether it's tinted as a possible answer. */
@@ -23,7 +24,8 @@ interface PianoProps {
   flats?: boolean
   /** Numbers to show on keys, by MIDI note. A "1" marks home and gets a stronger tint. */
   degrees?: Partial<Record<number, KeyDegree>>
-  onPress: (midi: number) => void
+  /** A key was pressed: clicked, typed, or played on a connected MIDI instrument. */
+  onPress: (midi: number, fromMidi: boolean) => void
 }
 
 const WHITE_SEMITONES = [0, 2, 4, 5, 7, 9, 11]
@@ -57,8 +59,8 @@ export function Piano({
   const [pressed, setPressed] = useState<number | null>(null)
   const releaseTimer = useRef(0)
 
-  const press = (midi: number) => {
-    onPress(midi)
+  const press = (midi: number, fromMidi = false) => {
+    onPress(midi, fromMidi)
     setPressed(midi)
     window.clearTimeout(releaseTimer.current)
     releaseTimer.current = window.setTimeout(() => setPressed(null), 180)
@@ -77,6 +79,9 @@ export function Piano({
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
+
+  // A note played on a MIDI instrument presses the same-named key, in whatever octave.
+  useMidiNotes((midi) => press(foldIntoPiano(midi, startMidi, octaves), true))
 
   const span = 12 * octaves
   const playingKey =

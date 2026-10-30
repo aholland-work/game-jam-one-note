@@ -1,8 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import { audioEngine } from '../../audio/engine'
+import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { Icon } from '../../components/Icon'
+import { MidiControl } from '../../components/MidiControl'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
@@ -107,8 +108,8 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
     setRevealedCount(song.melody.length)
   }
 
-  const pressKey = (midi: number) => {
-    audioEngine.playNote(midi)
+  const pressKey = (midi: number, fromMidi: boolean) => {
+    midiInput.playKey(midi, fromMidi)
     if (isOver) return
     setSelectedMidi(midi)
     if (tutorialStep === 'keys') setTutorialStep('lock')
@@ -305,6 +306,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
           </li>
         </ul>
       </details>
+      <MidiControl />
     </section>
   )
 }
