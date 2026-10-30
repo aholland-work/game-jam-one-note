@@ -46,10 +46,19 @@ export function ThemeToggle() {
   }
 
   return (
-    <button type="button" className="theme-toggle" role="switch" aria-checked={theme === 'dark'} onClick={toggle}>
-      <Icon name={theme === 'dark' ? 'moon' : 'sun'} />
-      <span>Dark mode</span>
-      <span className="theme-toggle-track" aria-hidden="true"><span /></span>
+    <button
+      type="button"
+      className="theme-toggle"
+      role="switch"
+      aria-label="Dark mode"
+      aria-checked={theme === 'dark'}
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      onClick={toggle}
+    >
+      <span className="theme-toggle-glyph" aria-hidden="true">
+        <span className="theme-toggle-sun"><Icon name="sun" /></span>
+        <span className="theme-toggle-moon"><Icon name="moon" /></span>
+      </span>
     </button>
   )
 }
