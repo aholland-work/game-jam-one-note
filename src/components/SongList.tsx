@@ -73,7 +73,6 @@ export function SongList({
       <div className="song-list-hero" aria-hidden="true">
         <div>
           <p className="song-list-wordmark">ONE<span>NOTE.</span></p>
-          <p className="song-list-tagline">ONLY ONE NOTE.</p>
         </div>
         <div className="piano-sculpture">
           {Array.from({ length: 7 }, (_, i) => <i key={i} className="piano-sculpture-key" />)}
