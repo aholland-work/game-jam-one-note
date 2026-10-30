@@ -14,4 +14,8 @@ export const twinkleTwinkle: Song = {
   `),
   // The jump up on the second "twin-".
   missingIndex: 2,
+  source: {
+    url: 'https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/demo/Tunes/AhVousDiraiJeMaman/0000',
+    notes: "First four bars, unchanged (Musica Viva ABC transcription of \"Ah! vous dirai-je, maman\").",
+  },
 }

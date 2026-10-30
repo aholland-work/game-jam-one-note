@@ -14,4 +14,8 @@ export const takeMeOut: Song = {
   `),
   // The octave leap up on "me".
   missingIndex: 1,
+  source: {
+    url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/TAKEBALL/0000',
+    notes: "Chorus, bars 1-4, transposed from D major to C major.",
+  },
 }

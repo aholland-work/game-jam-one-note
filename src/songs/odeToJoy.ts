@@ -14,4 +14,8 @@ export const odeToJoy: Song = {
   `),
   // The G at the top of the opening phrase.
   missingIndex: 3,
+  source: {
+    url: 'https://www.mutopiaproject.org/ftp/BeethovenLv/ode/ode.ly',
+    notes: "Soprano, bars 1-4, transposed from G major to C major.",
+  },
 }

@@ -17,4 +17,10 @@ export interface Song {
   melody: Note[]
   /** Index into `melody` of the note the player has to find. */
   missingIndex: number
+  /** The public-domain transcription this melody was checked against, note by note. */
+  source: {
+    url: string
+    /** Which bars were used and anything changed from the source (key, octave, rhythm). */
+    notes: string
+  }
 }

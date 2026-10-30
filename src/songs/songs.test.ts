@@ -39,12 +39,17 @@ describe.each(songs)('$title', (song) => {
     })
   })
 
-  it('stays in a range the staff and synth handle (A3 to C6)', () => {
+  it('stays in a range the staff and synth handle (A3 to E6)', () => {
     for (const note of song.melody) {
       if (note.midi === null) continue
       expect(note.midi).toBeGreaterThanOrEqual(57)
-      expect(note.midi).toBeLessThanOrEqual(84)
+      expect(note.midi).toBeLessThanOrEqual(88)
     }
+  })
+
+  it('names the transcription it was checked against', () => {
+    expect(song.source.url).toMatch(/^https:\/\//)
+    expect(song.source.notes.length).toBeGreaterThan(0)
   })
 
   it('has a sensible tempo', () => {

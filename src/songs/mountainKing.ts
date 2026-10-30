@@ -15,4 +15,8 @@ export const mountainKing: Song = {
   `),
   // The low note in the third step of the creeping chromatic slide (E, C, E).
   missingIndex: 11,
+  source: {
+    url: 'https://www.mutopiaproject.org/ftp/GriegE/O46/Dans_l_antre_du_roi_de_la_montagne/Dans_l_antre_du_roi_de_la_montagne.ly',
+    notes: "Melody, bars 2-5, moved up from the bass register to fit the treble staff, and slower than the score's quarter = 138.",
+  },
 }
