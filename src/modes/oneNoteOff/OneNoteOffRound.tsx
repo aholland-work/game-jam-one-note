@@ -153,8 +153,7 @@ export function OneNoteOffRound({ song, onBack, onNext }: OneNoteOffRoundProps) 
         pickupBeats={song.pickupBeats}
         revealedCount={revealedCount}
         showAnswer={isOver}
-        // Lighting each note as it plays would point straight at the changed one.
-        activeIndex={isOver ? player.activeIndex : null}
+        activeIndex={player.activeIndex}
         marks={marks}
         onNoteSelect={isOver ? undefined : setSelectedIndex}
       />
