@@ -1,7 +1,11 @@
 import { midiToName } from '../music/notation'
 
-/** How many mystery notes make up a round (endless practice has no limit). */
-export const ROUND_LENGTH = 5
+/** How many mystery notes make up a set (free practice has no limit). */
+export const ROUND_LENGTH = 10
+/** Right answers in a full set that unlock the next level. */
+export const LEVEL_UP_SCORE = 8
+/** The most times in a row the same note can come up. */
+export const MAX_REPEATS = 2
 /** In endless practice with random keys, the key changes after this many notes. */
 export const NOTES_PER_KEY = 10
 
@@ -85,22 +89,38 @@ export const noteInKey = (key: EchoKey, step: number) => key.tonic + step
 export const describeNote = (key: EchoKey, step: number) =>
   `${midiToName(noteInKey(key, step), key.flats)}, the ${degreeName(step)} of ${keyName(key)}`
 
+/** A missed note waiting to come back, at question number `due` (counting from 0). */
+export interface Review {
+  step: number
+  due: number
+}
+
 /**
- * Picks the next mystery note, as half steps above the 1, never the same as the previous
- * one. Notes the player has missed come up more often: each miss adds two extra chances.
+ * Schedules a missed note to come back 2 to 4 questions later. Not straight away: then
+ * "the one I just missed is next" would be a giveaway.
+ */
+export function scheduleReview(reviews: Review[], step: number, question: number, random: () => number = Math.random): Review[] {
+  return [...reviews, { step, due: question + 2 + Math.floor(random() * 3) }]
+}
+
+/**
+ * Picks the mystery note for question number `question`, as half steps above the 1.
+ * A missed note that's due comes back first; otherwise every note is equally likely,
+ * repeats included (up to MAX_REPEATS in a row), so the last answer rules nothing out.
  */
 export function pickEchoNote(
   steps: number[],
-  previous: number | null,
-  misses: Partial<Record<number, number>> = {},
+  recent: number[],
+  reviews: Review[] = [],
+  question = recent.length,
   random: () => number = Math.random,
-): number {
-  const choices = steps.filter((step) => step !== previous)
-  const weights = choices.map((step) => 1 + 2 * (misses[step] ?? 0))
-  let pick = random() * weights.reduce((sum, weight) => sum + weight, 0)
-  for (let i = 0; i < choices.length; i++) {
-    pick -= weights[i]
-    if (pick < 0) return choices[i]
+): { step: number; reviews: Review[] } {
+  const last = recent.slice(-MAX_REPEATS)
+  const allowed = (step: number) => last.length < MAX_REPEATS || last.some((previous) => previous !== step)
+  const dueIndex = reviews.findIndex((review) => review.due <= question && allowed(review.step) && steps.includes(review.step))
+  if (dueIndex !== -1) {
+    return { step: reviews[dueIndex].step, reviews: reviews.filter((_, i) => i !== dueIndex) }
   }
-  return choices[choices.length - 1]
+  const choices = steps.filter(allowed)
+  return { step: choices[Math.floor(random() * choices.length)], reviews }
 }

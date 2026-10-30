@@ -24,11 +24,11 @@ const ECHO_KEY_CHOICES = [
 ] as const
 
 const ECHO_LENGTH_CHOICES = [
-  { id: 'round', label: 'Rounds of 5', about: '5 mystery notes, then your results. Get 4 or more right to unlock the next notes.' },
+  { id: 'round', label: 'Sets of 10', about: '10 mystery notes, then your results. Get 8 or more right to unlock the next notes.' },
   {
     id: 'endless',
-    label: 'Endless practice',
-    about: 'Notes keep coming until you press Finish. Then you see which numbers you missed most.',
+    label: 'Free practice',
+    about: 'No score to hit: notes keep coming until you press Finish, then you see how each number went.',
   },
 ] as const
 
@@ -121,8 +121,8 @@ export function SongList({
                 name and its number, like “C♯, the 3 of A major”.
               </li>
               <li>
-                <strong>Keep going.</strong> Notes you miss come back more often. Score 4 of 5 or better to unlock the
-                next set of notes.
+                <strong>Keep going.</strong> A note you miss comes back a few notes later. Score 8 of 10 or better in a
+                set to unlock the next level.
               </li>
             </ol>
           </div>

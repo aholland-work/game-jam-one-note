@@ -106,3 +106,15 @@
 .echo-progress-mark { position: absolute; top: 4px; left: 0; width: 100%; text-align: center; font-size: 10px; font-weight: 700; }
 .echo-progress .is-found .echo-progress-mark { color: var(--success); }
 .echo-progress .is-missed .echo-progress-mark { color: var(--warning); }
+
+.echo-position { display: flex; align-items: center; gap: 14px; }
+.echo-position-text { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+.echo-by-step { border-collapse: collapse; width: auto; min-width: 260px; font-size: 0.95rem; }
+.echo-by-step caption { text-align: left; font-weight: 600; padding-bottom: 6px; }
+.echo-by-step th, .echo-by-step td { text-align: left; padding: 6px 24px 6px 0; border-bottom: 1px solid var(--border); }
+.echo-by-step thead th { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+.echo-by-step tbody th { font-weight: 600; }
+.echo-by-step tr.is-missed td { color: var(--warning); font-weight: 600; }
+.echo-each summary { cursor: pointer; font-size: 0.9rem; color: var(--text-muted); }
+.echo-each summary:hover { color: var(--accent); }
+.echo-practice-note { margin: 0; color: var(--text-muted); }

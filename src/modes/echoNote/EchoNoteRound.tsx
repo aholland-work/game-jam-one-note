@@ -10,6 +10,7 @@ import {
   CHORD_TONES,
   C_MAJOR,
   ECHO_LEVELS,
+  LEVEL_UP_SCORE,
   MAJOR_SCALE,
   NOTES_PER_KEY,
   ROUND_LENGTH,
@@ -20,9 +21,10 @@ import {
   noteInKey,
   pickEchoNote,
   pickKey,
+  scheduleReview,
   stepsForLevel,
   type EchoKey,
-  type EchoLevel,
+  type Review,
 } from '../../game/echoNote'
 import type { Settings } from '../../game/settings'
 import { midiToName, midiToPitch, type Note } from '../../music/notation'
@@ -43,45 +45,70 @@ const chord = (key: EchoKey, beats: number, low: boolean): Note => {
 
 const samePitchClass = (a: number, b: number) => a % 12 === b % 12
 
+/** How many recent answers free practice shows. */
+const TRAIL_LENGTH = 10
+
+interface Answer {
+  key: EchoKey
+  step: number
+  guess: number
+}
+
+const isRight = (entry: Answer) => samePitchClass(entry.guess, noteInKey(entry.key, entry.step))
+
+/** One answer in a trail: a mark that doesn't rely on color, and a label for screen readers. */
+function TrailMark({ entry, number }: { entry: Answer; number: number }) {
+  const right = isRight(entry)
+  return (
+    <li className={right ? 'is-found' : 'is-missed'}>
+      <span className="sr-only">{`Note ${number}: ${right ? 'right' : 'missed'}, the ${degreeName(entry.step)}`}</span>
+      <span className="echo-progress-mark" aria-hidden="true">
+        {right ? '✓' : '×'}
+      </span>
+    </li>
+  )
+}
+
 interface EchoNoteRoundProps {
   settings: Settings
   onSettingsChange: (settings: Settings) => void
   onBack: () => void
   onPlayAgain: () => void
-  /** Starts a new round at a harder level. */
-  onLevelUp: (level: EchoLevel) => void
+  /** Starts a new session with some settings changed, e.g. the next level or a set. */
+  onStartWith: (changes: Partial<Pick<Settings, 'echoLevel' | 'echoLength'>>) => void
 }
 
 /**
- * One Echo Note session: for each mystery note, hear the key's chord and then the note,
- * find it on the piano, and lock in one answer. Notes the player misses come back more often.
+ * One Echo Note session, a set of 10 notes or free practice: for each mystery note, hear the
+ * key's chord and then the note, find it on the piano, and lock in one answer. A missed note
+ * comes back a few questions later.
  */
-export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onLevelUp }: EchoNoteRoundProps) {
+export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onStartWith }: EchoNoteRoundProps) {
   const heading = useRef<HTMLHeadingElement>(null)
   // The level, length and key choice are set for the whole session.
   const [{ echoLevel: level, echoLength: length, echoKey: keyChoice }] = useState(settings)
   const steps = stepsForLevel(level)
   const [key, setKey] = useState(() => (keyChoice === 'random' ? pickKey(null) : C_MAJOR))
-  const [step, setStep] = useState(() => pickEchoNote(steps, null))
+  const [step, setStep] = useState(() => pickEchoNote(steps, []).step)
   // Bumped for every new mystery note, so it plays as soon as it comes up.
   const [turn, setTurn] = useState(0)
   const [answered, setAnswered] = useState(false)
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
-  const [history, setHistory] = useState<{ key: EchoKey; step: number; guess: number }[]>([])
-  // Misses are counted by note number, so a tricky 7 keeps coming back in every key.
-  const [misses, setMisses] = useState<Partial<Record<number, number>>>({})
+  const [history, setHistory] = useState<Answer[]>([])
+  // Missed notes waiting to come back, by note number, so a tricky 7 returns in any key.
+  const [reviews, setReviews] = useState<Review[]>([])
   const [hint, setHint] = useState<string | null>(null)
   const [newKey, setNewKey] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const player = useMelodyPlayer<Playback>(BPM)
+  const lockButton = useRef<HTMLButtonElement>(null)
+  const nextButton = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (showSummary) heading.current?.focus()
   }, [showSummary])
 
   const endless = length === 'endless'
   const target = noteInKey(key, step)
-  const isRight = (entry: { key: EchoKey; step: number; guess: number }) =>
-    samePitchClass(entry.guess, noteInKey(entry.key, entry.step))
   const correctCount = history.filter(isRight).length
   const roundOver = !endless && answered && history.length === ROUND_LENGTH
 
@@ -100,6 +127,17 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     onNewNote()
   }, [turn])
 
+  // Keep keyboard players moving: after answering, focus goes to the next step, then back to Lock in.
+  const lockFocus = useRef(false)
+  useEffect(() => {
+    if (answered) {
+      nextButton.current?.focus()
+      lockFocus.current = true
+    } else if (lockFocus.current) {
+      lockButton.current?.focus()
+    }
+  }, [answered])
+
   const pressKey = (midi: number, fromMidi: boolean) => {
     midiInput.playKey(midi, fromMidi)
     if (!answered) setSelectedMidi(midi)
@@ -112,10 +150,10 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     setAnswered(true)
     setNewKey(false)
     setHistory([...history, entry])
-    // A miss makes the note come up more often; getting it right eases it back.
-    setMisses({ ...misses, [step]: Math.max(0, (misses[step] ?? 0) + (right ? -1 : 1)) })
+    if (!right) setReviews(scheduleReview(reviews, step, history.length))
+    const answer = `${midiToName(target, key.flats)}, the ${degreeName(step)}`
     const picked = `${midiToName(selectedMidi, key.flats)}, the ${degreeName(selectedMidi - key.tonic)}`
-    setHint(right ? `That's it: ${describeNote(key, step)}.` : `Not quite. It was ${describeNote(key, step)}. You picked ${picked}.`)
+    setHint(right ? `Right: ${describeNote(key, step)}.` : `Not quite. It was ${answer}. You picked ${picked}.`)
     // Play the right answer so the player hears it.
     player.play('mystery', [note(target, 1.5)])
   }
@@ -125,7 +163,13 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     const changeKey = endless && keyChoice === 'random' && history.length % NOTES_PER_KEY === 0
     if (changeKey) setKey(pickKey(key))
     setNewKey(changeKey)
-    setStep(pickEchoNote(steps, changeKey ? null : step, misses))
+    const next = pickEchoNote(
+      steps,
+      history.map((entry) => entry.step),
+      reviews,
+    )
+    setStep(next.step)
+    setReviews(next.reviews)
     setTurn(turn + 1)
     setAnswered(false)
     setSelectedMidi(null)
@@ -168,10 +212,16 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
 
   if (showSummary) {
     const harder = nextLevel(level)
-    const strong = history.length > 0 && correctCount / history.length >= 0.8
-    const missedSteps = [...new Set(history.filter((entry) => !isRight(entry)).map((entry) => entry.step))]
-      .map((missed) => ({ missed, times: history.filter((entry) => entry.step === missed && !isRight(entry)).length }))
-      .sort((a, b) => b.times - a.times)
+    const fullSet = !endless && history.length === ROUND_LENGTH
+    // Only a full set counts toward the next level, so a lucky few answers can't unlock it.
+    const earned = fullSet && correctCount >= LEVEL_UP_SCORE && harder !== null
+    // How each note number went, hardest first.
+    const byStep = [...new Set(history.map((entry) => entry.step))]
+      .map((asked) => {
+        const tries = history.filter((entry) => entry.step === asked)
+        return { asked, right: tries.filter(isRight).length, total: tries.length }
+      })
+      .sort((a, b) => a.right / a.total - b.right / b.total || a.asked - b.asked)
     return (
       <section className="round" aria-labelledby="round-title">
         <RoundNavigation onBack={onBack} backLabel="Home" />
@@ -181,23 +231,39 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
           <p className="round-genre">{levelLabel}</p>
         </header>
         <p className="echo-score" role="status">
-          You matched <strong>{correctCount}</strong> of {history.length} notes.
+          You matched <strong>{correctCount}</strong> of {history.length} {history.length === 1 ? 'note' : 'notes'}.
         </p>
-        {endless ? (
-          missedSteps.length > 0 && (
-            <p className="echo-practice">
-              Notes to keep practicing:{' '}
-              {missedSteps.map(({ missed, times }) => `the ${degreeName(missed)} (missed ${times}×)`).join(', ')}
-            </p>
-          )
-        ) : (
+        {!endless && !fullSet && (
+          <p className="echo-practice">You ended the set early, so it doesn't count toward the next level.</p>
+        )}
+        <table className="echo-by-step">
+          <caption>How each note went</caption>
+          <thead>
+            <tr>
+              <th scope="col">Note</th>
+              <th scope="col">Right</th>
+            </tr>
+          </thead>
+          <tbody>
+            {byStep.map(({ asked, right, total }) => (
+              <tr key={asked} className={right === total ? 'is-found' : 'is-missed'}>
+                <th scope="row">the {degreeName(asked)}</th>
+                <td>
+                  {right} of {total}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <details className="echo-each">
+          <summary>See each answer</summary>
           <ol className="echo-results">
             {history.map((entry, i) => {
               const right = isRight(entry)
               return (
                 <li key={i} className={right ? 'is-found' : 'is-missed'}>
-                  <span className="sr-only">{right ? 'Correct: ' : 'Incorrect: '}</span>
-                  <span aria-hidden="true">{right ? '✓' : '✗'}</span> {describeNote(entry.key, entry.step)}
+                  <span className="sr-only">{right ? 'Right: ' : 'Missed: '}</span>
+                  <span aria-hidden="true">{right ? '✓' : '×'}</span> {describeNote(entry.key, entry.step)}
                   {!right && (
                     <span className="echo-guess">
                       {' '}
@@ -209,17 +275,25 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
               )
             })}
           </ol>
+        </details>
+        {earned && <p className="echo-level-up">Nice ear! Ready for more notes?</p>}
+        {endless && history.length >= 5 && (
+          <p className="echo-practice-note">Want to see if you're ready for the next level? Try a set of {ROUND_LENGTH}.</p>
         )}
-        {strong && harder && <p className="echo-level-up">Nice ear! Ready for more notes?</p>}
         <div className="round-controls">
           <span className="round-spacer" />
-          {strong && harder && (
-            <button type="button" className="round-next" onClick={() => onLevelUp(harder)}>
+          {earned && (
+            <button type="button" className="round-next" onClick={() => onStartWith({ echoLevel: harder })}>
               Next level: {ECHO_LEVELS.find((option) => option.id === harder)?.label}
             </button>
           )}
-          <button type="button" className={strong && harder ? '' : 'round-next'} onClick={onPlayAgain}>
-            {endless ? 'Practice again' : 'Play another round'}
+          {endless && (
+            <button type="button" onClick={() => onStartWith({ echoLength: 'round' })}>
+              Try a set of {ROUND_LENGTH}
+            </button>
+          )}
+          <button type="button" className={earned ? '' : 'round-next'} onClick={onPlayAgain}>
+            {endless ? 'Practice again' : 'Play another set'}
           </button>
         </div>
       </section>
@@ -237,6 +311,14 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       )
     : {}
 
+  // Where the player is: the question number in a set, or a running count in free practice.
+  const position = endless
+    ? history.length === 0
+      ? 'Ready when you are'
+      : `${history.length} played · ${correctCount} right`
+    : `Note ${Math.min(history.length + (answered ? 0 : 1), ROUND_LENGTH)} of ${ROUND_LENGTH}`
+  const trailStart = endless ? Math.max(0, history.length - TRAIL_LENGTH) : 0
+
   return (
     <section className="round" aria-labelledby="round-title">
       <RoundNavigation onBack={onBack} backLabel="Home">
@@ -246,12 +328,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       <header className="round-header">
         <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
         <div className="round-header-side">
-          <p className="round-genre">
-            {levelLabel} ·{' '}
-            {endless
-              ? `${correctCount} of ${history.length} right`
-              : `Note ${Math.min(history.length + (answered ? 0 : 1), ROUND_LENGTH)} of ${ROUND_LENGTH}`}
-          </p>
+          <p className="round-genre">{levelLabel}</p>
         </div>
       </header>
 
@@ -260,33 +337,40 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
           Key: <strong>{keyName(key)}</strong>
           {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
         </p>
-        {!endless && (
-          <ol className="echo-progress" aria-label="Round progress">
-            {Array.from({ length: ROUND_LENGTH }, (_, i) => (
-              <li
-                key={i}
-                aria-current={!answered && i === history.length ? 'step' : undefined}
-                className={
-                  i < history.length
-                    ? isRight(history[i])
-                      ? 'is-found'
-                      : 'is-missed'
-                    : !answered && i === history.length
-                      ? 'is-current'
-                      : ''
-                }
-              >
-                <span className="sr-only">{`Note ${i + 1}: ${i < history.length ? isRight(history[i]) ? 'correct' : 'incorrect' : !answered && i === history.length ? 'current' : 'not answered'}`}</span>
-                <span className="echo-progress-mark" aria-hidden="true">{i < history.length ? isRight(history[i]) ? '✓' : '×' : ''}</span>
-              </li>
-            ))}
-          </ol>
-        )}
+        <div className="echo-position">
+          <span className="echo-position-text">{position}</span>
+          {endless ? (
+            history.length > 0 && (
+              <ol className="echo-progress" aria-label={`Your last ${Math.min(history.length, TRAIL_LENGTH)} answers`}>
+                {history.slice(trailStart).map((entry, i) => (
+                  <TrailMark key={trailStart + i} entry={entry} number={trailStart + i + 1} />
+                ))}
+              </ol>
+            )
+          ) : (
+            <ol className="echo-progress" aria-label="Set progress">
+              {Array.from({ length: ROUND_LENGTH }, (_, i) =>
+                i < history.length ? (
+                  <TrailMark key={i} entry={history[i]} number={i + 1} />
+                ) : (
+                  <li
+                    key={i}
+                    aria-current={!answered && i === history.length ? 'step' : undefined}
+                    className={!answered && i === history.length ? 'is-current' : ''}
+                  >
+                    <span className="sr-only">{`Note ${i + 1}: ${!answered && i === history.length ? 'current' : 'not played yet'}`}</span>
+                  </li>
+                ),
+              )}
+            </ol>
+          )}
+        </div>
       </div>
 
       <p className={`round-hint${result ? ` is-${result}` : ''}`} role="status">
         {hint ??
           `The ${keyName(key)} chord sets home base (the 1). Which number is the mystery note?`}
+        {answered && !endless && <span className="sr-only">{` ${history.length} of ${ROUND_LENGTH} done.`}</span>}
       </p>
       {level === 'all' && (
         <p className="echo-tip">Tip: on this level the mystery note can also be one of the 5 notes outside the key.</p>
@@ -297,21 +381,21 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
         {playButton('chord', 'Chord', playChord)}
         {!answered && playButton('mystery', 'Mystery note', playMystery)}
         <span className="round-spacer" />
-        {endless && history.length > 0 && (
+        {history.length > 0 && !roundOver && (
           <button type="button" onClick={finish}>
-            Finish
+            {endless ? 'Finish' : 'End set'}
           </button>
         )}
         {!answered ? (
-          <button type="button" className="round-lock" onClick={lockIn}>
+          <button type="button" className="round-lock" ref={lockButton} onClick={lockIn}>
             Lock in
           </button>
         ) : roundOver ? (
-          <button type="button" className="round-next" onClick={finish}>
+          <button type="button" className="round-next" ref={nextButton} onClick={finish}>
             See results
           </button>
         ) : (
-          <button type="button" className="round-next" onClick={nextNote}>
+          <button type="button" className="round-next" ref={nextButton} onClick={nextNote}>
             Next note →
           </button>
         )}

@@ -72,8 +72,8 @@ function App() {
             onSettingsChange={changeSettings}
             onBack={() => setEchoRound(null)}
             onPlayAgain={startEcho}
-            onLevelUp={(echoLevel) => {
-              changeSettings({ ...settings, echoLevel })
+            onStartWith={(changes) => {
+              changeSettings({ ...settings, ...changes })
               startEcho()
             }}
           />

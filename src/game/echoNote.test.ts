@@ -7,32 +7,46 @@ import {
   describeNote,
   keyName,
   nextLevel,
+  MAX_REPEATS,
   pickEchoNote,
   pickKey,
+  scheduleReview,
   stepsForLevel,
 } from './echoNote'
 
 describe('pickEchoNote', () => {
-  it.each(ECHO_LEVELS)('only picks notes from $label, never the previous one again', ({ steps }) => {
-    let previous: number | null = null
-    for (let i = 0; i < 300; i++) {
-      const step = pickEchoNote(steps, previous)
+  it.each(ECHO_LEVELS)('picks notes from $label, repeating at most twice in a row', ({ steps }) => {
+    const recent: number[] = []
+    let backToBack = 0
+    for (let i = 0; i < 600; i++) {
+      const { step } = pickEchoNote(steps, recent)
       expect(steps).toContain(step)
-      expect(step).not.toBe(previous)
-      previous = step
+      expect(recent.slice(-MAX_REPEATS).every((previous) => previous === step) && recent.length >= MAX_REPEATS).toBe(false)
+      if (step === recent.at(-1)) backToBack++
+      recent.push(step)
+    }
+    // Repeats happen, so the last answer never rules a note out.
+    expect(backToBack).toBeGreaterThan(20)
+  })
+
+  it('brings a missed note back 2 to 4 questions later', () => {
+    for (const roll of [0, 0.5, 0.99]) {
+      const reviews = scheduleReview([], 5, 3, () => roll)
+      const due = reviews[0].due
+      expect(due - 3).toBeGreaterThanOrEqual(2)
+      expect(due - 3).toBeLessThanOrEqual(4)
+      // Not before it's due (a random pick could still land on it, which gives nothing away).
+      expect(pickEchoNote([0, 2, 4, 5], [0, 2, 4, 0], reviews, due - 1, () => 0).reviews).toHaveLength(1)
+      const picked = pickEchoNote([0, 2, 4, 5], [0, 2, 4, 0], reviews, due, () => 0)
+      expect(picked.step).toBe(5)
+      expect(picked.reviews).toHaveLength(0)
     }
   })
 
-  it('brings missed notes back more often', () => {
-    const steps = stepsForLevel('scale')
-    const counts = new Map<number, number>()
-    for (let i = 0; i < 4000; i++) {
-      const step = pickEchoNote(steps, null, { 5: 3 })
-      counts.set(step, (counts.get(step) ?? 0) + 1)
-    }
-    // The 4 (5 half steps up) has weight 7 against 1 for each other note: about half of all picks.
-    expect(counts.get(5)! / 4000).toBeGreaterThan(0.4)
-    expect(counts.get(2)! / 4000).toBeLessThan(0.15)
+  it('waits with a due review rather than repeat a note a third time', () => {
+    const picked = pickEchoNote([0, 4, 7], [4, 4], [{ step: 4, due: 2 }], 2, () => 0)
+    expect(picked.step).toBe(0)
+    expect(picked.reviews).toEqual([{ step: 4, due: 2 }])
   })
 })
 
