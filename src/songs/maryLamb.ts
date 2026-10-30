@@ -5,7 +5,7 @@ import type { Song } from './types'
 export const maryLamb: Song = {
   id: 'mary-had-a-little-lamb',
   title: 'Mary Had a Little Lamb',
-  genre: 'Folk and kids',
+  genre: 'Folk songs',
   difficulty: 'Easy',
   bpm: 112,
   beatsPerBar: 4,

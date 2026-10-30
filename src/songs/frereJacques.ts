@@ -5,7 +5,7 @@ import type { Song } from './types'
 export const frereJacques: Song = {
   id: 'frere-jacques',
   title: 'Frère Jacques',
-  genre: 'Folk and kids',
+  genre: 'Folk songs',
   difficulty: 'Easy',
   bpm: 104,
   beatsPerBar: 4,

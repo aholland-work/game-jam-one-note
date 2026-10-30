@@ -1,6 +1,6 @@
 import type { Note } from '../music/notation'
 
-export type Genre = 'Classical' | 'Folk and kids' | 'Holiday' | 'Ragtime' | 'Americana'
+export type Genre = 'Classical' | 'Folk songs' | 'Holiday' | 'Ragtime' | 'Americana'
 
 export type Difficulty = 'Easy' | 'Medium' | 'Hard'
 

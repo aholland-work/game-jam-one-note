@@ -5,7 +5,7 @@ import type { Song } from './types'
 export const twinkleTwinkle: Song = {
   id: 'twinkle-twinkle',
   title: 'Twinkle, Twinkle, Little Star',
-  genre: 'Folk and kids',
+  genre: 'Folk songs',
   difficulty: 'Easy',
   bpm: 100,
   beatsPerBar: 4,
