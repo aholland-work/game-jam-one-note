@@ -14,7 +14,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   oneNoteOffHighlight: true,
-  oneNoteOffInKey: true,
+  oneNoteOffInKey: false,
   oneNoteOffOneListen: false,
 }
 
