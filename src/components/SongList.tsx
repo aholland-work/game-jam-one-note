@@ -85,14 +85,6 @@ export function SongList({
                 next set of notes.
               </li>
             </ol>
-            <p className="song-list-tip">
-              Tip: hum the mystery note, then slide your voice down to the 1 and count the steps. Each number has its
-              own feel: the 1 sounds settled, the 5 sounds strong, and the 7 leans up toward the 1.
-            </p>
-            <p className="song-list-tip">
-              In ⚙ Settings you can hide the numbers on the piano once you know your way around, or play the mystery
-              note over the chord, the way a solo sits over a band.
-            </p>
           </div>
           <div className="song-list-choice" role="group" aria-label="Notes in play">
             <span>Notes</span>
