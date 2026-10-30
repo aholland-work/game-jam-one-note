@@ -161,7 +161,7 @@ export function Piano({
 
   return (
     <div ref={root} className="piano" role="group" aria-label="Piano" aria-describedby={helpId} style={{ '--octaves': octaves } as CSSProperties}>
-      <span id={helpId} className="sr-only">Use arrow keys to move between notes, Home or End to jump to either end, and Enter or Space to play. {lettersAnywhere ? 'Letter shortcuts work anywhere on the page; you can turn that off.' : 'Letter shortcuts work while the piano has focus.'}</span>
+      <span id={helpId} className="sr-only">Use arrow keys to move between notes, Home or End to jump to either end, and Enter or Space to play. {lettersAnywhere ? 'Letter shortcuts work anywhere on the page.' : 'Letter shortcuts work while the piano has focus.'}</span>
       {Array.from({ length: 12 * octaves }, (_, index) => {
         const octave = Math.floor(index / 12)
         const semitone = index % 12

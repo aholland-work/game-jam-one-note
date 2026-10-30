@@ -90,7 +90,7 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
       label: 'Play the mystery note over the chord, like a solo over a band (harder)',
       nextSong: false,
     },
-    LETTERS_ANYWHERE,
+    // LETTERS_ANYWHERE, (hidden for now; see MissingNoteRound)
   ],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
@@ -99,6 +99,6 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
       label: 'Hard mode: the changed note only moves to the next note in the song’s key (fast notes too), and you hear the original only once',
       nextSong: true,
     },
-    LETTERS_ANYWHERE,
+    // LETTERS_ANYWHERE, (hidden for now; see MissingNoteRound)
   ],
 }

@@ -394,7 +394,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
           selectedTone={result ?? 'selected'}
           flats={key.flats}
           degrees={degrees}
-          lettersAnywhere={settings.lettersAnywhere}
+          // lettersAnywhere={settings.lettersAnywhere}
           onPress={pressKey}
         />
       </div>

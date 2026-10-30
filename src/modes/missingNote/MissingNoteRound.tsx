@@ -7,7 +7,8 @@ import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
-import { LETTERS_ANYWHERE, type Settings } from '../../game/settings'
+// import { LETTERS_ANYWHERE, type Settings } from '../../game/settings'
+import type { Settings } from '../../game/settings'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import { usesFlats } from '../../music/notation'
@@ -47,7 +48,8 @@ interface MissingNoteRoundProps {
 }
 
 /** One Missing Note puzzle: listen, test keys on the piano, lock in one answer. */
-export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onNext, onSolved }: MissingNoteRoundProps) {
+// settings and onSettingsChange feed the hidden letter keys switch below.
+export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
@@ -289,7 +291,7 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
           // Lighting keys while guessing would give the answer away, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}
           showShortcuts={showShortcuts}
-          lettersAnywhere={settings.lettersAnywhere}
+          // lettersAnywhere={settings.lettersAnywhere}
           onPress={pressKey}
         />
       </div>
@@ -309,6 +311,8 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
             <kbd>Space</kbd> plays, pauses and resumes the melody.
           </li>
         </ul>
+        {/* Hidden for now: letter keys always play from anywhere on the page. To bring back the
+            switch, restore this and the lettersAnywhere props on the pianos.
         <label className="round-shortcuts-option">
           <input
             type="checkbox"
@@ -317,6 +321,7 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
           />
           {LETTERS_ANYWHERE.label}
         </label>
+        */}
       </details>
     </section>
   )
