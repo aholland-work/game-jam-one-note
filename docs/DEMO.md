@@ -21,7 +21,7 @@ Everyone can play by ear. No sheet-music reading needed, but musicians get a sta
 
 ## 2. Live demo (~2 min)
 
-1. **Song list:** two modes, genre filter, 14 public-domain songs from Twinkle to Maple Leaf Rag.
+1. **Song list:** two modes, genre filter, 23 public-domain songs, from Twinkle to Maple Leaf Rag.
 2. **Missing Note, Ode to Joy:**
    - Press **Play**. The staff shows rhythm only; the dashed box is the gap.
    - Tap a few piano keys to hunt for the note.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { songs } from '../songs'
-import { melodyPitchClasses, pickChange, withChange } from './oneNoteOff'
+import { keyPitchClasses, melodyPitchClasses, pickChange, withChange } from './oneNoteOff'
 
 // A small seeded generator (mulberry32) so every run checks the same spread of picks.
 function seeded(seed: number) {
@@ -26,8 +26,8 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('on Hard, moves the note to the next scale note above or below, away from its neighbors', () => {
-    const inKey = melodyPitchClasses(song.melody)
+  it('on Hard, moves the note to the next note in the key above or below, away from its neighbors', () => {
+    const inKey = keyPitchClasses(song.melody)
     for (const { index, midi } of changes) {
       const original = song.melody[index].midi as number
       const distance = Math.abs(midi - original)
@@ -59,5 +59,18 @@ describe.each(songs)('One Note Off: $title', (song) => {
     const changed = withChange(song.melody, changes[0])
     const differences = changed.filter((note, i) => note.midi !== song.melody[i].midi)
     expect(differences).toHaveLength(1)
+  })
+})
+
+describe('keyPitchClasses', () => {
+  it('fills out a full scale for a tune that only uses a few notes', () => {
+    // G, A and C only: C major is the scale that fits and ends on its home note.
+    const key = keyPitchClasses(songs.find((song) => song.id === 'coming-round-the-mountain')!.melody)
+    expect([...key].sort((a, b) => a - b)).toEqual([0, 2, 4, 5, 7, 9, 11])
+  })
+
+  it('keeps notes from outside the scale that the melody uses', () => {
+    const rondo = songs.find((song) => song.id === 'rondo-alla-turca')!.melody
+    for (const pitch of melodyPitchClasses(rondo)) expect(keyPitchClasses(rondo).has(pitch)).toBe(true)
   })
 })

@@ -14,9 +14,29 @@ const MIN_BEATS = { easy: 0.5, hard: 0.25 }
 const LOWEST = 57
 const HIGHEST = 88
 
-/** Every pitch class (C, C♯, …) the melody uses: its scale, in effect. */
+/** Every pitch class (C, C♯, …) the melody uses. */
 export function melodyPitchClasses(melody: Note[]): Set<number> {
   return new Set(melody.flatMap((note) => (note.midi === null ? [] : [note.midi % 12])))
+}
+
+const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11]
+
+/**
+ * The notes "in key" for a melody: the major scale that fits most of its notes, plus any
+ * other notes the melody itself uses (like the G♯ in an A minor tune). Short tunes that use
+ * only a few different notes still get a full scale to step through. Ties go to the scale
+ * whose home note ends the melody.
+ */
+export function keyPitchClasses(melody: Note[]): Set<number> {
+  const used = melody.flatMap((note) => (note.midi === null ? [] : [note.midi % 12]))
+  const last = used[used.length - 1]
+  let best = { tonic: 0, score: -1 }
+  for (let tonic = 0; tonic < 12; tonic++) {
+    const scale = MAJOR_SCALE.map((step) => (tonic + step) % 12)
+    const score = used.filter((pitch) => scale.includes(pitch)).length + (tonic === last ? 0.5 : 0)
+    if (score > best.score) best = { tonic, score }
+  }
+  return new Set([...MAJOR_SCALE.map((step) => (best.tonic + step) % 12), ...used])
 }
 
 export type Difficulty = 'easy' | 'hard'
@@ -26,9 +46,8 @@ export type Difficulty = 'easy' | 'hard'
  * side, so the change can't hide in a repeat.
  *
  * - Easy: the note moves 1 to 3 half steps up or down, to any pitch.
- * - Hard: the note moves to the next scale note above or below (a pitch the melody already
- *   uses, 1 or 2 half steps away), so the changed version still sounds plausible. Fast
- *   notes can be changed too.
+ * - Hard: the note moves to the next note in the song's key, above or below (1 or 2 half
+ *   steps away), so the changed version still sounds plausible. Fast notes can be changed too.
  */
 export function pickChange(
   song: Song,
@@ -36,7 +55,7 @@ export function pickChange(
   random: () => number = Math.random,
 ): NoteChange {
   const { melody } = song
-  const pitchClasses = melodyPitchClasses(melody)
+  const pitchClasses = keyPitchClasses(melody)
   const inKey = (pitch: number) => pitchClasses.has(pitch % 12)
   const candidates = (midi: number) =>
     difficulty === 'hard'
