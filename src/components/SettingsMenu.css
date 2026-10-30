@@ -2,6 +2,9 @@
   position: relative;
 }
 
+.settings-button { display: inline-flex; align-items: center; gap: 8px; }
+.settings-button .icon { width: 18px; height: 18px; flex: none; margin: 0; }
+
 .settings-button {
   padding: 0.3rem 0.8rem;
   font-size: 0.9rem;

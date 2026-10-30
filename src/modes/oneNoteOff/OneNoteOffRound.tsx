@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { RoundNavigation } from '../../components/RoundNavigation'
 import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
@@ -203,16 +204,15 @@ export function OneNoteOffRound({
   const nowPlaying = player.playing ?? player.paused
 
   return (
-    <section className="round" aria-labelledby="round-title">
-      <button type="button" className="round-back" onClick={onBack}>
-        ← Songs
-      </button>
+    <section className="round is-one-note-off" aria-labelledby="round-title">
+      <RoundNavigation onBack={onBack}>
+        <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
+      </RoundNavigation>
       <p className="round-mode">One Note Off</p>
       <header className="round-header">
         <h2 id="round-title" tabIndex={-1}>{song.title}</h2>
         <div className="round-header-side">
           <p className="round-genre">{song.genre}</p>
-          <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
         </div>
       </header>
 

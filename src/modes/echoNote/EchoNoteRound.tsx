@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { RoundNavigation } from '../../components/RoundNavigation'
 import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
@@ -173,9 +174,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       .sort((a, b) => b.times - a.times)
     return (
       <section className="round" aria-labelledby="round-title">
-        <button type="button" className="round-back" onClick={onBack}>
-          ← Home
-        </button>
+        <RoundNavigation onBack={onBack} backLabel="Home" />
         <p className="round-mode">Ear training</p>
         <header className="round-header">
           <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
@@ -240,9 +239,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
 
   return (
     <section className="round" aria-labelledby="round-title">
-      <button type="button" className="round-back" onClick={onBack}>
-        ← Home
-      </button>
+      <RoundNavigation onBack={onBack} backLabel="Home" />
       <p className="round-mode">Ear training</p>
       <header className="round-header">
         <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
