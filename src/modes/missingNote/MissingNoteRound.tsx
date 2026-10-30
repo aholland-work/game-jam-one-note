@@ -7,7 +7,7 @@ import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import type { Note } from '../../music/notation'
 import type { Song } from '../../songs/types'
-import './MissingNoteRound.css'
+import '../round.css'
 
 type Status = 'guessing' | 'found' | 'missed'
 

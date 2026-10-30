@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { SongList } from './components/SongList'
+import { SongList, type GameMode } from './components/SongList'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
+import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
 import { songs } from './songs'
 import type { Genre, Song } from './songs/types'
 
 function App() {
+  const [mode, setMode] = useState<GameMode>('missing-note')
   const [genre, setGenre] = useState<Genre | null>(null)
   const [current, setCurrent] = useState<Song | null>(null)
 
@@ -16,14 +18,26 @@ function App() {
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <h1 style={{ margin: '0 0 1rem' }}>One Note</h1>
       {current ? (
-        <MissingNoteRound
-          key={current.id}
-          song={current}
-          onBack={() => setCurrent(null)}
-          onNext={next ? () => setCurrent(next) : null}
-        />
+        (() => {
+          const Round = mode === 'one-note-off' ? OneNoteOffRound : MissingNoteRound
+          return (
+            <Round
+              key={`${mode}-${current.id}`}
+              song={current}
+              onBack={() => setCurrent(null)}
+              onNext={next ? () => setCurrent(next) : null}
+            />
+          )
+        })()
       ) : (
-        <SongList songs={songs} genre={genre} onGenreChange={setGenre} onSelect={setCurrent} />
+        <SongList
+          mode={mode}
+          onModeChange={setMode}
+          songs={songs}
+          genre={genre}
+          onGenreChange={setGenre}
+          onSelect={setCurrent}
+        />
       )}
     </main>
   )

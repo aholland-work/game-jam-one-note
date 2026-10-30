@@ -36,6 +36,22 @@
   animation: staff-drop-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.staff-note.is-selected {
+  color: var(--accent);
+}
+
+.staff-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.staff-hit:hover,
+.staff-hit:focus-visible {
+  fill: var(--accent-soft);
+  opacity: 0.6;
+  outline: none;
+}
+
 .staff-note.is-found {
   color: var(--success);
 }

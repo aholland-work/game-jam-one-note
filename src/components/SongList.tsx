@@ -2,7 +2,16 @@ import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
 import './SongList.css'
 
+export type GameMode = 'missing-note' | 'one-note-off'
+
+const MODES: { id: GameMode; label: string; blurb: string }[] = [
+  { id: 'missing-note', label: 'Missing Note', blurb: 'One note is missing. Find it on the piano.' },
+  { id: 'one-note-off', label: 'One Note Off', blurb: 'One note has changed. Spot which one.' },
+]
+
 interface SongListProps {
+  mode: GameMode
+  onModeChange: (mode: GameMode) => void
   songs: Song[]
   genre: Genre | null
   onGenreChange: (genre: Genre | null) => void
@@ -10,14 +19,28 @@ interface SongListProps {
 }
 
 /** Song cards with a genre filter. `genre` null means all genres. */
-export function SongList({ songs, genre, onGenreChange, onSelect }: SongListProps) {
+export function SongList({ mode, onModeChange, songs, genre, onGenreChange, onSelect }: SongListProps) {
   const genres = [...new Set(songs.map((song) => song.genre))]
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
 
   return (
     <section className="song-list" aria-labelledby="song-list-title">
+      <div className="song-list-modes" role="group" aria-label="Game mode">
+        {MODES.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            className="song-list-mode"
+            aria-pressed={mode === option.id}
+            onClick={() => onModeChange(option.id)}
+          >
+            <span className="song-list-mode-label">{option.label}</span>
+            <span className="song-list-mode-blurb">{option.blurb}</span>
+          </button>
+        ))}
+      </div>
       <h2 id="song-list-title">Pick a song</h2>
-      {!hasSeenTutorial() && (
+      {mode === 'missing-note' && !hasSeenTutorial() && (
         <p className="song-list-tip">
           New here? Each melody is missing one note, and your first song walks you through finding it.
           Twinkle, Twinkle is a gentle place to start.

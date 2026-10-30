@@ -54,6 +54,11 @@ export function midiToPitch(midi: number): string {
   return `${SHARP_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`
 }
 
+/** A note's name without its octave, as shown on the piano, e.g. 63 -> "D♯". */
+export function midiToName(midi: number): string {
+  return SHARP_NAMES[midi % 12].replace('#', '\u266F')
+}
+
 /** Position on the staff counted in letter steps (C4 = 28, E4 = 30), ignoring accidentals. */
 export function diatonicStep(pitch: string): number {
   const { letter, octave } = parsePitch(pitch)

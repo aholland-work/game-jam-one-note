@@ -1,6 +1,11 @@
 # One Note
 
-A music puzzle game for the "Only One" game jam. A short, well-known melody is missing one note. Listen, test notes on the piano, use up to three tries to hear your note in the melody, then lock in your one answer. When the round ends, the staff turns into the real sheet music as the completed melody plays.
+A music puzzle game for the "Only One" game jam, with two modes:
+
+- **Missing Note:** a short, well-known melody is missing one note. Listen, test notes on the piano, then lock in your one answer.
+- **One Note Off:** one note in the melody has been changed. Compare the original with the changed version, tap the note that's off, then lock in.
+
+When a round ends, the staff turns into the real sheet music as the melody plays.
 
 All songs are public-domain melodies. The musical note icon is from [Twemoji](https://github.com/twitter/twemoji) (© Twitter, Inc and other contributors), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
@@ -58,4 +63,4 @@ npm run build   # type-check and production build
 - Vite, React and TypeScript, no backend.
 - `src/audio/engine.ts`: a Web Audio synth. Notes are scheduled on the audio clock, and the on-screen highlights follow the same clock.
 - `src/components/`: the staff (hand-drawn SVG), the one-octave piano and the song list, shared by any game mode.
-- `src/modes/missingNote/`: the Missing Note round. Future modes get their own folder next to it.
+- `src/modes/missingNote/` and `src/modes/oneNoteOff/`: one folder per game mode. Shared round styles live in `src/modes/round.css`.

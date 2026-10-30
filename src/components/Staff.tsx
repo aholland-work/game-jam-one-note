@@ -1,18 +1,25 @@
 import { diatonicStep, parsePitch, type Note } from '../music/notation'
 import './Staff.css'
 
+/** A highlight on one note: the player's pick, or a right or wrong answer. */
+export type NoteMark = 'selected' | 'found' | 'missed'
+
 interface StaffProps {
   notes: Note[]
   beatsPerBar: number
   /** Length of a pickup (anacrusis) before the first full bar, in beats. */
   pickupBeats?: number
-  gapIndex: number
+  /** A note drawn as a "?" slot until `showAnswer`. Omit when no note is hidden. */
+  gapIndex?: number
   /** How many notes, from the start, sit at their real pitch. The rest sit on the middle line. */
   revealedCount: number
   /** Draw the missing note instead of the "?" slot. */
   showAnswer: boolean
   answerTone?: 'found' | 'missed'
   activeIndex: number | null
+  marks?: Partial<Record<number, NoteMark>>
+  /** Makes notes tappable, e.g. to pick the one that sounds wrong. */
+  onNoteSelect?: (index: number) => void
 }
 
 const WIDTH = 760
@@ -61,11 +68,13 @@ export function Staff({
   notes,
   beatsPerBar,
   pickupBeats = 0,
-  gapIndex,
+  gapIndex = -1,
   revealedCount,
   showAnswer,
   answerTone = 'found',
   activeIndex,
+  marks = {},
+  onNoteSelect,
 }: StaffProps) {
   const staffLeft = MARGIN + CLEF_WIDTH
   const staffRight = WIDTH - MARGIN
@@ -99,7 +108,12 @@ export function Staff({
   const noteX = units.map((unit) => xForUnit(unit) + NOTE_INSET)
 
   return (
-    <svg className="staff" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="The melody written on a music staff">
+    <svg
+      className="staff"
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      role={onNoteSelect ? 'group' : 'img'}
+      aria-label="The melody written on a music staff"
+    >
       <g className="staff-lines">
         {[30, 32, 34, 36, 38].map((step) => (
           <line key={step} x1={MARGIN} x2={staffRight} y1={yFor(step)} y2={yFor(step)} />
@@ -149,12 +163,43 @@ export function Staff({
             accidental={accidentals[index]}
             tieToX={tieToX}
             revealed={isAnswer || index < revealedCount}
-            className={['staff-note', activeIndex === index && 'is-active', isAnswer && `is-answer is-${answerTone}`]
+            className={[
+              'staff-note',
+              activeIndex === index && 'is-active',
+              isAnswer && `is-answer is-${answerTone}`,
+              marks[index] && `is-${marks[index]}`,
+            ]
               .filter(Boolean)
               .join(' ')}
           />
         )
       })}
+
+      {onNoteSelect &&
+        notes.map((note, index) =>
+          note.pitch === null ? null : (
+            <rect
+              key={`hit-${index}`}
+              className="staff-hit"
+              x={noteX[index] - 12}
+              y={8}
+              width={24}
+              height={HEIGHT - 16}
+              rx={6}
+              role="button"
+              tabIndex={0}
+              aria-label={`Note ${index + 1} of ${notes.length}`}
+              aria-pressed={marks[index] === 'selected'}
+              onClick={() => onNoteSelect(index)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onNoteSelect(index)
+                }
+              }}
+            />
+          ),
+        )}
     </svg>
   )
 }
