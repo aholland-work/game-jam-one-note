@@ -2,7 +2,7 @@
 
 A music puzzle game for the "Only One" game jam. A short, well-known melody is missing one note. Listen, test notes on the piano, use up to three tries to hear your note in the melody, then lock in your one answer. When the round ends, the staff turns into the real sheet music as the completed melody plays.
 
-All songs are public-domain melodies.
+All songs are public-domain melodies. The musical note icon is from [Twemoji](https://github.com/twitter/twemoji) (© Twitter, Inc and other contributors), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## The jam theme: "Only One"
 
