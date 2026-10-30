@@ -8,7 +8,7 @@ import { Staff, type NoteMark } from '../../components/Staff'
 import { pickChange, withChange } from '../../game/oneNoteOff'
 import { pianoStartMidi } from '../../game/puzzle'
 import type { Settings } from '../../game/settings'
-import { midiToName } from '../../music/notation'
+import { midiToName, usesFlats } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import '../round.css'
 import './OneNoteOffRound.css'
@@ -75,8 +75,9 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, o
     player.play(version, melodyFor(version))
   }
 
-  const originalName = midiToName(originalMidi)
-  const changedName = midiToName(change.midi)
+  const flats = usesFlats(song.melody)
+  const originalName = midiToName(originalMidi, flats)
+  const changedName = midiToName(change.midi, flats)
   const originalBackHint = `…and here's the original, with the ${originalName} back in place (green).`
 
   const lockIn = () => {
@@ -272,6 +273,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, o
       <div className="round-piano">
         <Piano
           startMidi={pianoStartMidi(song)}
+          flats={flats}
           selectedMidi={null}
           // Lighting keys while guessing would point at the changed note, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}

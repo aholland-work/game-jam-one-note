@@ -28,6 +28,7 @@ const DURATION_BEATS: Record<string, number> = {
 }
 
 const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
 export interface PitchParts {
   letter: string
@@ -49,14 +50,19 @@ export function pitchToMidi(pitch: string): number {
   return (octave + 1) * 12 + LETTER_SEMITONES[letter] + offset
 }
 
-/** Spells a MIDI number with sharps, e.g. 63 -> "D#4". */
-export function midiToPitch(midi: number): string {
-  return `${SHARP_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`
+/** Whether a melody is written with flats (like Maple Leaf Rag's A♭ major) rather than sharps. */
+export function usesFlats(melody: Note[]): boolean {
+  return melody.some((note) => note.pitch?.[1] === 'b')
 }
 
-/** A note's name without its octave, as shown on the piano, e.g. 63 -> "D♯". */
-export function midiToName(midi: number): string {
-  return SHARP_NAMES[midi % 12].replace('#', '\u266F')
+/** Spells a MIDI number, with sharps by default: 63 -> "D#4", or "Eb4" with `flats`. */
+export function midiToPitch(midi: number, flats = false): string {
+  return `${(flats ? FLAT_NAMES : SHARP_NAMES)[midi % 12]}${Math.floor(midi / 12) - 1}`
+}
+
+/** A note's name without its octave, as shown on the piano, e.g. 63 -> "D♯" (or "E♭" with `flats`). */
+export function midiToName(midi: number, flats = false): string {
+  return (flats ? FLAT_NAMES : SHARP_NAMES)[midi % 12].replace('#', '\u266F').replace(/^([A-G])b$/, '$1\u266D')
 }
 
 /** Position on the staff counted in letter steps (C4 = 28, E4 = 30), ignoring accidentals. */

@@ -11,6 +11,8 @@ interface PianoProps {
   playingMidi?: number | null
   /** Show each key's computer-keyboard shortcut on the key. */
   showShortcuts?: boolean
+  /** Name the black keys with flats (B♭) instead of sharps (A♯), to match songs written in flats. */
+  flats?: boolean
   onPress: (midi: number) => void
 }
 
@@ -23,8 +25,10 @@ const BLACK_KEYS = [
   { semitone: 8, afterWhite: 5 },
   { semitone: 10, afterWhite: 6 },
 ]
-const NOTE_NAMES = ['C', 'C\u266F', 'D', 'D\u266F', 'E', 'F', 'F\u266F', 'G', 'G\u266F', 'A', 'A\u266F', 'B']
-const SPOKEN_NAMES = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 'G sharp', 'A', 'A sharp', 'B']
+const SHARP_LABELS = ['C', 'C\u266F', 'D', 'D\u266F', 'E', 'F', 'F\u266F', 'G', 'G\u266F', 'A', 'A\u266F', 'B']
+const FLAT_LABELS = ['C', 'D\u266D', 'D', 'E\u266D', 'E', 'F', 'G\u266D', 'G', 'A\u266D', 'A', 'B\u266D', 'B']
+const SPOKEN_SHARPS = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 'G sharp', 'A', 'A sharp', 'B']
+const SPOKEN_FLATS = ['C', 'D flat', 'D', 'E flat', 'E', 'F', 'G flat', 'G', 'A flat', 'A', 'B flat', 'B']
 // Computer keyboard shortcuts, in semitone order (the usual music-app layout).
 const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
@@ -35,6 +39,7 @@ export function Piano({
   selectedTone = 'selected',
   playingMidi = null,
   showShortcuts = false,
+  flats = false,
   onPress,
 }: PianoProps) {
   const [pressed, setPressed] = useState<number | null>(null)
@@ -82,7 +87,7 @@ export function Piano({
             key={semitone}
             type="button"
             className={keyClass('piano-key piano-white', midi)}
-            aria-label={SPOKEN_NAMES[semitone]}
+            aria-label={(flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]}
             aria-pressed={midi === selectedMidi}
             onPointerDown={(event) => {
               event.preventDefault()
@@ -97,7 +102,7 @@ export function Piano({
             style={{ left: `${(i / 7) * 100}%` }}
           >
             {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
-            <span className="piano-label">{NOTE_NAMES[semitone]}</span>
+            <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
           </button>
         )
       })}
@@ -108,7 +113,7 @@ export function Piano({
             key={semitone}
             type="button"
             className={keyClass('piano-key piano-black', midi)}
-            aria-label={SPOKEN_NAMES[semitone]}
+            aria-label={(flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]}
             aria-pressed={midi === selectedMidi}
             onPointerDown={(event) => {
               event.preventDefault()
@@ -123,7 +128,7 @@ export function Piano({
             style={{ left: `${(afterWhite / 7) * 100}%` }}
           >
             {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
-            <span className="piano-label">{NOTE_NAMES[semitone]}</span>
+            <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
           </button>
         )
       })}

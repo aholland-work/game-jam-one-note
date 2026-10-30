@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { diatonicStep, midiToPitch, parseDuration, parseMelody, pitchToMidi } from './notation'
+import { diatonicStep, midiToName, midiToPitch, parseDuration, parseMelody, pitchToMidi, usesFlats } from './notation'
 
 describe('pitchToMidi', () => {
   it('reads naturals, sharps and flats', () => {
@@ -15,9 +15,17 @@ describe('pitchToMidi', () => {
   })
 })
 
-it('spells MIDI numbers with sharps', () => {
+it('spells MIDI numbers with sharps, or flats when asked', () => {
   expect(midiToPitch(60)).toBe('C4')
   expect(midiToPitch(63)).toBe('D#4')
+  expect(midiToPitch(63, true)).toBe('Eb4')
+  expect(midiToName(70)).toBe('A\u266F')
+  expect(midiToName(70, true)).toBe('B\u266D')
+})
+
+it('tells melodies written in flats from ones in sharps', () => {
+  expect(usesFlats(parseMelody('Ab4/q Eb5/q'))).toBe(true)
+  expect(usesFlats(parseMelody('F#4/q B4/q'))).toBe(false)
 })
 
 it('counts staff steps by letter, ignoring accidentals', () => {

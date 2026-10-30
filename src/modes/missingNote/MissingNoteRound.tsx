@@ -6,7 +6,7 @@ import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
-import type { Note } from '../../music/notation'
+import { usesFlats, type Note } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import '../round.css'
 
@@ -312,6 +312,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
       <div className={`round-piano ${coached('keys')}`}>
         <Piano
           startMidi={pianoStartMidi(song)}
+          flats={usesFlats(song.melody)}
           selectedMidi={isOver && !showingWrongNote ? answer : selectedMidi}
           selectedTone={isOver ? resultTone : 'selected'}
           // Lighting keys while guessing would give the answer away, so only show it in the result.

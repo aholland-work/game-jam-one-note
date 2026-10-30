@@ -1,4 +1,4 @@
-import { midiToPitch, type Note } from '../music/notation'
+import { midiToPitch, usesFlats, type Note } from '../music/notation'
 import type { Song } from '../songs/types'
 
 export interface NoteChange {
@@ -66,6 +66,6 @@ export function pickChange(
 /** The melody with one note moved. */
 export function withChange(melody: Note[], change: NoteChange): Note[] {
   return melody.map((note, i) =>
-    i === change.index ? { ...note, midi: change.midi, pitch: midiToPitch(change.midi) } : note,
+    i === change.index ? { ...note, midi: change.midi, pitch: midiToPitch(change.midi, usesFlats(melody)) } : note,
   )
 }
