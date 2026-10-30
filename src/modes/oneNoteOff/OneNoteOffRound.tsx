@@ -27,21 +27,20 @@ interface OneNoteOffRoundProps {
 
 /** One One Note Off puzzle: compare two versions, tap the note that changed, lock in once. */
 export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNext }: OneNoteOffRoundProps) {
-  // Settings as they were when the song opened. Only highlighting can change during a song;
-  // the others shape how the puzzle is set up and apply from the next one.
-  const [startSettings] = useState(settings)
-  // A new random change every time the round opens.
-  const [change] = useState(() => pickChange(song, { inKey: startSettings.oneNoteOffInKey }))
+  // A new random change every time the round opens. "Stays in key" shapes this pick, so
+  // changing that setting mid-song applies from the next song; the others apply right away.
+  const [change] = useState(() => pickChange(song, { inKey: settings.oneNoteOffInKey }))
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
-  const [hint, setHint] = useState(
-    startSettings.oneNoteOffOneListen
-      ? 'One note in the changed version is off. You can hear the original only once, and the changed version as often as you like. Tap the note that sounds different, then lock in.'
-      : 'One note in the changed version is off. Compare the two as often as you like, tap the note that sounds different, then lock in.',
-  )
-  // With the one-listen setting, the original can be heard once while guessing
-  // (pausing and resuming is fine).
+  // Null shows the instructions, which follow the current one-listen setting.
+  const [hint, setHint] = useState<string | null>(null)
+  const oneListen = settings.oneNoteOffOneListen
+  const instructions = oneListen
+    ? 'One note in the changed version is off. You can hear the original only once, and the changed version as often as you like. Tap the note that sounds different, then lock in.'
+    : 'One note in the changed version is off. Compare the two as often as you like, tap the note that sounds different, then lock in.'
+  // Tracked whether or not the one-listen setting is on, so turning it on mid-song counts a
+  // listen that already happened (pausing and resuming is fine).
   const [originalHeard, setOriginalHeard] = useState(false)
   const player = useMelodyPlayer<Version>(song.bpm)
 
@@ -56,8 +55,8 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
   const toggle = (version: Version) => {
     if (player.playing === version) return player.pause()
     if (player.paused === version) return player.resume()
-    if (version === 'original' && !isOver && startSettings.oneNoteOffOneListen) {
-      if (originalHeard) return
+    if (version === 'original' && !isOver) {
+      if (oneListen && originalHeard) return
       setOriginalHeard(true)
     }
     player.play(version, melodyFor(version))
@@ -111,7 +110,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
       )
     }
     // Restarting the original would be a second listen, so it only offers Resume.
-    const limited = version === 'original' && !isOver && startSettings.oneNoteOffOneListen
+    const limited = version === 'original' && !isOver && oneListen
     if (player.paused === version) {
       return (
         <>
@@ -172,7 +171,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
       />
 
       <p className={`round-hint${isOver ? ` is-${status}` : ''}`} role="status">
-        {hint}
+        {hint ?? instructions}
       </p>
 
       <div className="round-controls">

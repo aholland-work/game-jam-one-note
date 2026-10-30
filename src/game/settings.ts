@@ -53,6 +53,6 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
     { key: 'oneNoteOffInKey', label: 'Harder: the changed note stays in the song’s key', nextSong: true },
-    { key: 'oneNoteOffOneListen', label: 'Harder: hear the original only once', nextSong: true },
+    { key: 'oneNoteOffOneListen', label: 'Harder: hear the original only once', nextSong: false },
   ],
 }
