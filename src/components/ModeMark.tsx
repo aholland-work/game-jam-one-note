@@ -15,14 +15,12 @@ export function ModeMark({ mode }: { mode: GameMode }) {
         <ellipse cx="12" cy="29" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 12 29)" />
         <ellipse cx="42" cy="16" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 42 16)" />
         <ellipse cx="71" cy="25" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 71 25)" />
-        <path d="M17 28V10M47 15V2M76 24V6M36 29h12M54 28V14m-3 3 3-3 3 3" />
+        <path d="M17 28V10M47 15V2M76 24V6" />
+        <ellipse cx="42" cy="30" rx="5" ry="3.5" strokeDasharray="2 4" transform="rotate(-20 42 30)" />
       </>}
       {mode === 'echo-note' && <>
-        <ellipse cx="15" cy="31" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 15 31)" />
-        <ellipse cx="15" cy="23" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 15 23)" />
-        <ellipse cx="15" cy="15" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 15 15)" />
-        <path d="M20 30V3M35 16q4 5 0 10m9-15q8 10 0 20M76 26V8" />
-        <ellipse cx="71" cy="27" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 71 27)" />
+        <ellipse cx="18" cy="28" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 18 28)" />
+        <path d="M23 27V5M39 15q5 5 0 10M53 10q9 10 0 20M67 5q13 15 0 30" />
       </>}
     </svg>
   )
