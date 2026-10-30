@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { foldIntoPiano, parseNoteOn, toConcert } from './midi'
+import { foldIntoPiano, parseNoteOn } from './midi'
 
 it('reads note-on messages on any channel and ignores the rest', () => {
   expect(parseNoteOn(new Uint8Array([0x90, 60, 100]))).toBe(60)
@@ -8,13 +8,6 @@ it('reads note-on messages on any channel and ignores the rest', () => {
   expect(parseNoteOn(new Uint8Array([0x90, 60, 0]))).toBeNull()
   expect(parseNoteOn(new Uint8Array([0x80, 60, 64]))).toBeNull()
   expect(parseNoteOn(new Uint8Array([0xb0, 7, 100]))).toBeNull()
-})
-
-it('turns written notes for transposing instruments into sounding notes', () => {
-  // A written C sounds as C on a keyboard, B♭ on a tenor sax and E♭ on an alto sax.
-  expect(toConcert(72, 'c')).toBe(72)
-  expect(toConcert(72, 'bb') % 12).toBe(10)
-  expect(toConcert(72, 'eb') % 12).toBe(3)
 })
 
 it('folds any octave onto the piano', () => {

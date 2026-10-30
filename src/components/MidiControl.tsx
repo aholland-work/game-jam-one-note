@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { TRANSPOSE_OPTIONS, midiInput, useMidiState, type Transpose } from '../audio/midi'
+import { midiInput, useMidiState } from '../audio/midi'
 import { midiToName } from '../music/notation'
 import './MidiControl.css'
 
@@ -46,16 +46,6 @@ export function MidiControl() {
           : 'MIDI is on. Plug in an instrument or pair it over Bluetooth.'}
         {midi.lastNote !== null && <span className="midi-control-heard">Heard {midiToName(midi.lastNote)}</span>}
       </span>
-      <label>
-        Reads music in{' '}
-        <select value={midi.transpose} onChange={(event) => midiInput.setTranspose(event.target.value as Transpose)}>
-          {TRANSPOSE_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
       <label>
         <input type="checkbox" checked={midi.sound} onChange={(event) => midiInput.setSound(event.target.checked)} />{' '}
         Piano sound

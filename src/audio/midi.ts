@@ -6,24 +6,11 @@ import { audioEngine } from './engine'
  * piano keys. Uses the Web MIDI API (Chrome, Edge and Firefox; not Safari).
  */
 
-export type Transpose = 'c' | 'bb' | 'eb'
-
-/** Instruments that read music in one key and sound in another, and how far they shift. */
-export const TRANSPOSE_OPTIONS: { id: Transpose; label: string; semitones: number }[] = [
-  { id: 'c', label: 'C (keyboard, flute, violin)', semitones: 0 },
-  { id: 'bb', label: 'B♭ (tenor or soprano sax, trumpet, clarinet)', semitones: -2 },
-  { id: 'eb', label: 'E♭ (alto or baritone sax)', semitones: -9 },
-]
-
 /** The note a message starts, or null for anything else (a note-on with velocity 0 is a release). */
 export function parseNoteOn(data: Uint8Array): number | null {
   const [status, note, velocity] = data
   return (status & 0xf0) === 0x90 && velocity > 0 ? note : null
 }
-
-/** The sounding pitch of a note written for a transposing instrument. */
-export const toConcert = (midi: number, transpose: Transpose) =>
-  midi + (TRANSPOSE_OPTIONS.find((option) => option.id === transpose)?.semitones ?? 0)
 
 /** Moves a note by octaves until it lands on a piano that starts at `startMidi`. */
 export function foldIntoPiano(midi: number, startMidi: number, octaves: number): number {
@@ -37,10 +24,9 @@ export interface MidiState {
   status: MidiStatus
   /** Names of the connected instruments. */
   devices: string[]
-  transpose: Transpose
   /** Play the game's piano sound for MIDI notes (off for instruments with their own sound). */
   sound: boolean
-  /** The last note heard, after transposing, to check the setup. */
+  /** The last note heard, to check the setup. */
   lastNote: number | null
 }
 
@@ -48,12 +34,11 @@ const STORAGE_KEY = 'one-note:midi'
 
 interface SavedPrefs {
   enabled: boolean
-  transpose: Transpose
   sound: boolean
 }
 
 function loadPrefs(): SavedPrefs {
-  const defaults: SavedPrefs = { enabled: false, transpose: 'c', sound: true }
+  const defaults: SavedPrefs = { enabled: false, sound: true }
   try {
     return { ...defaults, ...(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}') as Partial<SavedPrefs>) }
   } catch {
@@ -69,7 +54,6 @@ class MidiInput {
   state: MidiState = {
     status: typeof navigator !== 'undefined' && 'requestMIDIAccess' in navigator ? 'off' : 'unsupported',
     devices: [],
-    transpose: this.prefs.transpose,
     sound: this.prefs.sound,
     lastNote: null,
   }
@@ -116,11 +100,6 @@ class MidiInput {
     this.update({ status: 'off', devices: [], lastNote: null })
   }
 
-  setTranspose(transpose: Transpose) {
-    this.savePrefs({ transpose })
-    this.update({ transpose })
-  }
-
   setSound(sound: boolean) {
     this.savePrefs({ sound })
     this.update({ sound })
@@ -140,9 +119,8 @@ class MidiInput {
       input.onmidimessage = (event) => {
         const note = event.data ? parseNoteOn(event.data) : null
         if (note === null) return
-        const concert = toConcert(note, this.state.transpose)
-        this.update({ lastNote: concert })
-        this.noteListeners.forEach((listener) => listener(concert))
+        this.update({ lastNote: note })
+        this.noteListeners.forEach((listener) => listener(note))
       }
     })
     this.update({ devices })
@@ -170,7 +148,7 @@ export function useMidiState(): MidiState {
   return useSyncExternalStore(midiInput.subscribe, () => midiInput.state)
 }
 
-/** Calls `handler` with each note played on a connected instrument (sounding pitch). */
+/** Calls `handler` with each note played on a connected instrument. */
 export function useMidiNotes(handler: (midi: number) => void) {
   const onNote = useEffectEvent(handler)
   useEffect(() => midiInput.onNote((midi) => onNote(midi)), [])

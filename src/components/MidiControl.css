@@ -13,15 +13,6 @@
   font-size: 0.85rem;
 }
 
-.midi-control select {
-  font: inherit;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px 4px;
-}
-
 .midi-control-note {
   margin: 0;
   text-align: center;
