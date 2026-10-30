@@ -9,7 +9,9 @@
   transition: transform 140ms, box-shadow 140ms, border-color 140ms, background-color 140ms, color 140ms;
 }
 
-:is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change):is(:hover, :focus-visible, [aria-expanded='true']):not(:disabled) {
+:is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change):is(:hover, :focus-visible):not(:disabled),
+/* An open menu keeps its button lit; Change practice and Done stay plain. */
+:is(.round-navigation .round-back, .round-navigation .settings-button)[aria-expanded='true']:not(:disabled) {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
