@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useId, useRef, useState, type CSSProperties } from 'react'
 import { foldIntoPiano, useMidiNotes } from '../audio/midi'
+import { LETTER_KEYS as SHORTCUTS, letterKeySemitone } from '../game/letterKeys'
 import './Piano.css'
 
 /** A number shown on a key, e.g. its step in a scale, and whether it's tinted as a possible answer. */
@@ -22,6 +23,8 @@ interface PianoProps {
   showShortcuts?: boolean
   /** Name the black keys with flats (B♭) instead of sharps (A♯), to match songs written in flats. */
   flats?: boolean
+  /** Letter keys play notes wherever focus is on the page, not just on the piano. */
+  lettersAnywhere?: boolean
   /** Numbers to show on keys, by MIDI note. A "1" marks home and gets a stronger tint. */
   degrees?: Partial<Record<number, KeyDegree>>
   /** A key was pressed: clicked, typed, or played on a connected MIDI instrument. */
@@ -41,8 +44,6 @@ const SHARP_LABELS = ['C', 'C\u266F', 'D', 'D\u266F', 'E', 'F', 'F\u266F', 'G', 
 const FLAT_LABELS = ['C', 'D\u266D', 'D', 'E\u266D', 'E', 'F', 'G\u266D', 'G', 'A\u266D', 'A', 'B\u266D', 'B']
 const SPOKEN_SHARPS = ['C', 'C sharp', 'D', 'D sharp', 'E', 'F', 'F sharp', 'G', 'G sharp', 'A', 'A sharp', 'B']
 const SPOKEN_FLATS = ['C', 'D flat', 'D', 'E flat', 'E', 'F', 'G flat', 'G', 'A flat', 'A', 'B flat', 'B']
-// Computer keyboard shortcuts, in semitone order (the usual music-app layout).
-const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
 /** A piano of one or more octaves with note names on the keys, and optionally their keyboard shortcuts. */
 export function Piano({
@@ -53,6 +54,7 @@ export function Piano({
   playingMidi = null,
   showShortcuts = false,
   flats = false,
+  lettersAnywhere = true,
   degrees = {},
   onPress,
 }: PianoProps) {
@@ -68,18 +70,25 @@ export function Piano({
     releaseTimer.current = window.setTimeout(() => setPressed(null), 180)
   }
 
-  const onShortcut = useEffectEvent((semitone: number) => press(startMidi + semitone))
+  const onShortcut = useEffectEvent((event: KeyboardEvent) => {
+    const target = event.target instanceof Element ? event.target : null
+    const semitone = letterKeySemitone(
+      {
+        key: event.key,
+        repeat: event.repeat,
+        modified: event.metaKey || event.ctrlKey || event.altKey,
+        typing: Boolean(target?.closest('input, select, textarea, [contenteditable]')),
+        inPiano: Boolean(root.current?.contains(document.activeElement)),
+      },
+      lettersAnywhere,
+    )
+    if (semitone === null) return
+    event.preventDefault()
+    press(startMidi + semitone)
+  })
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return
-      // Single-letter shortcuts are scoped to the focused instrument.
-      if (!root.current?.contains(document.activeElement)) return
-      const semitone = SHORTCUTS.indexOf(event.key.toLowerCase())
-      if (semitone === -1) return
-      event.preventDefault()
-      onShortcut(semitone)
-    }
+    const onKeyDown = (event: KeyboardEvent) => onShortcut(event)
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
@@ -152,7 +161,7 @@ export function Piano({
 
   return (
     <div ref={root} className="piano" role="group" aria-label="Piano" aria-describedby={helpId} style={{ '--octaves': octaves } as CSSProperties}>
-      <span id={helpId} className="sr-only">Use arrow keys to move between notes, Home or End to jump to either end, and Enter or Space to play. Letter shortcuts work while the piano has focus.</span>
+      <span id={helpId} className="sr-only">Use arrow keys to move between notes, Home or End to jump to either end, and Enter or Space to play. {lettersAnywhere ? 'Letter shortcuts work anywhere on the page; you can turn that off in Settings.' : 'Letter shortcuts work while the piano has focus.'}</span>
       {Array.from({ length: 12 * octaves }, (_, index) => {
         const octave = Math.floor(index / 12)
         const semitone = index % 12

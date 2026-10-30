@@ -283,6 +283,7 @@ export function OneNoteOffRound({
           selectedMidi={null}
           // Lighting keys while guessing would point at the changed note, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}
+          lettersAnywhere={settings.lettersAnywhere}
           onPress={(midi, fromMidi) => midiInput.playKey(midi, fromMidi)}
         />
       </div>

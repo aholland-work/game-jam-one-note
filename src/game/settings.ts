@@ -23,6 +23,8 @@ export interface Settings {
   echoShowScale: boolean
   /** Echo Note: play the mystery note while the chord is still ringing, like a solo over a band. */
   echoOverChord: boolean
+  /** Every mode: letter keys play the piano from anywhere on the page, not only when it has focus. */
+  lettersAnywhere: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -33,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   echoKey: 'c',
   echoShowScale: true,
   echoOverChord: false,
+  lettersAnywhere: true,
 }
 
 // Storage can be unavailable (private windows, blocked site data); defaults apply then.
@@ -67,9 +70,16 @@ export interface SettingOption {
   nextSong: boolean
 }
 
-/** Each mode's optional rules, in the order they're listed. Missing Note has none. */
+// Voice control and some screen readers send single letters, which could play notes by accident.
+const LETTERS_ANYWHERE: SettingOption = {
+  key: 'lettersAnywhere',
+  label: 'Letter keys (A, W, S…) play the piano from anywhere on the page. Turn off if you use voice control or a screen reader',
+  nextSong: false,
+}
+
+/** Each mode's optional rules, in the order they're listed. */
 export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
-  'missing-note': [],
+  'missing-note': [LETTERS_ANYWHERE],
   'echo-note': [
     { key: 'echoShowScale', label: 'Show the key’s notes and their numbers on the piano', nextSong: false },
     {
@@ -77,6 +87,7 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
       label: 'Play the mystery note over the chord, like a solo over a band (harder)',
       nextSong: false,
     },
+    LETTERS_ANYWHERE,
   ],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
@@ -85,5 +96,6 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
       label: 'Hard mode: the changed note only moves to the next note in the song’s key (fast notes too), and you hear the original only once',
       nextSong: true,
     },
+    LETTERS_ANYWHERE,
   ],
 }

@@ -3,10 +3,12 @@ import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { RoundNavigation } from '../../components/RoundNavigation'
+import { SettingsMenu } from '../../components/SettingsMenu'
 import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
+import type { Settings } from '../../game/settings'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import { usesFlats } from '../../music/notation'
@@ -36,6 +38,8 @@ const TUTORIAL_TEXT: Record<TutorialStep, string> = {
 
 interface MissingNoteRoundProps {
   song: Song
+  settings: Settings
+  onSettingsChange: (settings: Settings) => void
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
@@ -44,7 +48,7 @@ interface MissingNoteRoundProps {
 }
 
 /** One Missing Note puzzle: listen, test keys on the piano, lock in one answer. */
-export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNoteRoundProps) {
+export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onNext, onSolved }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
@@ -176,7 +180,9 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
 
   return (
     <section className="round is-missing-note" aria-labelledby="round-title">
-      <RoundNavigation onBack={onBack} />
+      <RoundNavigation onBack={onBack}>
+        <SettingsMenu mode="missing-note" settings={settings} onChange={onSettingsChange} inRound />
+      </RoundNavigation>
       <p className="round-mode">Missing Note</p>
       <header className="round-header">
         <h2 id="round-title" tabIndex={-1}>{song.title}</h2>
@@ -286,6 +292,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
           // Lighting keys while guessing would give the answer away, so only show it in the result.
           playingMidi={isOver ? playingMidi : null}
           showShortcuts={showShortcuts}
+          lettersAnywhere={settings.lettersAnywhere}
           onPress={pressKey}
         />
       </div>

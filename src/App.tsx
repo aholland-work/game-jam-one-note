@@ -93,6 +93,8 @@ function App() {
             <MissingNoteRound
               key={`${mode}-${current.id}`}
               song={current}
+              settings={settings}
+              onSettingsChange={changeSettings}
               onBack={() => setCurrent(null)}
               onNext={next ? () => setCurrent(next) : null}
               onSolved={() => markSolved(current)}
