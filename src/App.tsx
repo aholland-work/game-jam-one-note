@@ -37,8 +37,8 @@ function App() {
       {echoRound !== null ? (
         <EchoNoteRound
           key={echoRound}
-          level={settings.echoLevel}
-          length={settings.echoLength}
+          settings={settings}
+          onSettingsChange={changeSettings}
           onBack={() => setEchoRound(null)}
           onPlayAgain={startEcho}
           onLevelUp={(echoLevel) => {

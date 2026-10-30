@@ -13,6 +13,8 @@ interface PianoProps {
   showShortcuts?: boolean
   /** Name the black keys with flats (B♭) instead of sharps (A♯), to match songs written in flats. */
   flats?: boolean
+  /** Numbers to show on keys, by note (0 = C, 1 = C♯ ... 11 = B), e.g. a key's scale steps. Those keys get a tint. */
+  degrees?: Partial<Record<number, string>>
   onPress: (midi: number) => void
 }
 
@@ -40,6 +42,7 @@ export function Piano({
   playingMidi = null,
   showShortcuts = false,
   flats = false,
+  degrees = {},
   onPress,
 }: PianoProps) {
   const [pressed, setPressed] = useState<number | null>(null)
@@ -71,6 +74,8 @@ export function Piano({
   const keyClass = (base: string, midi: number) =>
     [
       base,
+      degrees[midi % 12] && 'is-in-key',
+      degrees[midi % 12] === '1' && 'is-home',
       midi === selectedMidi && `is-${selectedTone}`,
       midi === playingKey && 'is-playing',
       midi === pressed && 'is-pressed',
@@ -101,6 +106,7 @@ export function Piano({
             }}
             style={{ left: `${(i / 7) * 100}%` }}
           >
+            {degrees[midi % 12] && <span className="piano-degree">{degrees[midi % 12]}</span>}
             {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
             <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
           </button>
@@ -127,6 +133,7 @@ export function Piano({
             }}
             style={{ left: `${(afterWhite / 7) * 100}%` }}
           >
+            {degrees[midi % 12] && <span className="piano-degree">{degrees[midi % 12]}</span>}
             {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
             <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
           </button>

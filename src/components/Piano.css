@@ -41,6 +41,36 @@
   z-index: 2;
 }
 
+.piano-white.is-in-key {
+  background: #e6f0fa;
+}
+
+.piano-black.is-in-key {
+  background: #3f5f86;
+  border-color: #3f5f86;
+}
+
+.piano-white.is-home {
+  background: #cfe2f6;
+  box-shadow: inset 0 -4px 0 #2f6db0;
+}
+
+.piano-black.is-home {
+  background: #2f6db0;
+  border-color: #2f6db0;
+}
+
+.piano-degree {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2f6db0;
+  pointer-events: none;
+}
+
+.piano-black .piano-degree {
+  color: #e6f0fa;
+}
+
 .piano-white:hover {
   background: #f4f3ef;
 }

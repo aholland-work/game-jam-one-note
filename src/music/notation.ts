@@ -9,6 +9,8 @@ export interface Note {
   tie?: boolean
   /** Other pitches sounding with this note, making it a chord. Only used for sound, not the staff. */
   chord?: number[]
+  /** Extra beats this note and its chord keep ringing after the next note starts. Only used for sound. */
+  sustain?: number
 }
 
 const LETTER_SEMITONES: Record<string, number> = {

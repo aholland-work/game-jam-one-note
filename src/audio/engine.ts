@@ -104,9 +104,10 @@ class AudioEngine {
         // A tied chain sounds as one held note.
         let beats = note.beats
         for (let j = i; notes[j].tie && notes[j + 1]?.midi === note.midi; j++) beats += notes[j + 1].beats
-        sources.push(...this.scheduleVoice(note.midi, time, beats * secondsPerBeat))
+        sources.push(...this.scheduleVoice(note.midi, time, (beats + (note.sustain ?? 0)) * secondsPerBeat))
       }
-      for (const midi of note.chord ?? []) sources.push(...this.scheduleVoice(midi, time, note.beats * secondsPerBeat))
+      const chordSeconds = (note.beats + (note.sustain ?? 0)) * secondsPerBeat
+      for (const midi of note.chord ?? []) sources.push(...this.scheduleVoice(midi, time, chordSeconds))
       time += note.beats * secondsPerBeat
     })
     const end = time

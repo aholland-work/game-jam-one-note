@@ -57,11 +57,43 @@ export function SongList({
       </div>
       {mode === 'echo-note' ? (
         <div className="song-list-echo">
-          <h2 id="song-list-title">Echo Note</h2>
+          <div className="song-list-heading">
+            <h2 id="song-list-title">Echo Note</h2>
+            <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
+          </div>
           <p>
-            Train your ear. For each mystery note you hear a C major chord to set the key, then the note. Find it on the
-            piano and lock in one answer. Notes you miss come back more often.
+            Ear training for playing by ear and improvising: learn to hear where a note sits in a key, and find it on
+            the piano.
           </p>
+          <div className="song-list-how">
+            <h3>How it works</h3>
+            <ol>
+              <li>
+                <strong>A chord sets the key.</strong> Its lowest note is home base, the <strong>1</strong>. The other
+                notes of the key are numbered up from there: 1 2 3 4 5 6 7.
+              </li>
+              <li>
+                <strong>A mystery note plays.</strong> Replay the chord and the note as often as you like (Space
+                replays both).
+              </li>
+              <li>
+                <strong>Find it on the piano.</strong> Tap keys to compare, then lock in one answer. You'll see its
+                name and its number, like “C♯, the 3 of A major”.
+              </li>
+              <li>
+                <strong>Keep going.</strong> Notes you miss come back more often. Score 4 of 5 or better to unlock the
+                next set of notes.
+              </li>
+            </ol>
+            <p className="song-list-tip">
+              Tip: hum the mystery note, then slide your voice down to the 1 and count the steps. Each number has its
+              own feel: the 1 sounds settled, the 5 sounds strong, and the 7 leans up toward the 1.
+            </p>
+            <p className="song-list-tip">
+              In ⚙ Settings you can hide the numbers on the piano once you know your way around, or play the mystery
+              note over the chord, the way a solo sits over a band.
+            </p>
+          </div>
           <div className="song-list-choice" role="group" aria-label="Notes in play">
             <span>Notes</span>
             {ECHO_LEVELS.map((option) => (
@@ -73,6 +105,28 @@ export function SongList({
                 onClick={() => onSettingsChange({ ...settings, echoLevel: option.id })}
               >
                 {option.label}
+              </button>
+            ))}
+          </div>
+          <p className="song-list-choice-about">
+            {ECHO_LEVELS.find((option) => option.id === settings.echoLevel)?.about}
+          </p>
+          <div className="song-list-choice" role="group" aria-label="Key">
+            <span>Key</span>
+            {(
+              [
+                ['c', 'C major'],
+                ['random', 'New key each round'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="song-list-filter"
+                aria-pressed={settings.echoKey === id}
+                onClick={() => onSettingsChange({ ...settings, echoKey: id })}
+              >
+                {label}
               </button>
             ))}
           </div>
@@ -96,7 +150,7 @@ export function SongList({
             ))}
           </div>
           <button type="button" className="song-list-start" onClick={onStartEcho}>
-            ▶ Start a round
+            ▶ Start
           </button>
         </div>
       ) : (

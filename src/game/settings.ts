@@ -1,4 +1,4 @@
-import type { EchoLength, EchoLevel } from './echoNote'
+import type { EchoKeyChoice, EchoLength, EchoLevel } from './echoNote'
 
 const STORAGE_KEY = 'one-note:settings'
 
@@ -17,6 +17,12 @@ export interface Settings {
   echoLevel: EchoLevel
   /** Echo Note: five-note rounds, or endless practice. */
   echoLength: EchoLength
+  /** Echo Note: always C major, or a new key each round. */
+  echoKey: EchoKeyChoice
+  /** Echo Note: tint the key's notes on the piano and show their numbers. */
+  echoShowScale: boolean
+  /** Echo Note: play the mystery note while the chord is still ringing, like a solo over a band. */
+  echoOverChord: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -24,6 +30,9 @@ export const DEFAULT_SETTINGS: Settings = {
   oneNoteOffHard: false,
   echoLevel: 'triad',
   echoLength: 'round',
+  echoKey: 'c',
+  echoShowScale: true,
+  echoOverChord: false,
 }
 
 // Storage can be unavailable (private windows, blocked site data); defaults apply then.
@@ -58,10 +67,17 @@ export interface SettingOption {
   nextSong: boolean
 }
 
-/** Each mode's optional rules, in the order they're listed. Missing Note and Echo Note have none. */
+/** Each mode's optional rules, in the order they're listed. Missing Note has none. */
 export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
   'missing-note': [],
-  'echo-note': [],
+  'echo-note': [
+    { key: 'echoShowScale', label: 'Show the key’s notes and their numbers on the piano', nextSong: false },
+    {
+      key: 'echoOverChord',
+      label: 'Play the mystery note over the chord, like a solo over a band (harder)',
+      nextSong: false,
+    },
+  ],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
     {

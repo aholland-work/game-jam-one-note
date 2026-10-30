@@ -154,3 +154,33 @@
   font-size: 0.9rem;
   color: var(--text-muted);
 }
+
+.song-list-echo .song-list-heading {
+  width: 100%;
+}
+
+.song-list-how {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 64ch;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.song-list-how h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.song-list-how ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.song-list-echo .song-list-choice-about {
+  margin: -0.25rem 0 0 calc(4rem + 8px);
+  font-size: 0.9rem;
+}

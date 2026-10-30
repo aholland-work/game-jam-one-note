@@ -3,18 +3,26 @@ import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { PlayingBars } from '../../components/PlayingBars'
+import { SettingsMenu } from '../../components/SettingsMenu'
 import {
+  CHORD_TONES,
+  C_MAJOR,
   ECHO_LEVELS,
-  KEY_CHORD,
-  REFERENCE_MIDI,
+  MAJOR_SCALE,
+  NOTES_PER_KEY,
   ROUND_LENGTH,
-  intervalFromC,
+  degreeName,
+  describeNote,
+  keyName,
   nextLevel,
-  notesForLevel,
+  noteInKey,
   pickEchoNote,
-  type EchoLength,
+  pickKey,
+  stepsForLevel,
+  type EchoKey,
   type EchoLevel,
 } from '../../game/echoNote'
+import type { Settings } from '../../game/settings'
 import { midiToName, midiToPitch, type Note } from '../../music/notation'
 import '../round.css'
 import './EchoNoteRound.css'
@@ -23,12 +31,19 @@ type Playback = 'both' | 'chord' | 'mystery'
 
 const BPM = 80
 const note = (midi: number, beats: number): Note => ({ midi, pitch: midiToPitch(midi), beats })
-const chord = (beats: number): Note => ({ ...note(KEY_CHORD[0], beats), chord: KEY_CHORD.slice(1) })
 const rest = (beats: number): Note => ({ midi: null, pitch: null, beats })
 
+/** The key's own chord. Under a mystery note it sits an octave lower, so the note stands out. */
+const chord = (key: EchoKey, beats: number, low: boolean): Note => {
+  const [root, ...upper] = CHORD_TONES.map((step) => key.tonic + step - (low ? 12 : 0))
+  return { ...note(root, beats), chord: upper }
+}
+
+const samePitchClass = (a: number, b: number) => a % 12 === b % 12
+
 interface EchoNoteRoundProps {
-  level: EchoLevel
-  length: EchoLength
+  settings: Settings
+  onSettingsChange: (settings: Settings) => void
   onBack: () => void
   onPlayAgain: () => void
   /** Starts a new round at a harder level. */
@@ -36,28 +51,42 @@ interface EchoNoteRoundProps {
 }
 
 /**
- * One Echo Note session: for each mystery note, hear a C major chord and then the note,
+ * One Echo Note session: for each mystery note, hear the key's chord and then the note,
  * find it on the piano, and lock in one answer. Notes the player misses come back more often.
  */
-export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }: EchoNoteRoundProps) {
-  const notes = notesForLevel(level)
-  const [target, setTarget] = useState(() => pickEchoNote(notes, null))
+export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onLevelUp }: EchoNoteRoundProps) {
+  // The level, length and key choice are set for the whole session.
+  const [{ echoLevel: level, echoLength: length, echoKey: keyChoice }] = useState(settings)
+  const steps = stepsForLevel(level)
+  const [key, setKey] = useState(() => (keyChoice === 'random' ? pickKey(null) : C_MAJOR))
+  const [step, setStep] = useState(() => pickEchoNote(steps, null))
   // Bumped for every new mystery note, so it plays as soon as it comes up.
   const [turn, setTurn] = useState(0)
   const [answered, setAnswered] = useState(false)
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
-  const [history, setHistory] = useState<{ target: number; guess: number }[]>([])
+  const [history, setHistory] = useState<{ key: EchoKey; step: number; guess: number }[]>([])
+  // Misses are counted by note number, so a tricky 7 keeps coming back in every key.
   const [misses, setMisses] = useState<Partial<Record<number, number>>>({})
   const [hint, setHint] = useState<string | null>(null)
+  const [newKey, setNewKey] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const player = useMelodyPlayer<Playback>(BPM)
 
   const endless = length === 'endless'
-  const correctCount = history.filter((entry) => entry.guess === entry.target).length
+  const target = noteInKey(key, step)
+  const isRight = (entry: { key: EchoKey; step: number; guess: number }) =>
+    samePitchClass(entry.guess, noteInKey(entry.key, entry.step))
+  const correctCount = history.filter(isRight).length
   const roundOver = !endless && answered && history.length === ROUND_LENGTH
 
-  const playBoth = () => player.play('both', [chord(1), rest(0.5), note(target, 1.5)])
-  const playChord = () => player.play('chord', [chord(1.5)])
+  const playBoth = () =>
+    player.play(
+      'both',
+      settings.echoOverChord
+        ? [{ ...chord(key, 1, true), sustain: 2 }, note(target, 2)]
+        : [chord(key, 1, false), rest(0.5), note(target, 1.5)],
+    )
+  const playChord = () => player.play('chord', [chord(key, 1.5, settings.echoOverChord)])
   const playMystery = () => player.play('mystery', [note(target, 1.5)])
 
   const onNewNote = useEffectEvent(() => playBoth())
@@ -72,19 +101,25 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
 
   const lockIn = () => {
     if (selectedMidi === null) return setHint('Tap the piano key you think the mystery note is first.')
-    const right = selectedMidi === target
+    const entry = { key, step, guess: selectedMidi }
+    const right = isRight(entry)
     setAnswered(true)
-    setHistory([...history, { target, guess: selectedMidi }])
+    setNewKey(false)
+    setHistory([...history, entry])
     // A miss makes the note come up more often; getting it right eases it back.
-    setMisses({ ...misses, [target]: Math.max(0, (misses[target] ?? 0) + (right ? -1 : 1)) })
-    const name = `${midiToName(target)}, ${intervalFromC(target)}`
-    setHint(right ? `That's it: ${name}.` : `Not quite. It was ${name}. You picked ${midiToName(selectedMidi)}.`)
+    setMisses({ ...misses, [step]: Math.max(0, (misses[step] ?? 0) + (right ? -1 : 1)) })
+    const picked = `${midiToName(selectedMidi, key.flats)}, the ${degreeName(selectedMidi - key.tonic)}`
+    setHint(right ? `That's it: ${describeNote(key, step)}.` : `Not quite. It was ${describeNote(key, step)}. You picked ${picked}.`)
     // Play the right answer so the player hears it.
     player.play('mystery', [note(target, 1.5)])
   }
 
   const nextNote = () => {
-    setTarget(pickEchoNote(notes, target, misses))
+    // Endless practice with random keys moves to a new key every so often.
+    const changeKey = endless && keyChoice === 'random' && history.length % NOTES_PER_KEY === 0
+    if (changeKey) setKey(pickKey(key))
+    setNewKey(changeKey)
+    setStep(pickEchoNote(steps, changeKey ? null : step, misses))
     setTurn(turn + 1)
     setAnswered(false)
     setSelectedMidi(null)
@@ -126,8 +161,8 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
   if (showSummary) {
     const harder = nextLevel(level)
     const strong = history.length > 0 && correctCount / history.length >= 0.8
-    const missedNotes = [...new Set(history.filter((entry) => entry.guess !== entry.target).map((entry) => entry.target))]
-      .map((midi) => ({ midi, times: history.filter((entry) => entry.target === midi && entry.guess !== midi).length }))
+    const missedSteps = [...new Set(history.filter((entry) => !isRight(entry)).map((entry) => entry.step))]
+      .map((missed) => ({ missed, times: history.filter((entry) => entry.step === missed && !isRight(entry)).length }))
       .sort((a, b) => b.times - a.times)
     return (
       <section className="round" aria-labelledby="round-title">
@@ -142,32 +177,32 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
           You matched <strong>{correctCount}</strong> of {history.length} notes.
         </p>
         {endless ? (
-          missedNotes.length > 0 && (
+          missedSteps.length > 0 && (
             <p className="echo-practice">
               Notes to keep practicing:{' '}
-              {missedNotes.map(({ midi, times }) => `${midiToName(midi)} (missed ${times}×)`).join(', ')}
+              {missedSteps.map(({ missed, times }) => `the ${degreeName(missed)} (missed ${times}×)`).join(', ')}
             </p>
           )
         ) : (
           <ol className="echo-results">
             {history.map((entry, i) => {
-              const right = entry.guess === entry.target
+              const right = isRight(entry)
               return (
                 <li key={i} className={right ? 'is-found' : 'is-missed'}>
-                  <span aria-hidden="true">{right ? '✓' : '✗'}</span> {midiToName(entry.target)}
-                  <span className="echo-guess">
-                    {' '}
-                    ({intervalFromC(entry.target)}
-                    {!right && `; you picked ${midiToName(entry.guess)}`})
-                  </span>
+                  <span aria-hidden="true">{right ? '✓' : '✗'}</span> {describeNote(entry.key, entry.step)}
+                  {!right && (
+                    <span className="echo-guess">
+                      {' '}
+                      (you picked {midiToName(entry.guess, entry.key.flats)}, the{' '}
+                      {degreeName(entry.guess - entry.key.tonic)})
+                    </span>
+                  )}
                 </li>
               )
             })}
           </ol>
         )}
-        {strong && harder && (
-          <p className="echo-level-up">Nice ear! Ready for more notes?</p>
-        )}
+        {strong && harder && <p className="echo-level-up">Nice ear! Ready for more notes?</p>}
         <div className="round-controls">
           <span className="round-spacer" />
           {strong && harder && (
@@ -183,7 +218,10 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
     )
   }
 
-  const result = answered ? (history[history.length - 1].guess === target ? 'found' : 'missed') : null
+  const result = answered ? (isRight(history[history.length - 1]) ? 'found' : 'missed') : null
+  const degrees = settings.echoShowScale
+    ? Object.fromEntries(MAJOR_SCALE.map((scaleStep) => [(key.tonic + scaleStep) % 12, degreeName(scaleStep)]))
+    : {}
 
   return (
     <section className="round" aria-labelledby="round-title">
@@ -192,13 +230,21 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
       </button>
       <header className="round-header">
         <h2 id="round-title">Echo Note</h2>
-        <p className="round-genre">
-          {levelLabel} ·{' '}
-          {endless
-            ? `${correctCount} of ${history.length} right`
-            : `Note ${Math.min(history.length + (answered ? 0 : 1), ROUND_LENGTH)} of ${ROUND_LENGTH}`}
-        </p>
+        <div className="round-header-side">
+          <p className="round-genre">
+            {levelLabel} ·{' '}
+            {endless
+              ? `${correctCount} of ${history.length} right`
+              : `Note ${Math.min(history.length + (answered ? 0 : 1), ROUND_LENGTH)} of ${ROUND_LENGTH}`}
+          </p>
+          <SettingsMenu mode="echo-note" settings={settings} onChange={onSettingsChange} inRound />
+        </div>
       </header>
+
+      <p className="echo-key">
+        Key: <strong>{keyName(key)}</strong>
+        {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
+      </p>
 
       {!endless && (
         <ol className="echo-progress" aria-label="Round progress">
@@ -207,7 +253,7 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
               key={i}
               className={
                 i < history.length
-                  ? history[i].guess === history[i].target
+                  ? isRight(history[i])
                     ? 'is-found'
                     : 'is-missed'
                   : i === history.length
@@ -221,11 +267,11 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
 
       <p className={`round-hint${result ? ` is-${result}` : ''}`} role="status">
         {hint ??
-          'You hear a C major chord to set the key, then the mystery note. Find it on the piano, then lock in. Listen as often as you like.'}
+          `The ${keyName(key)} chord sets home base (the 1). Which number is the mystery note? Tap keys to compare, then lock in.`}
       </p>
 
       <div className="round-controls">
-        {playButton('both', 'Chord, then the mystery note', playBoth)}
+        {playButton('both', settings.echoOverChord ? 'Mystery note over the chord' : 'Chord, then the mystery note', playBoth)}
         {playButton('chord', 'Chord', playChord)}
         {!answered && playButton('mystery', 'Mystery note', playMystery)}
         <span className="round-spacer" />
@@ -251,9 +297,11 @@ export function EchoNoteRound({ level, length, onBack, onPlayAgain, onLevelUp }:
 
       <div className="round-piano">
         <Piano
-          startMidi={REFERENCE_MIDI}
-          selectedMidi={answered ? target : selectedMidi}
+          startMidi={60}
+          selectedMidi={answered ? 60 + (target % 12) : selectedMidi}
           selectedTone={result ?? 'selected'}
+          flats={key.flats}
+          degrees={degrees}
           onPress={pressKey}
         />
       </div>
