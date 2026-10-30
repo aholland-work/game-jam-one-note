@@ -36,3 +36,21 @@
   color: var(--text-muted);
   text-decoration: underline;
 }
+
+.midi-details {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.midi-details summary {
+  cursor: pointer;
+  text-align: center;
+}
+
+.midi-details summary:hover {
+  color: var(--accent);
+}
+
+.midi-details .midi-control {
+  margin-top: 0.5rem;
+}
