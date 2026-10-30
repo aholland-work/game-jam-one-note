@@ -38,13 +38,9 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('on Easy, jumps the note 3 to 5 half steps to a pitch the melody never uses', () => {
-    const inKey = melodyPitchClasses(song.melody)
+  it('on Easy, always moves the note up exactly 3 half steps', () => {
     for (const { index, midi } of anyPitch) {
-      const distance = Math.abs(midi - (song.melody[index].midi as number))
-      expect(distance).toBeGreaterThanOrEqual(3)
-      expect(distance).toBeLessThanOrEqual(5)
-      expect(inKey.has(midi % 12)).toBe(false)
+      expect(midi - (song.melody[index].midi as number)).toBe(3)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }

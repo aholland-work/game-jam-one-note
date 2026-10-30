@@ -24,8 +24,7 @@ export type Difficulty = 'easy' | 'hard'
  * Picks one note to move for a One Note Off round. It never matches the notes on either
  * side, so the change can't hide in a repeat.
  *
- * - Easy: the note jumps 3 to 5 half steps to a pitch the melody never uses, so the
- *   changed version clearly clashes.
+ * - Easy: the note always moves up exactly 3 half steps, to any pitch.
  * - Hard: the note moves up to 4 half steps to a pitch the melody already uses, so the
  *   changed version still sounds plausible.
  */
@@ -36,18 +35,18 @@ export function pickChange(
 ): NoteChange {
   const { melody } = song
   const pitchClasses = melodyPitchClasses(melody)
-  const [minDistance, maxDistance] = difficulty === 'hard' ? [1, 4] : [3, 5]
-  const fits = (midi: number) => (difficulty === 'hard' ? pitchClasses.has(midi % 12) : !pitchClasses.has(midi % 12))
+  const candidates = (midi: number) =>
+    difficulty === 'hard'
+      ? [-4, -3, -2, -1, 1, 2, 3, 4].map((offset) => midi + offset).filter((pitch) => pitchClasses.has(pitch % 12))
+      : [midi + 3]
   const options: NoteChange[] = []
   melody.forEach((note, index) => {
     if (note.midi === null || note.beats < MIN_BEATS) return
     if (note.tie || melody[index - 1]?.tie) return
-    for (let distance = minDistance; distance <= maxDistance; distance++) {
-      for (const midi of [note.midi - distance, note.midi + distance]) {
-        if (!fits(midi) || midi < LOWEST || midi > HIGHEST) continue
-        if (midi === melody[index - 1]?.midi || midi === melody[index + 1]?.midi) continue
-        options.push({ index, midi })
-      }
+    for (const midi of candidates(note.midi)) {
+      if (midi < LOWEST || midi > HIGHEST) continue
+      if (midi === melody[index - 1]?.midi || midi === melody[index + 1]?.midi) continue
+      options.push({ index, midi })
     }
   })
   if (options.length === 0) throw new Error(`${song.id}: no note can be changed`)
