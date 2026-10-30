@@ -1,107 +1,19 @@
 .round.is-one-note-off { gap: 12px; }
-
-.version-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  padding: 0.45rem 0.9rem 0.45rem 0.6rem;
-}
-
-.version-icon {
-  flex: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  color: var(--surface);
-}
-
-.version-text {
-  display: grid;
-}
-
-.version-title {
-  font-weight: 600;
-}
-
-.version-caption {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-/* Changed: the one to hunt in, in the accent color. */
-.version-button.is-changed {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.is-changed .version-icon,
-.now-playing.is-changed .now-playing-icon {
-  background: var(--accent);
-}
-
-/* Original: the real tune, in green. */
-.version-button.is-original {
-  border-color: var(--success);
-}
-
-.is-original .version-icon,
-.now-playing.is-original .now-playing-icon {
-  background: var(--success);
-}
-
-.version-button.is-playing.is-changed {
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-.version-button.is-playing.is-original {
-  box-shadow: 0 0 0 2px var(--success);
-}
-
-.now-playing {
-  margin: 0;
-  min-height: 1.6rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.now-playing.is-changed {
-  color: var(--accent);
-}
-
-.now-playing.is-original {
-  color: var(--success);
-}
-
-.now-playing-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 0.75rem;
-  color: var(--surface);
-}
-
-.version-button.is-changed .version-caption .playing-bars {
-  color: var(--accent);
-}
-
-.version-button.is-original .version-caption .playing-bars {
-  color: var(--success);
-}
-
-.version-button { min-width: 200px; padding: 10px 14px; border-radius: 7px; }
-.version-icon { background: transparent !important; color: inherit; font-size: 1.7rem; font-weight: 400; }
-.version-button.is-changed { color: var(--accent); }
-.version-button.is-original { color: var(--success); background: var(--success-soft); }
-.version-caption { color: inherit; font-size: 0.72rem; }
-.now-playing { font-size: 0.75rem; min-height: 1.2rem; margin: -8px 0; }
-.now-playing-icon { background: transparent !important; color: inherit; font-size: 1rem; }
-@media (max-width: 600px) { .version-button { min-width: 0; flex: 1 1 160px; } }
+.is-one-note-off .round-controls { align-items: flex-end; }
+.melody-comparison { min-width: 0; }
+.comparison-status { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin-bottom: 7px; font-size: 0.8rem; }
+.comparison-now-playing { margin: 0; color: var(--text); }
+.comparison-limit { color: var(--text-muted); }
+.comparison-playback { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.comparison-strip { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.version-button { --version-color: var(--accent); --version-ink: var(--accent-ink); display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 140px; flex: none; min-height: 44px; padding: 10px 14px; border-color: transparent; border-radius: 6px; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; transition: background-color 140ms, color 140ms, box-shadow 140ms, transform 140ms; }
+.version-button.is-original { --version-color: var(--success); --version-ink: var(--success-ink); }
+.version-button .icon { width: 18px; height: 18px; margin: 0; flex: none; }
+.version-button .playing-bars { margin: 0; color: inherit; }
+.version-button:hover:not(:disabled) { border-color: transparent; background: color-mix(in srgb, var(--version-color) 12%, var(--surface)); color: var(--text); }
+.version-button[aria-pressed='true'] { border-color: var(--version-color); background: var(--version-color); color: var(--version-ink); box-shadow: 0 2px 3px rgb(0 0 0 / 12%); }
+.version-button[aria-pressed='true']:hover:not(:disabled) { border-color: var(--version-color); background: color-mix(in srgb, var(--version-color) 80%, var(--text)); color: var(--version-ink); }
+.version-button:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 2px 4px rgb(0 0 0 / 22%); transition-duration: 40ms; }
+@media (max-width: 600px) { .version-button { width: 128px; padding: 10px; } }
+@media (prefers-reduced-motion: reduce) { .version-button:active:not(:disabled) { transform: none; } }
+@media (forced-colors: active) { .version-button[aria-pressed='true'] { border-color: Highlight; outline: 2px solid Highlight; outline-offset: -3px; } }

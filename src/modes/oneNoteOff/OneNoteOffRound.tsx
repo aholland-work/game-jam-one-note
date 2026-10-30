@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useId, useRef, useState } from 'react'
 import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
@@ -18,10 +18,7 @@ import './OneNoteOffRound.css'
 type Status = 'guessing' | 'found' | 'missed'
 type Version = 'original' | 'changed'
 
-const VERSIONS: Record<Version, { icon: string; title: string; caption: string }> = {
-  changed: { icon: '≠', title: 'Changed', caption: 'One note is off' },
-  original: { icon: '✓', title: 'Original', caption: 'How the tune really goes' },
-}
+const VERSIONS: Record<Version, string> = { changed: 'Changed', original: 'Original' }
 
 interface OneNoteOffRoundProps {
   song: Song
@@ -68,6 +65,7 @@ export function OneNoteOffRound({
   const [awaitingOriginal, setAwaitingOriginal] = useState(false)
   const originalTimer = useRef(0)
   const player = useMelodyPlayer<Version>(song.bpm)
+  const originalLimitId = useId()
 
   const changedMelody = withChange(song.melody, change)
   const originalMidi = song.melody[change.index].midi as number
@@ -154,54 +152,59 @@ export function OneNoteOffRound({
   if (selectedIndex !== null && (!isOver || selectedIndex !== change.index)) marks[selectedIndex] = 'selected'
   if (isOver) marks[change.index] = showingChanged ? 'missed' : 'found'
 
-  // Each version gets its own icon, color and caption so they're hard to mix up.
+  // Both versions stay directly playable; the filled segment follows playback and pause.
   const versionButton = (version: Version) => {
-    const meta = VERSIONS[version]
     const playing = player.playing === version
     const paused = player.paused === version
     // On Hard, restarting the original would be a second listen, so it only offers Resume.
     const limited = version === 'original' && !isOver && oneListen
     const used = limited && originalHeard && !playing && !paused
     const action = playing ? 'Pause' : paused ? 'Resume' : 'Play'
-    const caption = used ? 'Already heard' : limited && !playing && !paused ? 'One listen only' : meta.caption
     return (
-      <>
         <button
           type="button"
-          className={`version-button is-${version}${playing ? ' is-playing' : ''}`}
+          className={`version-button is-${version}`}
+          aria-pressed={playing || paused}
+          aria-label={`${action} ${version} melody`}
+          aria-describedby={limited ? originalLimitId : undefined}
           onClick={playing ? player.pause : paused ? () => player.resume() : () => toggle(version)}
           disabled={used || (resultPlaying && !playing && !paused)}
         >
-          <span className="version-icon" aria-hidden="true">
-            {meta.icon}
-          </span>
-          <span className="version-text">
-            <span className="version-title">
-              <Icon name={playing ? 'pause' : 'play'} />
-              {action} {meta.title.toLowerCase()}
-            </span>
-            <span className="version-caption">
-              {playing ? (
-                <>
-                  Playing <PlayingBars />
-                </>
-              ) : (
-                caption
-              )}
-            </span>
-          </span>
+          <Icon name={playing ? 'pause' : 'play'} />
+          {VERSIONS[version]}
+          {playing && <PlayingBars />}
         </button>
-        {paused && !limited && (
-          <button type="button" onClick={() => player.resume(true)}>
-            <Icon name="restart" />
-            Restart
-          </button>
-        )}
-      </>
     )
   }
 
   const nowPlaying = player.playing ?? player.paused
+  const comparisonControls = (
+    <div className="melody-comparison">
+      <div className="comparison-status">
+        <p className="comparison-now-playing" role="status">
+          {nowPlaying
+            ? `${player.playing ? 'Now playing' : 'Paused'}: ${nowPlaying} melody`
+            : 'Compare versions'}
+        </p>
+        {oneListen && !isOver && (
+          <span id={originalLimitId} className="comparison-limit">
+            Original: {originalHeard && nowPlaying !== 'original' ? 'already heard' : 'one listen only'}
+          </span>
+        )}
+      </div>
+      <div className="comparison-playback">
+        <div className="comparison-strip" role="group" aria-label="Compare versions">
+          {versionButton('changed')}
+          {versionButton('original')}
+        </div>
+        {player.paused && !(player.paused === 'original' && !isOver && oneListen) && (
+          <button type="button" onClick={() => player.resume(true)}>
+            <Icon name="restart" /> Restart
+          </button>
+        )}
+      </div>
+    </div>
+  )
 
   return (
     <section className="round is-one-note-off" aria-labelledby="round-title">
@@ -232,16 +235,6 @@ export function OneNoteOffRound({
         </div>
       )}
 
-      {/* Says which version is sounding, so the two can't be confused. */}
-      <p className={`now-playing${nowPlaying ? ` is-${nowPlaying}` : ''}`} aria-hidden={!nowPlaying}>
-        {nowPlaying && (
-          <>
-            <span className="now-playing-icon">{VERSIONS[nowPlaying].icon}</span>
-            {player.playing ? 'Now playing' : 'Paused'}: {VERSIONS[nowPlaying].title.toLowerCase()} version
-          </>
-        )}
-      </p>
-
       <Staff
         notes={showingChanged ? changedMelody : song.melody}
         beatsPerBar={song.beatsPerBar}
@@ -259,10 +252,9 @@ export function OneNoteOffRound({
       </p>
 
       <div className="round-controls">
+        {comparisonControls}
         {isOver ? (
           <>
-            {versionButton('changed')}
-            {versionButton('original')}
             {resultPlaying && (
               <button type="button" onClick={skipReveal}>
                 Skip
@@ -276,8 +268,6 @@ export function OneNoteOffRound({
           </>
         ) : (
           <>
-            {versionButton('changed')}
-            {versionButton('original')}
             <span className="round-spacer" />
             <button type="button" className="round-lock" onClick={lockIn}>
               Lock in

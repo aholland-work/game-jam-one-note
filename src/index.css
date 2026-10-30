@@ -10,6 +10,7 @@
   --accent-ink: #fffefa;
   --accent-edge: #462c8c;
   --success: #427025;
+  --success-ink: #fffefa;
   --success-soft: #e4eddc;
   --warning: #9a480d;
   --warning-soft: #f9e7d8;
@@ -65,6 +66,7 @@
     --accent-ink: #241a30;
     --accent-edge: #715394;
     --success: #a0cd82;
+    --success-ink: #203017;
     --success-soft: #2c3825;
     --warning: #f0a35e;
     --warning-soft: #443021;
