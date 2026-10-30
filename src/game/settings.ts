@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'one-note:settings'
 
+export type GameMode = 'missing-note' | 'one-note-off'
+
 /** Optional gameplay rules players can switch on or off from the song list. */
 export interface Settings {
   /** Missing Note: hear your chosen note in the melody (up to 3 times) before locking in. */
@@ -35,4 +37,23 @@ export function saveSettings(settings: Settings): void {
   } catch {
     // Nothing to do; see above.
   }
+}
+
+export interface SettingOption {
+  key: keyof Settings
+  label: string
+  /** True when the setting shapes how a song is set up, so it can't change partway through. */
+  nextSong: boolean
+}
+
+/** Each mode's optional rules, in the order they're listed. */
+export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
+  'missing-note': [
+    { key: 'missingNoteTries', label: 'Try it: hear your note in the melody before locking in (3 tries)', nextSong: true },
+  ],
+  'one-note-off': [
+    { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
+    { key: 'oneNoteOffInKey', label: 'Harder: the changed note stays in the song’s key', nextSong: true },
+    { key: 'oneNoteOffOneListen', label: 'Harder: hear the original only once', nextSong: true },
+  ],
 }

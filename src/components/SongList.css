@@ -7,6 +7,13 @@
   margin: 0;
 }
 
+.song-list-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .song-list-modes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -37,38 +44,6 @@
 .song-list-mode-blurb {
   font-size: 0.85rem;
   color: var(--text-muted);
-}
-
-.song-list-settings {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.song-list-settings summary {
-  cursor: pointer;
-  width: fit-content;
-}
-
-.song-list-settings summary:hover {
-  color: var(--accent);
-}
-
-.song-list-settings-options {
-  display: grid;
-  gap: 6px;
-  margin-top: 0.5rem;
-  color: var(--text);
-}
-
-.song-list-settings-options label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.song-list-settings-options input {
-  accent-color: var(--accent);
 }
 
 .song-list-tip {

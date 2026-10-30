@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff, type NoteMark } from '../../components/Staff'
 import { pickChange, withChange } from '../../game/oneNoteOff'
 import { pianoStartMidi } from '../../game/puzzle'
@@ -18,20 +19,24 @@ const VERSION_LABELS: Record<Version, string> = { original: 'Original', changed:
 interface OneNoteOffRoundProps {
   song: Song
   settings: Settings
+  onSettingsChange: (settings: Settings) => void
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
 }
 
 /** One One Note Off puzzle: compare two versions, tap the note that changed, lock in once. */
-export function OneNoteOffRound({ song, settings, onBack, onNext }: OneNoteOffRoundProps) {
+export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNext }: OneNoteOffRoundProps) {
+  // Settings as they were when the song opened. Only highlighting can change during a song;
+  // the others shape how the puzzle is set up and apply from the next one.
+  const [startSettings] = useState(settings)
   // A new random change every time the round opens.
-  const [change] = useState(() => pickChange(song, { inKey: settings.oneNoteOffInKey }))
+  const [change] = useState(() => pickChange(song, { inKey: startSettings.oneNoteOffInKey }))
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState(
-    settings.oneNoteOffOneListen
+    startSettings.oneNoteOffOneListen
       ? 'One note in the changed version is off. You can hear the original only once, and the changed version as often as you like. Tap the note that sounds different, then lock in.'
       : 'One note in the changed version is off. Compare the two as often as you like, tap the note that sounds different, then lock in.',
   )
@@ -51,7 +56,7 @@ export function OneNoteOffRound({ song, settings, onBack, onNext }: OneNoteOffRo
   const toggle = (version: Version) => {
     if (player.playing === version) return player.pause()
     if (player.paused === version) return player.resume()
-    if (version === 'original' && !isOver && settings.oneNoteOffOneListen) {
+    if (version === 'original' && !isOver && startSettings.oneNoteOffOneListen) {
       if (originalHeard) return
       setOriginalHeard(true)
     }
@@ -106,7 +111,7 @@ export function OneNoteOffRound({ song, settings, onBack, onNext }: OneNoteOffRo
       )
     }
     // Restarting the original would be a second listen, so it only offers Resume.
-    const limited = version === 'original' && !isOver && settings.oneNoteOffOneListen
+    const limited = version === 'original' && !isOver && startSettings.oneNoteOffOneListen
     if (player.paused === version) {
       return (
         <>
@@ -149,7 +154,10 @@ export function OneNoteOffRound({ song, settings, onBack, onNext }: OneNoteOffRo
       </button>
       <header className="round-header">
         <h2 id="round-title">{song.title}</h2>
-        <p className="round-genre">{song.genre}</p>
+        <div className="round-header-side">
+          <p className="round-genre">{song.genre}</p>
+          <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
+        </div>
       </header>
 
       <Staff

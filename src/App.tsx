@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { SongList, type GameMode } from './components/SongList'
+import { SongList } from './components/SongList'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
-import { loadSettings, saveSettings, type Settings } from './game/settings'
+import { loadSettings, saveSettings, type GameMode, type Settings } from './game/settings'
 import { songs } from './songs'
 import type { Genre, Song } from './songs/types'
 
@@ -32,6 +32,7 @@ function App() {
               key={`${mode}-${current.id}`}
               song={current}
               settings={settings}
+              onSettingsChange={changeSettings}
               onBack={() => setCurrent(null)}
               onNext={next ? () => setCurrent(next) : null}
             />

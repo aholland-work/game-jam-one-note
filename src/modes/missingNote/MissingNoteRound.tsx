@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
+import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
 import type { Settings } from '../../game/settings'
@@ -31,15 +32,18 @@ const TUTORIAL_TEXT: Record<TutorialStep, string> = {
 interface MissingNoteRoundProps {
   song: Song
   settings: Settings
+  onSettingsChange: (settings: Settings) => void
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
 }
 
 /** One Missing Note puzzle: listen, test keys, use up to three tries, lock in one answer. */
-export function MissingNoteRound({ song, settings, onBack, onNext }: MissingNoteRoundProps) {
+export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onNext }: MissingNoteRoundProps) {
+  // Settings as they were when the song opened; changes made during the song apply from the next one.
+  const [startSettings] = useState(settings)
   // "Try it" is an optional setting; without it players have to imagine the note in place.
-  const maxTries = settings.missingNoteTries ? MAX_TRIES : 0
+  const maxTries = startSettings.missingNoteTries ? MAX_TRIES : 0
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(maxTries)
@@ -221,7 +225,10 @@ export function MissingNoteRound({ song, settings, onBack, onNext }: MissingNote
       </button>
       <header className="round-header">
         <h2 id="round-title">{song.title}</h2>
-        <p className="round-genre">{song.genre}</p>
+        <div className="round-header-side">
+          <p className="round-genre">{song.genre}</p>
+          <SettingsMenu mode="missing-note" settings={settings} onChange={onSettingsChange} inRound />
+        </div>
       </header>
 
       <Staff
