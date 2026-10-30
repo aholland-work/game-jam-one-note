@@ -10,7 +10,6 @@ export interface NoteChange {
 
 // Shorter notes go by too fast to judge, and tied notes blur into their neighbor.
 const MIN_BEATS = 0.5
-const MAX_DISTANCE = 4
 const LOWEST = 57
 const HIGHEST = 88
 
@@ -20,21 +19,28 @@ export function melodyPitchClasses(melody: Note[]): Set<number> {
 }
 
 /**
- * Picks one note to move for a One Note Off round. The new pitch is within 4 half steps
- * and uses only notes the melody already contains, so the changed version still sounds
- * in key instead of clashing. It never matches the notes on either side, so the change
- * can't hide in a repeat.
+ * Picks one note to move for a One Note Off round. It never matches the notes on either
+ * side, so the change can't hide in a repeat.
+ *
+ * - `inKey` (harder): the new pitch is within 4 half steps and uses only notes the melody
+ *   already contains, so the changed version still sounds plausible.
+ * - Otherwise: the note moves 1 to 3 half steps to any pitch, which often clashes.
  */
-export function pickChange(song: Song, random: () => number = Math.random): NoteChange {
+export function pickChange(
+  song: Song,
+  { inKey = true }: { inKey?: boolean } = {},
+  random: () => number = Math.random,
+): NoteChange {
   const { melody } = song
-  const inKey = melodyPitchClasses(melody)
+  const pitchClasses = melodyPitchClasses(melody)
+  const maxDistance = inKey ? 4 : 3
   const options: NoteChange[] = []
   melody.forEach((note, index) => {
     if (note.midi === null || note.beats < MIN_BEATS) return
     if (note.tie || melody[index - 1]?.tie) return
-    for (let offset = -MAX_DISTANCE; offset <= MAX_DISTANCE; offset++) {
+    for (let offset = -maxDistance; offset <= maxDistance; offset++) {
       const midi = note.midi + offset
-      if (offset === 0 || !inKey.has(midi % 12)) continue
+      if (offset === 0 || (inKey && !pitchClasses.has(midi % 12))) continue
       if (midi < LOWEST || midi > HIGHEST) continue
       if (midi === melody[index - 1]?.midi || midi === melody[index + 1]?.midi) continue
       options.push({ index, midi })

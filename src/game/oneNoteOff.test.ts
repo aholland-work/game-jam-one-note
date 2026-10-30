@@ -13,10 +13,11 @@ function seeded(seed: number) {
 }
 
 describe.each(songs)('One Note Off: $title', (song) => {
-  const changes = Array.from({ length: 200 }, (_, i) => pickChange(song, seeded(i + 1)))
+  const changes = Array.from({ length: 200 }, (_, i) => pickChange(song, { inKey: true }, seeded(i + 1)))
+  const anyPitch = Array.from({ length: 200 }, (_, i) => pickChange(song, { inKey: false }, seeded(i + 1)))
 
   it('only changes notes long enough to hear, and never a tie', () => {
-    for (const { index } of changes) {
+    for (const { index } of [...changes, ...anyPitch]) {
       const note = song.melody[index]
       expect(note.midi).not.toBeNull()
       expect(note.beats).toBeGreaterThanOrEqual(0.5)
@@ -32,6 +33,16 @@ describe.each(songs)('One Note Off: $title', (song) => {
       expect(distance).toBeGreaterThanOrEqual(1)
       expect(distance).toBeLessThanOrEqual(4)
       expect(inKey.has(midi % 12)).toBe(true)
+      expect(midi).not.toBe(song.melody[index - 1]?.midi)
+      expect(midi).not.toBe(song.melody[index + 1]?.midi)
+    }
+  })
+
+  it('without the in-key rule, moves the note 1 to 3 half steps to any pitch', () => {
+    for (const { index, midi } of anyPitch) {
+      const distance = Math.abs(midi - (song.melody[index].midi as number))
+      expect(distance).toBeGreaterThanOrEqual(1)
+      expect(distance).toBeLessThanOrEqual(3)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }

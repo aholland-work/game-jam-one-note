@@ -2,11 +2,18 @@ import { useState } from 'react'
 import { SongList, type GameMode } from './components/SongList'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
+import { loadSettings, saveSettings, type Settings } from './game/settings'
 import { songs } from './songs'
 import type { Genre, Song } from './songs/types'
 
 function App() {
   const [mode, setMode] = useState<GameMode>('missing-note')
+  const [settings, setSettings] = useState<Settings>(loadSettings)
+
+  const changeSettings = (next: Settings) => {
+    setSettings(next)
+    saveSettings(next)
+  }
   const [genre, setGenre] = useState<Genre | null>(null)
   const [current, setCurrent] = useState<Song | null>(null)
 
@@ -24,6 +31,7 @@ function App() {
             <Round
               key={`${mode}-${current.id}`}
               song={current}
+              settings={settings}
               onBack={() => setCurrent(null)}
               onNext={next ? () => setCurrent(next) : null}
             />
@@ -33,6 +41,8 @@ function App() {
         <SongList
           mode={mode}
           onModeChange={setMode}
+          settings={settings}
+          onSettingsChange={changeSettings}
           songs={songs}
           genre={genre}
           onGenreChange={setGenre}

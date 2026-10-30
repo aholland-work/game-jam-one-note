@@ -1,11 +1,8 @@
 import { midiToPitch, type Note } from '../music/notation'
 import type { Song } from '../songs/types'
 
-/**
- * How many times a player can hear the melody with their chosen note in the gap.
- * Set to 0 to hide "Try it" entirely, so players have to imagine the note in place.
- */
-export const MAX_TRIES = 0
+/** How many times a player can hear the melody with their chosen note in the gap, when "Try it" is on. */
+export const MAX_TRIES = 3
 
 /** The melody as the player first hears it: the missing note becomes silence. */
 export function withGap(melody: Note[], missingIndex: number): Note[] {
