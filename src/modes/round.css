@@ -96,6 +96,11 @@
   margin: 0 auto;
 }
 
+/* Two octaves, keys the same size as the one-octave piano. */
+.round-piano.is-wide {
+  max-width: 880px;
+}
+
 .round-coach {
   display: flex;
   align-items: flex-start;

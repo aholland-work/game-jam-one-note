@@ -1,7 +1,8 @@
 .piano {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  --octaves: 1;
+  max-width: calc(440px * var(--octaves));
   height: 170px;
   margin: 0 auto;
   user-select: none;
@@ -23,7 +24,7 @@
 }
 
 .piano-white {
-  width: calc(100% / 7);
+  width: calc(100% / (7 * var(--octaves)));
   height: 100%;
   background: #ffffff;
   border: 1px solid #888780;
@@ -32,7 +33,7 @@
 }
 
 .piano-black {
-  width: calc(100% / 7 * 0.6);
+  width: calc(100% / (7 * var(--octaves)) * 0.6);
   height: 60%;
   transform: translateX(-50%);
   background: #2c2c2a;
@@ -69,6 +70,15 @@
 
 .piano-black .piano-degree {
   color: #e6f0fa;
+}
+
+.piano-degree.is-faint {
+  font-weight: 500;
+  color: #9fb4cc;
+}
+
+.piano-black .piano-degree.is-faint {
+  color: #8e8d86;
 }
 
 .piano-white:hover {

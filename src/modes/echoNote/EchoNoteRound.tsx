@@ -219,8 +219,14 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   }
 
   const result = answered ? (isRight(history[history.length - 1]) ? 'found' : 'missed') : null
+  // Number the key's scale from the 1 upward; tint only the notes that can come up at this level.
   const degrees = settings.echoShowScale
-    ? Object.fromEntries(MAJOR_SCALE.map((scaleStep) => [(key.tonic + scaleStep) % 12, degreeName(scaleStep)]))
+    ? Object.fromEntries(
+        MAJOR_SCALE.map((scaleStep) => [
+          noteInKey(key, scaleStep),
+          { label: degreeName(scaleStep), inPlay: steps.includes(scaleStep) },
+        ]),
+      )
     : {}
 
   return (
@@ -295,10 +301,11 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
         )}
       </div>
 
-      <div className="round-piano">
+      <div className="round-piano is-wide">
         <Piano
           startMidi={60}
-          selectedMidi={answered ? 60 + (target % 12) : selectedMidi}
+          octaves={2}
+          selectedMidi={answered ? target : selectedMidi}
           selectedTone={result ?? 'selected'}
           flats={key.flats}
           degrees={degrees}

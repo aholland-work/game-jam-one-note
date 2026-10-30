@@ -1,20 +1,28 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from 'react'
 import './Piano.css'
 
+/** A number shown on a key, e.g. its step in a scale, and whether it's tinted as a possible answer. */
+export interface KeyDegree {
+  label: string
+  inPlay: boolean
+}
+
 interface PianoProps {
-  /** MIDI number of the leftmost key, a C. The piano spans one octave from there. */
+  /** MIDI number of the leftmost key, a C. */
   startMidi: number
+  /** How many octaves the piano spans from `startMidi`. */
+  octaves?: number
   selectedMidi: number | null
   /** How to color the selected key: the player's pick, a wrong answer, or the right one. */
   selectedTone?: 'selected' | 'missed' | 'found'
-  /** The note sounding in a melody right now. Notes outside the octave light up their same-named key. */
+  /** The note sounding in a melody right now. Notes outside the piano light up their same-named key. */
   playingMidi?: number | null
-  /** Show each key's computer-keyboard shortcut on the key. */
+  /** Show each key's computer-keyboard shortcut on the key (first octave only). */
   showShortcuts?: boolean
   /** Name the black keys with flats (B♭) instead of sharps (A♯), to match songs written in flats. */
   flats?: boolean
-  /** Numbers to show on keys, by note (0 = C, 1 = C♯ ... 11 = B), e.g. a key's scale steps. Those keys get a tint. */
-  degrees?: Partial<Record<number, string>>
+  /** Numbers to show on keys, by MIDI note. A "1" marks home and gets a stronger tint. */
+  degrees?: Partial<Record<number, KeyDegree>>
   onPress: (midi: number) => void
 }
 
@@ -34,9 +42,10 @@ const SPOKEN_FLATS = ['C', 'D flat', 'D', 'E flat', 'E', 'F', 'G flat', 'G', 'A 
 // Computer keyboard shortcuts, in semitone order (the usual music-app layout).
 const SHORTCUTS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j']
 
-/** A one-octave piano with note names on the keys, and optionally their keyboard shortcuts. */
+/** A piano of one or more octaves with note names on the keys, and optionally their keyboard shortcuts. */
 export function Piano({
   startMidi,
+  octaves = 1,
   selectedMidi,
   selectedTone = 'selected',
   playingMidi = null,
@@ -69,76 +78,62 @@ export function Piano({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const playingKey = playingMidi === null ? null : startMidi + ((((playingMidi - startMidi) % 12) + 12) % 12)
+  const span = 12 * octaves
+  const playingKey =
+    playingMidi === null ? null : startMidi + ((((playingMidi - startMidi) % span) + span) % span)
+  const whiteCount = 7 * octaves
 
-  const keyClass = (base: string, midi: number) =>
-    [
-      base,
-      degrees[midi % 12] && 'is-in-key',
-      degrees[midi % 12] === '1' && 'is-home',
+  const renderKey = (color: 'white' | 'black', midi: number, whiteIndex: number) => {
+    const semitone = (midi - startMidi) % 12
+    const degree = degrees[midi]
+    const className = [
+      `piano-key piano-${color}`,
+      degree?.inPlay && 'is-in-key',
+      degree?.inPlay && degree.label === '1' && 'is-home',
       midi === selectedMidi && `is-${selectedTone}`,
       midi === playingKey && 'is-playing',
       midi === pressed && 'is-pressed',
     ]
       .filter(Boolean)
       .join(' ')
+    const spoken = (flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]
+    return (
+      <button
+        key={midi}
+        type="button"
+        className={className}
+        aria-label={octaves > 1 ? `${spoken} ${Math.floor(midi / 12) - 1}` : spoken}
+        aria-pressed={midi === selectedMidi}
+        onPointerDown={(event) => {
+          event.preventDefault()
+          press(midi)
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            press(midi)
+          }
+        }}
+        style={{ left: `${(whiteIndex / whiteCount) * 100}%` }}
+      >
+        {degree && <span className={`piano-degree${degree.inPlay ? '' : ' is-faint'}`}>{degree.label}</span>}
+        {showShortcuts && midi - startMidi < 12 && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
+        <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
+      </button>
+    )
+  }
 
+  const octaveStarts = Array.from({ length: octaves }, (_, octave) => octave)
   return (
-    <div className="piano" role="group" aria-label="Piano">
-      {WHITE_SEMITONES.map((semitone, i) => {
-        const midi = startMidi + semitone
-        return (
-          <button
-            key={semitone}
-            type="button"
-            className={keyClass('piano-key piano-white', midi)}
-            aria-label={(flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]}
-            aria-pressed={midi === selectedMidi}
-            onPointerDown={(event) => {
-              event.preventDefault()
-              press(midi)
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                press(midi)
-              }
-            }}
-            style={{ left: `${(i / 7) * 100}%` }}
-          >
-            {degrees[midi % 12] && <span className="piano-degree">{degrees[midi % 12]}</span>}
-            {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
-            <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
-          </button>
-        )
-      })}
-      {BLACK_KEYS.map(({ semitone, afterWhite }) => {
-        const midi = startMidi + semitone
-        return (
-          <button
-            key={semitone}
-            type="button"
-            className={keyClass('piano-key piano-black', midi)}
-            aria-label={(flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]}
-            aria-pressed={midi === selectedMidi}
-            onPointerDown={(event) => {
-              event.preventDefault()
-              press(midi)
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                press(midi)
-              }
-            }}
-            style={{ left: `${(afterWhite / 7) * 100}%` }}
-          >
-            {degrees[midi % 12] && <span className="piano-degree">{degrees[midi % 12]}</span>}
-            {showShortcuts && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
-            <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
-          </button>
-        )
-      })}
+    <div className="piano" role="group" aria-label="Piano" style={{ '--octaves': octaves } as CSSProperties}>
+      {octaveStarts.flatMap((octave) =>
+        WHITE_SEMITONES.map((semitone, i) => renderKey('white', startMidi + 12 * octave + semitone, 7 * octave + i)),
+      )}
+      {octaveStarts.flatMap((octave) =>
+        BLACK_KEYS.map(({ semitone, afterWhite }) =>
+          renderKey('black', startMidi + 12 * octave + semitone, 7 * octave + afterWhite),
+        ),
+      )}
     </div>
   )
 }
