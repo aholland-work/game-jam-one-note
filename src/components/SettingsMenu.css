@@ -52,3 +52,10 @@
   color: var(--warning);
   background: color-mix(in srgb, var(--warning) 14%, transparent);
 }
+
+.settings-button { background: transparent; font-size: 0.8rem; border-color: transparent; }
+.settings-button[aria-expanded='true'] { background: var(--accent-soft); }
+.settings-panel { border-top: 3px solid var(--accent); padding: 18px 20px; border-radius: 4px 4px 10px 10px; box-shadow: var(--panel-shadow); font-size: 0.8rem; }
+.settings-panel label { gap: 10px; line-height: 1.65; padding: 5px 0; }
+.settings-panel input { margin: 2px 0 0; }
+.settings-note { display: flex; gap: 5px; align-items: center; padding: 0; border-radius: 0; background: transparent; font-size: 0.7rem; font-weight: 500; }

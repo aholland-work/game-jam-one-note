@@ -234,6 +234,7 @@ export function Staff({
       role={onNoteSelect ? 'group' : 'img'}
       aria-label="The melody written on a music staff"
     >
+      <g aria-hidden="true">
       <g className="staff-lines">
         {[30, 32, 34, 36, 38].map((step) => (
           <line key={step} x1={MARGIN} x2={staffRight} y1={yFor(step)} y2={yFor(step)} />
@@ -309,6 +310,8 @@ export function Staff({
         </text>
       ))}
 
+      </g>
+
       {onNoteSelect &&
         notes.map((note, index) =>
           note.pitch === null ? null : (
@@ -326,6 +329,17 @@ export function Staff({
               aria-pressed={marks[index] === 'selected'}
               onClick={() => onNoteSelect(index)}
               onKeyDown={(event) => {
+                const targets = event.currentTarget.ownerSVGElement?.querySelectorAll<SVGRectElement>('.staff-hit')
+                const items = targets ? Array.from(targets) : []
+                const position = items.indexOf(event.currentTarget)
+                const next = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? Math.min(position + 1, items.length - 1)
+                  : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? Math.max(position - 1, 0)
+                  : event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : null
+                if (next !== null) {
+                  event.preventDefault()
+                  items[next]?.focus()
+                  return
+                }
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
                   onNoteSelect(index)

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useEffectEvent, useId, useRef, useState, type CSSProperties } from 'react'
 import { foldIntoPiano, useMidiNotes } from '../audio/midi'
 import './Piano.css'
 
@@ -56,6 +56,8 @@ export function Piano({
   degrees = {},
   onPress,
 }: PianoProps) {
+  const helpId = useId()
+  const root = useRef<HTMLDivElement>(null)
   const [pressed, setPressed] = useState<number | null>(null)
   const releaseTimer = useRef(0)
 
@@ -71,6 +73,8 @@ export function Piano({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return
+      // Single-letter shortcuts are scoped to the focused instrument.
+      if (!root.current?.contains(document.activeElement)) return
       const semitone = SHORTCUTS.indexOf(event.key.toLowerCase())
       if (semitone === -1) return
       event.preventDefault()
@@ -90,7 +94,8 @@ export function Piano({
 
   const renderKey = (color: 'white' | 'black', midi: number, whiteIndex: number) => {
     const semitone = (midi - startMidi) % 12
-    const degree = degrees[midi]
+    // A scale degree names a pitch class, so repeat it across the visible octaves.
+    const degree = degrees[midi] ?? Object.entries(degrees).find(([note]) => (midi - Number(note)) % 12 === 0)?.[1]
     const className = [
       `piano-key piano-${color}`,
       degree?.inPlay && 'is-in-key',
@@ -102,43 +107,58 @@ export function Piano({
       .filter(Boolean)
       .join(' ')
     const spoken = (flats ? SPOKEN_FLATS : SPOKEN_SHARPS)[semitone]
+    const result = midi === selectedMidi && selectedTone !== 'selected'
+      ? selectedTone === 'found' ? ', correct answer' : ', highlighted note'
+      : ''
+    const shortcut = showShortcuts && midi - startMidi < 12 ? SHORTCUTS[semitone].toUpperCase() : null
+    const visibleLabel = [degree?.label, shortcut, (flats ? FLAT_LABELS : SHARP_LABELS)[semitone]].filter(Boolean).join(' ')
+    const scaleLabel = degree ? `, scale degree ${degree.label}${degree.label === '1' ? ', home base' : ''}` : ''
     return (
       <button
         key={midi}
         type="button"
         className={className}
-        aria-label={octaves > 1 ? `${spoken} ${Math.floor(midi / 12) - 1}` : spoken}
+        aria-label={`${visibleLabel}, octave ${Math.floor(midi / 12) - 1}${result}`}
+        aria-description={`${spoken}${scaleLabel}${shortcut ? `, keyboard shortcut ${shortcut}` : ''}`}
+        aria-keyshortcuts={showShortcuts && midi - startMidi < 12 ? SHORTCUTS[semitone] : undefined}
         aria-pressed={midi === selectedMidi}
         onPointerDown={(event) => {
           event.preventDefault()
+          event.currentTarget.focus({ preventScroll: true })
           press(midi)
         }}
+        // Pointer notes sound immediately; native clicks cover keyboard and assistive technology.
+        onClick={(event) => { if (event.detail === 0) press(midi) }}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            press(midi)
-          }
+          const keys = root.current?.querySelectorAll<HTMLButtonElement>('.piano-key')
+          if (!keys) return
+          const index = midi - startMidi
+          const next = event.key === 'ArrowRight' || event.key === 'ArrowUp' ? Math.min(index + 1, keys.length - 1)
+            : event.key === 'ArrowLeft' || event.key === 'ArrowDown' ? Math.max(index - 1, 0)
+            : event.key === 'Home' ? 0 : event.key === 'End' ? keys.length - 1 : null
+          if (next === null) return
+          event.preventDefault()
+          keys[next]?.focus()
         }}
         style={{ left: `${(whiteIndex / whiteCount) * 100}%` }}
       >
-        {degree && <span className={`piano-degree${degree.inPlay ? '' : ' is-faint'}`}>{degree.label}</span>}
-        {showShortcuts && midi - startMidi < 12 && <kbd className="piano-kbd">{SHORTCUTS[semitone].toUpperCase()}</kbd>}
+        {degree && <><span className={`piano-degree${degree.inPlay ? '' : ' is-faint'}`}>{degree.label}</span>{' '}</>}
+        {shortcut && <><kbd className="piano-kbd" aria-hidden="true">{shortcut}</kbd>{' '}</>}
         <span className="piano-label">{(flats ? FLAT_LABELS : SHARP_LABELS)[semitone]}</span>
       </button>
     )
   }
 
-  const octaveStarts = Array.from({ length: octaves }, (_, octave) => octave)
   return (
-    <div className="piano" role="group" aria-label="Piano" style={{ '--octaves': octaves } as CSSProperties}>
-      {octaveStarts.flatMap((octave) =>
-        WHITE_SEMITONES.map((semitone, i) => renderKey('white', startMidi + 12 * octave + semitone, 7 * octave + i)),
-      )}
-      {octaveStarts.flatMap((octave) =>
-        BLACK_KEYS.map(({ semitone, afterWhite }) =>
-          renderKey('black', startMidi + 12 * octave + semitone, 7 * octave + afterWhite),
-        ),
-      )}
+    <div ref={root} className="piano" role="group" aria-label="Piano" aria-describedby={helpId} style={{ '--octaves': octaves } as CSSProperties}>
+      <span id={helpId} className="sr-only">Use arrow keys to move between notes, Home or End to jump to either end, and Enter or Space to play. Letter shortcuts work while the piano has focus.</span>
+      {Array.from({ length: 12 * octaves }, (_, index) => {
+        const octave = Math.floor(index / 12)
+        const semitone = index % 12
+        const white = WHITE_SEMITONES.indexOf(semitone)
+        const black = BLACK_KEYS.find((key) => key.semitone === semitone)
+        return renderKey(white >= 0 ? 'white' : 'black', startMidi + index, 7 * octave + (white >= 0 ? white : black!.afterWhite))
+      })}
     </div>
   )
 }

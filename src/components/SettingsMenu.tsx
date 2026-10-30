@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { SETTING_OPTIONS, type GameMode, type Settings } from '../game/settings'
+import { Icon } from './Icon'
 import './SettingsMenu.css'
 
 interface SettingsMenuProps {
@@ -10,8 +11,10 @@ interface SettingsMenuProps {
   inRound?: boolean
 }
 
-/** A ⚙ Settings button that opens the current mode's options in a small panel. */
+/** A Settings button that opens the current mode's options in a small panel. */
 export function SettingsMenu({ mode, settings, onChange, inRound = false }: SettingsMenuProps) {
+  const panelId = useId()
+  const trigger = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
 
@@ -22,7 +25,10 @@ export function SettingsMenu({ mode, settings, onChange, inRound = false }: Sett
       if (!root.current?.contains(event.target as Node)) setOpen(false)
     }
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') {
+        setOpen(false)
+        if (root.current?.contains(document.activeElement)) trigger.current?.focus()
+      }
     }
     document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
@@ -35,12 +41,12 @@ export function SettingsMenu({ mode, settings, onChange, inRound = false }: Sett
   if (SETTING_OPTIONS[mode].length === 0) return null
 
   return (
-    <div className="settings-menu" ref={root}>
-      <button type="button" className="settings-button" aria-expanded={open} onClick={() => setOpen(!open)}>
-        ⚙ Settings
+    <div className="settings-menu" ref={root} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false) }}>
+      <button type="button" className="settings-button" ref={trigger} aria-expanded={open} aria-controls={open ? panelId : undefined} onClick={() => setOpen(!open)}>
+        <Icon name="settings" /> Settings
       </button>
       {open && (
-        <div className="settings-panel" role="group" aria-label="Settings">
+        <div id={panelId} className="settings-panel" role="group" aria-label="Settings">
           {SETTING_OPTIONS[mode].map(({ key, label, nextSong }) => (
             <label key={key}>
               <input
@@ -50,7 +56,7 @@ export function SettingsMenu({ mode, settings, onChange, inRound = false }: Sett
               />
               <span>
                 {label}
-                {inRound && nextSong && <span className="settings-note">⏭ Starts on the next song</span>}
+                {inRound && nextSong && <span className="settings-note"><Icon name="restart" /> Starts on the next song</span>}
               </span>
             </label>
           ))}

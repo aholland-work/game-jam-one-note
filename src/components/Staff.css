@@ -121,3 +121,12 @@
   fill: var(--text);
   transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+.staff-hit[aria-pressed='true'] { fill: var(--accent-soft); fill-opacity: 0.4; stroke: var(--accent); stroke-width: 1.5; }
+.staff-hit:focus-visible { fill: transparent; opacity: 1; stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: 5 3; outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  .staff-note, .staff-stem, .staff-beam, .staff-tuplet, .staff-pitch-clue { transition: none; animation: none; }
+}
+@media (forced-colors: active) {
+  .staff-hit[aria-pressed='true'], .staff-hit:focus-visible { stroke: Highlight; fill: transparent; }
+}

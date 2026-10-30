@@ -136,7 +136,7 @@ export function OneNoteOffRound({
   })
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== ' ' || event.target instanceof HTMLButtonElement || event.target instanceof SVGElement) return
+      if (event.key !== ' ' || (event.target instanceof Element && event.target.closest('button, input, select, textarea, summary, a, [role="button"]'))) return
       event.preventDefault()
       onSpace()
     }
@@ -207,8 +207,9 @@ export function OneNoteOffRound({
       <button type="button" className="round-back" onClick={onBack}>
         ← Songs
       </button>
+      <p className="round-mode">One Note Off</p>
       <header className="round-header">
-        <h2 id="round-title">{song.title}</h2>
+        <h2 id="round-title" tabIndex={-1}>{song.title}</h2>
         <div className="round-header-side">
           <p className="round-genre">{song.genre}</p>
           <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
@@ -219,7 +220,7 @@ export function OneNoteOffRound({
       {settings.oneNoteOffHard !== hard && (
         <div className="round-pending" role="status">
           <span className="round-pending-icon" aria-hidden="true">
-            ⏭
+            <Icon name="restart" />
           </span>
           <p>
             <strong>{settings.oneNoteOffHard ? 'Hard mode' : 'Easy mode'} starts on the next song.</strong> This song

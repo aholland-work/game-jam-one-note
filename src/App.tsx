@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { audioEngine } from './audio/engine'
 import { MidiControl } from './components/MidiControl'
 import { SongList } from './components/SongList'
@@ -9,8 +9,12 @@ import { loadSolved, saveSolved, withSolved } from './game/progress'
 import { loadSettings, saveSettings, type GameMode, type Settings } from './game/settings'
 import { songs } from './songs'
 import type { Genre, Song } from './songs/types'
+import './App.css'
 
 function App() {
+  const contentRef = useRef<HTMLElement>(null)
+  const returnFocus = useRef<string | null>(null)
+  const previousScreen = useRef('home')
   const [mode, setMode] = useState<GameMode>('missing-note')
   const [settings, setSettings] = useState<Settings>(loadSettings)
 
@@ -31,74 +35,88 @@ function App() {
   // Echo Note rounds don't use songs; this is set while one is open.
   const [echoRound, setEchoRound] = useState<number | null>(null)
   const startEcho = () => {
+    if (echoRound === null) returnFocus.current = document.activeElement?.id ?? null
     audioEngine.warmUp()
     setEchoRound((n) => (n ?? 0) + 1)
   }
+
+  const screen = echoRound !== null ? `echo-${echoRound}` : current ? `${mode}-${current.id}-${attempt}` : 'home'
+  useEffect(() => {
+    if (screen === previousScreen.current) return
+    previousScreen.current = screen
+    const trigger = screen === 'home' && returnFocus.current ? document.getElementById(returnFocus.current) : null
+    if (trigger) trigger.focus()
+    else contentRef.current?.querySelector<HTMLElement>('.round h2, #song-list-title')?.focus()
+  }, [screen])
 
   // "Next song" follows the list the player was looking at.
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
   const next = current ? visible[visible.indexOf(current) + 1] ?? null : null
 
   return (
-    <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', margin: '0 0 1rem' }}>
-        <h1 style={{ margin: 0 }}>One Note</h1>
+    <div className="app">
+      <a className="skip-link" href="#main-content">Skip to game</a>
+      <header className="app-header">
+        <h1 className="app-brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>One Note</h1>
         <MidiControl />
       </header>
-      {echoRound !== null ? (
-        <EchoNoteRound
-          key={echoRound}
-          settings={settings}
-          onSettingsChange={changeSettings}
-          onBack={() => setEchoRound(null)}
-          onPlayAgain={startEcho}
-          onLevelUp={(echoLevel) => {
-            changeSettings({ ...settings, echoLevel })
-            startEcho()
-          }}
-        />
-      ) : current ? (
-        mode === 'one-note-off' ? (
-          <OneNoteOffRound
-            key={`${mode}-${current.id}-${attempt}`}
-            song={current}
+      <main id="main-content" tabIndex={-1} ref={contentRef}>
+        {echoRound !== null ? (
+          <EchoNoteRound
+            key={echoRound}
             settings={settings}
             onSettingsChange={changeSettings}
-            onRestart={() => setAttempt((n) => n + 1)}
-            onBack={() => setCurrent(null)}
-            onNext={next ? () => setCurrent(next) : null}
-            onSolved={() => markSolved(current)}
+            onBack={() => setEchoRound(null)}
+            onPlayAgain={startEcho}
+            onLevelUp={(echoLevel) => {
+              changeSettings({ ...settings, echoLevel })
+              startEcho()
+            }}
           />
+        ) : current ? (
+          mode === 'one-note-off' ? (
+            <OneNoteOffRound
+              key={`${mode}-${current.id}-${attempt}`}
+              song={current}
+              settings={settings}
+              onSettingsChange={changeSettings}
+              onRestart={() => setAttempt((n) => n + 1)}
+              onBack={() => setCurrent(null)}
+              onNext={next ? () => setCurrent(next) : null}
+              onSolved={() => markSolved(current)}
+            />
+          ) : (
+            <MissingNoteRound
+              key={`${mode}-${current.id}`}
+              song={current}
+              onBack={() => setCurrent(null)}
+              onNext={next ? () => setCurrent(next) : null}
+              onSolved={() => markSolved(current)}
+            />
+          )
         ) : (
-          <MissingNoteRound
-            key={`${mode}-${current.id}`}
-            song={current}
-            onBack={() => setCurrent(null)}
-            onNext={next ? () => setCurrent(next) : null}
-            onSolved={() => markSolved(current)}
+          <SongList
+            mode={mode}
+            onModeChange={setMode}
+            settings={settings}
+            onSettingsChange={changeSettings}
+            songs={songs}
+            solvedIds={solved[mode] ?? []}
+            genre={genre}
+            onGenreChange={setGenre}
+            onSelect={(song) => {
+              returnFocus.current = document.activeElement?.id ?? null
+              // Opening a song is a click, so audio can start and the piano samples begin loading.
+              audioEngine.warmUp()
+              setCurrent(song)
+            }}
+            onStartEcho={startEcho}
           />
-        )
-      ) : (
-        <SongList
-          mode={mode}
-          onModeChange={setMode}
-          settings={settings}
-          onSettingsChange={changeSettings}
-          songs={songs}
-          solvedIds={solved[mode] ?? []}
-          genre={genre}
-          onGenreChange={setGenre}
-          onSelect={(song) => {
-            // Opening a song is a click, so audio can start and the piano samples begin loading.
-            audioEngine.warmUp()
-            setCurrent(song)
-          }}
-          onStartEcho={startEcho}
-        />
-      )}
+        )}
+      </main>
       {/* Credits belong on the home page, not inside a song. */}
       {!current && echoRound === null && (
-        <footer style={{ marginTop: '3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <footer className="app-footer">
           Songs are public domain (
           <a href="https://github.com/aholland-work/game-jam-one-note#song-sources-and-credits">sources and credits</a>).
           Piano sound:{' '}
@@ -107,7 +125,7 @@ function App() {
           <a href="https://github.com/twitter/twemoji">Twemoji</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
         </footer>
       )}
-    </main>
+    </div>
   )
 }
 

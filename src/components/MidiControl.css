@@ -61,3 +61,11 @@
   padding: 0.3rem 0.8rem;
   font-size: 0.85rem;
 }
+
+.midi-control { max-width: 55%; }
+.midi-button { background: transparent; font-size: 0.7rem; border-radius: 30px; padding: 7px 12px; text-align: right; }
+.midi-panel { text-align: left; box-shadow: var(--panel-shadow); border-radius: 6px; font-size: 0.8rem; }
+.midi-panel input { margin: 2px 0 0; }
+.midi-panel label { gap: 10px; line-height: 1.6; }
+.midi-heard { color: var(--accent); }
+@media (max-width: 550px) { .midi-control { max-width: 54%; } .midi-button { font-size: 0.65rem; padding: 6px 9px; } }

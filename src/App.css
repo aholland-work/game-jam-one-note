@@ -1,0 +1,10 @@
+.app { max-width: 1068px; margin: 0 auto; padding: 28px 36px 44px; }
+.app-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 23px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.app-brand { display: flex; align-items: center; gap: 13px; margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.brand-mark { display: flex; gap: 3px; height: 31px; transform: skewY(-14deg); }
+.brand-mark i { display: block; width: 6px; height: 26px; background: var(--text); border-bottom: 6px solid var(--accent); }
+.brand-mark i:last-child { height: 24px; transform: translateY(-5px); background: var(--accent); }
+.app-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.75rem; line-height: 1.8; color: var(--text-muted); }
+.skip-link { position: absolute; top: 8px; left: 16px; padding: 10px 16px; background: var(--surface); z-index: 30; transform: translateY(-160%); }
+.skip-link:focus { transform: none; }
+@media (max-width: 650px) { .app { padding: 22px 20px 36px; } .app-header { gap: 12px; } .app-brand { font-size: 0.8rem; gap: 8px; } }

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
@@ -56,6 +56,7 @@ interface EchoNoteRoundProps {
  * find it on the piano, and lock in one answer. Notes the player misses come back more often.
  */
 export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onLevelUp }: EchoNoteRoundProps) {
+  const heading = useRef<HTMLHeadingElement>(null)
   // The level, length and key choice are set for the whole session.
   const [{ echoLevel: level, echoLength: length, echoKey: keyChoice }] = useState(settings)
   const steps = stepsForLevel(level)
@@ -72,6 +73,9 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   const [newKey, setNewKey] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const player = useMelodyPlayer<Playback>(BPM)
+  useEffect(() => {
+    if (showSummary) heading.current?.focus()
+  }, [showSummary])
 
   const endless = length === 'endless'
   const target = noteInKey(key, step)
@@ -138,7 +142,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   })
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== ' ' || event.target instanceof HTMLButtonElement) return
+      if (event.key !== ' ' || (event.target instanceof Element && event.target.closest('button, input, select, textarea, summary, a, [role="button"]'))) return
       event.preventDefault()
       onSpace()
     }
@@ -172,11 +176,12 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
         <button type="button" className="round-back" onClick={onBack}>
           ← Home
         </button>
+        <p className="round-mode">Ear training</p>
         <header className="round-header">
-          <h2 id="round-title">Echo Note</h2>
+          <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
           <p className="round-genre">{levelLabel}</p>
         </header>
-        <p className="echo-score">
+        <p className="echo-score" role="status">
           You matched <strong>{correctCount}</strong> of {history.length} notes.
         </p>
         {endless ? (
@@ -192,6 +197,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
               const right = isRight(entry)
               return (
                 <li key={i} className={right ? 'is-found' : 'is-missed'}>
+                  <span className="sr-only">{right ? 'Correct: ' : 'Incorrect: '}</span>
                   <span aria-hidden="true">{right ? '✓' : '✗'}</span> {describeNote(entry.key, entry.step)}
                   {!right && (
                     <span className="echo-guess">
@@ -237,8 +243,9 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       <button type="button" className="round-back" onClick={onBack}>
         ← Home
       </button>
+      <p className="round-mode">Ear training</p>
       <header className="round-header">
-        <h2 id="round-title">Echo Note</h2>
+        <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
         <div className="round-header-side">
           <p className="round-genre">
             {levelLabel} ·{' '}
@@ -250,37 +257,42 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
         </div>
       </header>
 
-      <p className="echo-key">
-        Key: <strong>{keyName(key)}</strong>
-        {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
-      </p>
-      {level === 'all' && (
-        <p className="echo-tip">Tip: on this level the mystery note can also be one of the 5 notes outside the key.</p>
-      )}
-
-      {!endless && (
-        <ol className="echo-progress" aria-label="Round progress">
-          {Array.from({ length: ROUND_LENGTH }, (_, i) => (
-            <li
-              key={i}
-              className={
-                i < history.length
-                  ? isRight(history[i])
-                    ? 'is-found'
-                    : 'is-missed'
-                  : i === history.length
-                    ? 'is-current'
-                    : ''
-              }
-            />
-          ))}
-        </ol>
-      )}
+      <div className="echo-context">
+        <p className="echo-key">
+          Key: <strong>{keyName(key)}</strong>
+          {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
+        </p>
+        {!endless && (
+          <ol className="echo-progress" aria-label="Round progress">
+            {Array.from({ length: ROUND_LENGTH }, (_, i) => (
+              <li
+                key={i}
+                aria-current={!answered && i === history.length ? 'step' : undefined}
+                className={
+                  i < history.length
+                    ? isRight(history[i])
+                      ? 'is-found'
+                      : 'is-missed'
+                    : !answered && i === history.length
+                      ? 'is-current'
+                      : ''
+                }
+              >
+                <span className="sr-only">{`Note ${i + 1}: ${i < history.length ? isRight(history[i]) ? 'correct' : 'incorrect' : !answered && i === history.length ? 'current' : 'not answered'}`}</span>
+                <span className="echo-progress-mark" aria-hidden="true">{i < history.length ? isRight(history[i]) ? '✓' : '×' : ''}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
 
       <p className={`round-hint${result ? ` is-${result}` : ''}`} role="status">
         {hint ??
           `The ${keyName(key)} chord sets home base (the 1). Which number is the mystery note?`}
       </p>
+      {level === 'all' && (
+        <p className="echo-tip">Tip: on this level the mystery note can also be one of the 5 notes outside the key.</p>
+      )}
 
       <div className="round-controls">
         {playButton('both', settings.echoOverChord ? 'Mystery note over the chord' : 'Chord, then the mystery note', playBoth)}

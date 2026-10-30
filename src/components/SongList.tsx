@@ -69,8 +69,17 @@ export function SongList({
 
   return (
     <section className="song-list" aria-labelledby="song-list-title">
+      <div className="song-list-hero" aria-hidden="true">
+        <div>
+          <p className="song-list-wordmark">ONE<span>NOTE.</span></p>
+          <p className="song-list-tagline">ONLY ONE NOTE.</p>
+        </div>
+        <div className="piano-sculpture">
+          {Array.from({ length: 7 }, (_, i) => <i key={i} className="piano-sculpture-key" />)}
+        </div>
+      </div>
       <div className="song-list-modes" role="group" aria-label="Game mode">
-        {MODES.map((option) => (
+        {MODES.map((option, index) => (
           <button
             key={option.id}
             type="button"
@@ -78,6 +87,9 @@ export function SongList({
             aria-pressed={mode === option.id}
             onClick={() => onModeChange(option.id)}
           >
+            <span className="song-list-mode-mark" aria-hidden="true">
+              <span>0{index + 1}</span><b>{['— ? —', '≠', '1 · 3 · 5'][index]}</b>
+            </span>
             <span className="song-list-mode-label">{option.label}</span>
             <span className="song-list-mode-blurb">{option.blurb}</span>
           </button>
@@ -86,7 +98,7 @@ export function SongList({
       {mode === 'echo-note' ? (
         <div className="song-list-echo">
           <div className="song-list-heading">
-            <h2 id="song-list-title">Echo Note</h2>
+            <h2 id="song-list-title" tabIndex={-1}>Echo Note</h2>
             <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
           </div>
           <p>
@@ -165,7 +177,7 @@ export function SongList({
           <p className="song-list-choice-about">
             {ECHO_LENGTH_CHOICES.find((option) => option.id === settings.echoLength)?.about}
           </p>
-          <button type="button" className="song-list-start" onClick={onStartEcho}>
+          <button type="button" id="start-echo" className="song-list-start" onClick={onStartEcho}>
             <Icon name="play" />
             Start
           </button>
@@ -173,7 +185,7 @@ export function SongList({
       ) : (
         <>
           <div className="song-list-heading">
-            <h2 id="song-list-title">Pick a song</h2>
+            <h2 id="song-list-title" tabIndex={-1}>Pick a song</h2>
             <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
           </div>
           {mode === 'missing-note' && !hasSeenTutorial() && (
@@ -200,8 +212,8 @@ export function SongList({
               <span className="song-list-progress">
                 {solvedCount} of {visible.length} solved
               </span>
-              <button type="button" onClick={playRandom}>
-                🎲 Random song
+              <button type="button" id="random-song" onClick={playRandom}>
+                <Icon name="shuffle" /> Random song
               </button>
             </div>
           </div>
@@ -210,6 +222,7 @@ export function SongList({
               <li key={song.id}>
                 <button
                   type="button"
+                  id={`song-${song.id}`}
                   className={`song-card${solvedIds.includes(song.id) ? ' is-solved' : ''}`}
                   onClick={() => onSelect(song)}
                 >

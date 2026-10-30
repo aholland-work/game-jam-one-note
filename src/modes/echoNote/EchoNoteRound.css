@@ -86,3 +86,23 @@
   color: var(--success);
   font-weight: 600;
 }
+
+.echo-key { font-size: 0.85rem; border-top: 3px solid var(--text); padding-top: 18px; color: var(--text-muted); }
+.echo-key strong { color: var(--text); }
+.echo-tip { font-size: 0.8rem; font-style: normal; border-left-width: 3px; }
+.echo-progress { gap: 8px; }
+.echo-progress li { width: 26px; height: 6px; border: 0; border-radius: 0; background: var(--border); }
+.echo-progress li.is-current { border: 0; background: var(--accent); }
+.echo-progress li.is-found { background: var(--success); }
+.echo-progress li.is-missed { background: var(--warning); }
+.echo-results { list-style: none; padding: 0; gap: 0; }
+.echo-results li { border-bottom: 1px solid var(--border); padding: 12px 0; }
+.echo-score { font-size: 1.15rem; }
+@media (max-width: 550px) { .round-piano.is-wide .piano { height: 155px; } .round-piano.is-wide .piano-label { font-size: 10px; } .round-piano.is-wide .piano-degree { font-size: 11px; } }
+.echo-progress li { position: relative; margin-bottom: 12px; }
+.echo-context { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; border-top: 3px solid var(--text); padding-top: 18px; }
+.echo-context .echo-key { border: 0; padding-top: 0; }
+.echo-context .echo-progress { flex: none; }
+.echo-progress-mark { position: absolute; top: 4px; left: 0; width: 100%; text-align: center; font-size: 10px; font-weight: 700; }
+.echo-progress .is-found .echo-progress-mark { color: var(--success); }
+.echo-progress .is-missed .echo-progress-mark { color: var(--warning); }

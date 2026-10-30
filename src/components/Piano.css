@@ -2,192 +2,82 @@
   position: relative;
   width: 100%;
   --octaves: 1;
-  max-width: calc(440px * var(--octaves));
+  max-width: calc(490px * var(--octaves));
   height: 170px;
   margin: 0 auto;
+  border-top: 9px solid var(--text);
+  filter: drop-shadow(0 10px 7px rgb(25 18 20 / 18%));
   user-select: none;
   touch-action: manipulation;
 }
-
 .piano-key {
   position: absolute;
   top: 0;
-  padding: 0 0 10px;
+  padding: 0 0 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  transition:
-    background-color 120ms,
-    transform 80ms;
+  gap: 5px;
+  transition: background-color 120ms, transform 80ms;
+  --key-face: var(--piano-ivory);
+  --key-shade: var(--piano-ivory-shade);
+  --key-edge: var(--piano-ivory-edge);
+  --key-ink: var(--piano-ink);
 }
-
 .piano-white {
   width: calc(100% / (7 * var(--octaves)));
   height: 100%;
-  background: #ffffff;
-  border: 1px solid #888780;
-  border-radius: 0 0 8px 8px;
+  background: linear-gradient(95deg, var(--key-shade), var(--key-face) 35%, var(--key-face));
+  border: 1px solid var(--piano-key-border);
+  border-radius: 0 0 6px 6px;
+  box-shadow: inset 2px 0 2px rgb(255 255 255 / 45%), inset 0 -5px 1px var(--key-edge);
   z-index: 1;
 }
-
 .piano-black {
   width: calc(100% / (7 * var(--octaves)) * 0.6);
-  height: 60%;
+  height: 61%;
   transform: translateX(-50%);
-  background: #2c2c2a;
-  border: 1px solid #2c2c2a;
-  border-radius: 0 0 6px 6px;
+  background: linear-gradient(90deg, var(--piano-ebony), var(--piano-ebony-light) 78%, var(--piano-ebony));
+  border: 1px solid var(--piano-ebony-edge);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 2px 4px 3px rgb(0 0 0 / 25%), inset 0 -8px 0 var(--piano-ebony-edge);
+  --key-ink: var(--piano-black-label);
   z-index: 2;
 }
-
-.piano-white.is-in-key {
-  background: #e6f0fa;
+/* Only home base gets blue. Other scale keys keep their ivory/ebony faces. */
+.piano-white.is-home { --key-face: var(--piano-home); --key-shade: var(--piano-home-shade); --key-edge: var(--piano-home-edge); --key-ink: var(--piano-home-ink); }
+.piano-black.is-home { background: var(--piano-home-ink); border-color: var(--piano-home-ink); }
+.piano-degree { font-size: 13px; font-weight: 700; color: var(--key-ink); pointer-events: none; }
+.piano-degree.is-faint { font-weight: 400; }
+.piano-white:hover { border-color: var(--piano-focus); }
+.piano-black:hover { border-color: var(--piano-black-focus); }
+.piano-white.is-selected { --key-face: var(--piano-pick); --key-shade: var(--piano-pick-shade); --key-edge: var(--piano-pick-edge); --key-ink: var(--piano-pick-ink); border-color: var(--piano-focus); }
+.piano-black.is-selected { background: var(--piano-black-pick); border-color: var(--piano-black-pick); }
+.piano-white.is-missed { --key-face: var(--piano-missed); --key-shade: var(--piano-missed-shade); --key-edge: var(--piano-missed-edge); --key-ink: var(--piano-missed-ink); border-color: var(--piano-missed-ink); }
+.piano-black.is-missed { background: var(--piano-missed-ink); border-color: var(--piano-missed-ink); }
+.piano-white.is-found { --key-face: var(--piano-found); --key-shade: var(--piano-found-shade); --key-edge: var(--piano-found-edge); --key-ink: var(--piano-found-ink); border-color: var(--piano-found-ink); }
+.piano-black.is-found { background: var(--piano-found-ink); border-color: var(--piano-found-ink); }
+.piano-white.is-playing, .piano-white.is-pressed { --key-face: var(--piano-pick); --key-shade: var(--piano-pick-shade); --key-edge: var(--piano-pick-edge); --key-ink: var(--piano-pick-ink); }
+.piano-white.is-found.is-playing { --key-face: var(--piano-found); --key-shade: var(--piano-found-shade); --key-edge: var(--piano-found-edge); --key-ink: var(--piano-found-ink); }
+.piano-white.is-missed.is-playing { --key-face: var(--piano-missed); --key-shade: var(--piano-missed-shade); --key-edge: var(--piano-missed-edge); --key-ink: var(--piano-missed-ink); }
+.piano-black.is-playing, .piano-black.is-pressed { background: var(--piano-black-pick); }
+.piano-black.is-found.is-playing { background: var(--piano-found-ink); }
+.piano-black.is-missed.is-playing { background: var(--piano-missed-ink); }
+.piano-white.is-pressed { transform: translateY(3px); }
+.piano-black.is-pressed { transform: translate(-50%, 3px); }
+.piano-label { font-size: 12px; font-weight: 500; color: var(--key-ink); pointer-events: none; }
+.piano-black .piano-label { font-size: 11px; }
+.piano-kbd { font-family: inherit; font-size: 10px; line-height: 1; min-width: 16px; padding: 2px 3px; border: 1px solid var(--piano-key-border); border-bottom-width: 2px; border-radius: 4px; color: var(--key-ink); pointer-events: none; }
+.piano-key:focus-visible { outline: 3px solid var(--piano-focus); outline-offset: -5px; }
+.piano-black:focus-visible { outline-color: var(--piano-black-focus); }
+@media (hover: none) { .piano-kbd { display: none; } }
+@media (forced-colors: active) {
+  .piano { filter: none; }
+  .piano-key { forced-color-adjust: none; background: Canvas; border-color: CanvasText; box-shadow: none; }
+  .piano-black { background: CanvasText; --key-ink: Canvas; }
+  .piano-key.is-selected, .piano-key.is-found, .piano-key.is-missed { background: Highlight; --key-ink: HighlightText; }
+  .piano-key:focus-visible { outline-color: Highlight; }
+  .piano-key[aria-pressed='true']:focus-visible { outline-color: HighlightText; }
 }
-
-.piano-black.is-in-key {
-  background: #3f5f86;
-  border-color: #3f5f86;
-}
-
-.piano-white.is-home {
-  background: #cfe2f6;
-  box-shadow: inset 0 -4px 0 #2f6db0;
-}
-
-.piano-black.is-home {
-  background: #2f6db0;
-  border-color: #2f6db0;
-}
-
-.piano-degree {
-  font-size: 13px;
-  font-weight: 700;
-  color: #2f6db0;
-  pointer-events: none;
-}
-
-.piano-black .piano-degree {
-  color: #e6f0fa;
-}
-
-.piano-degree.is-faint {
-  font-weight: 500;
-  color: #9fb4cc;
-}
-
-.piano-black .piano-degree.is-faint {
-  color: #8e8d86;
-}
-
-.piano-white:hover {
-  background: #f4f3ef;
-}
-
-.piano-black:hover {
-  background: #444441;
-}
-
-.piano-white.is-selected {
-  background: #cecbf6;
-  border-color: #534ab7;
-}
-
-.piano-black.is-selected {
-  background: #534ab7;
-  border-color: #534ab7;
-}
-
-.piano-white.is-missed {
-  background: #f6d5bf;
-  border-color: #b4560f;
-}
-
-.piano-black.is-missed {
-  background: #b4560f;
-  border-color: #b4560f;
-}
-
-.piano-white.is-found {
-  background: #d4e8b8;
-  border-color: #3b6d11;
-}
-
-.piano-black.is-found {
-  background: #3b6d11;
-  border-color: #3b6d11;
-}
-
-.piano-white.is-playing {
-  background: #e7e5fb;
-}
-
-.piano-black.is-playing {
-  background: #7f77dd;
-}
-
-.piano-white.is-selected.is-playing {
-  background: #afa9ec;
-}
-
-.piano-white.is-missed.is-playing {
-  background: #f0b48c;
-}
-
-.piano-white.is-found.is-playing {
-  background: #b5d68c;
-}
-
-.piano-black.is-missed.is-playing {
-  background: #d8742f;
-}
-
-.piano-black.is-found.is-playing {
-  background: #639922;
-}
-
-.piano-white.is-pressed {
-  background: #afa9ec;
-}
-
-.piano-black.is-pressed {
-  background: #7f77dd;
-}
-
-.piano-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #5f5e5a;
-  pointer-events: none;
-}
-
-.piano-black .piano-label {
-  font-size: 11px;
-  color: #d3d1c7;
-}
-
-/* Faint keycap showing which computer key plays this piano key. */
-.piano-kbd {
-  font-family: inherit;
-  font-size: 10px;
-  line-height: 1;
-  min-width: 16px;
-  padding: 2px 3px;
-  border: 1px solid #d3d1c7;
-  border-bottom-width: 2px;
-  border-radius: 4px;
-  color: #888780;
-  pointer-events: none;
-}
-
-.piano-black .piano-kbd {
-  border-color: #5f5e5a;
-  color: #b4b2a9;
-}
-
-@media (hover: none) {
-  .piano-kbd {
-    display: none;
-  }
-}
+.piano-key[aria-pressed='true'] .piano-label::after { content: ''; display: block; width: 12px; height: 2px; margin: 2px auto -4px; background: currentColor; }

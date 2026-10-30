@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { midiInput, useMidiState } from '../audio/midi'
 import { midiToName } from '../music/notation'
+import { Icon } from './Icon'
 import './MidiControl.css'
 
 /**
@@ -9,6 +10,9 @@ import './MidiControl.css'
  */
 export function MidiControl() {
   const midi = useMidiState()
+  const panelId = useId()
+  const trigger = useRef<HTMLButtonElement>(null)
+  const restoreFocus = useRef(false)
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
 
@@ -24,7 +28,10 @@ export function MidiControl() {
       if (!root.current?.contains(event.target as Node)) setOpen(false)
     }
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') {
+        setOpen(false)
+        if (root.current?.contains(document.activeElement)) trigger.current?.focus()
+      }
     }
     document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('keydown', onKeyDown)
@@ -34,19 +41,27 @@ export function MidiControl() {
     }
   }, [open])
 
+  useEffect(() => {
+    if (restoreFocus.current && midi.status !== 'on') {
+      restoreFocus.current = false
+      trigger.current?.focus()
+    }
+  }, [midi.status])
+
   // Safari has no Web MIDI, so there's nothing to offer there.
   if (midi.status === 'unsupported') return null
 
   if (midi.status !== 'on') {
     return (
-      <div className="midi-control" ref={root}>
+      <div className="midi-control" ref={root} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false) }}>
         <button
           type="button"
           className="midi-button"
+          ref={trigger}
           onClick={() => void midiInput.connect()}
           disabled={midi.status === 'connecting'}
         >
-          🎹 {midi.status === 'connecting' ? 'Connecting…' : 'Connect a MIDI instrument'}
+          <Icon name="keyboard" /> {midi.status === 'connecting' ? 'Connecting…' : 'Connect a MIDI instrument'}
         </button>
         {midi.status === 'blocked' && (
           <p className="midi-panel">
@@ -59,13 +74,13 @@ export function MidiControl() {
 
   const device = midi.devices.length > 0 ? midi.devices.join(', ') : 'MIDI on, no instrument found'
   return (
-    <div className="midi-control" ref={root}>
-      <button type="button" className="midi-button is-on" aria-expanded={open} onClick={() => setOpen(!open)}>
-        🎹 {device}
+    <div className="midi-control" ref={root} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false) }}>
+      <button type="button" className="midi-button is-on" ref={trigger} aria-expanded={open} aria-controls={open ? panelId : undefined} onClick={() => setOpen(!open)}>
+        <Icon name="keyboard" /> {device}
         {midi.lastNote !== null && <span className="midi-heard">{midiToName(midi.lastNote)}</span>}
       </button>
       {open && (
-        <div className="midi-panel" role="group" aria-label="MIDI instrument">
+        <div id={panelId} className="midi-panel" role="group" aria-label="MIDI instrument">
           {midi.devices.length === 0 && <p>Plug in an instrument, or pair it over Bluetooth, and it shows up here.</p>}
           <label>
             <input type="checkbox" checked={midi.sound} onChange={(event) => midiInput.setSound(event.target.checked)} />
@@ -74,6 +89,7 @@ export function MidiControl() {
           <button
             type="button"
             onClick={() => {
+              restoreFocus.current = true
               midiInput.disconnect()
               setOpen(false)
             }}

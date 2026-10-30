@@ -161,7 +161,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
   // The player stops any sound when the round closes.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== ' ' || event.target instanceof HTMLButtonElement) return
+      if (event.key !== ' ' || (event.target instanceof Element && event.target.closest('button, input, select, textarea, summary, a, [role="button"]'))) return
       event.preventDefault()
       onSpace()
     }
@@ -177,8 +177,9 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
       <button type="button" className="round-back" onClick={onBack}>
         ← Songs
       </button>
+      <p className="round-mode">Missing Note</p>
       <header className="round-header">
-        <h2 id="round-title">{song.title}</h2>
+        <h2 id="round-title" tabIndex={-1}>{song.title}</h2>
         <p className="round-genre">{song.genre}</p>
       </header>
 
