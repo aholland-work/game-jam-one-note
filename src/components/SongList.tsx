@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { ECHO_LEVELS } from '../game/echoNote'
 import { pickRandomSong } from '../game/progress'
 import type { GameMode, Settings } from '../game/settings'
+import { readFlag, writeFlag } from '../game/storage'
 import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
 import { Icon } from './Icon'
@@ -24,7 +26,7 @@ const ECHO_KEY_CHOICES = [
 ] as const
 
 const ECHO_LENGTH_CHOICES = [
-  { id: 'round', label: 'Sets of 5', about: '5 mystery notes, then your results. Get 4 or more right to unlock the next notes.' },
+  { id: 'round', label: 'Set of 5', about: '5 mystery notes, then your results. Get 4 or more right to unlock the next notes.' },
   {
     id: 'endless',
     label: 'Free practice',
@@ -96,92 +98,7 @@ export function SongList({
         ))}
       </div>
       {mode === 'echo-note' ? (
-        <div className="song-list-echo">
-          <div className="song-list-heading">
-            <h2 id="song-list-title" tabIndex={-1}>Echo Note</h2>
-            <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
-          </div>
-          <p>
-            Ear training for playing by ear and improvising: learn to hear where a note sits in a key, and find it on
-            the piano.
-          </p>
-          <div className="song-list-how">
-            <h3>How it works</h3>
-            <ol>
-              <li>
-                <strong>A chord sets the key.</strong> Its lowest note is home base, the <strong>1</strong>. The other
-                notes of the key are numbered up from there: 1 2 3 4 5 6 7.
-              </li>
-              <li>
-                <strong>A mystery note plays.</strong> Replay the chord and the note as often as you like (Space
-                replays both).
-              </li>
-              <li>
-                <strong>Find it on the piano.</strong> Tap keys to compare, then lock in one answer. You'll see its
-                name and its number, like “C♯, the 3 of A major”.
-              </li>
-              <li>
-                <strong>Keep going.</strong> Your results show which numbers you missed most. Score 4 of 5 or better in a
-                set to unlock the next level.
-              </li>
-            </ol>
-          </div>
-          <div className="song-list-choice" role="group" aria-label="Notes in play">
-            <span>Notes</span>
-            {ECHO_LEVELS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className="song-list-filter"
-                aria-pressed={settings.echoLevel === option.id}
-                onClick={() => onSettingsChange({ ...settings, echoLevel: option.id })}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-          <p className="song-list-choice-about">
-            {ECHO_LEVELS.find((option) => option.id === settings.echoLevel)?.about}
-          </p>
-          <div className="song-list-choice" role="group" aria-label="Key">
-            <span>Key</span>
-            {ECHO_KEY_CHOICES.map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                className="song-list-filter"
-                aria-pressed={settings.echoKey === id}
-                onClick={() => onSettingsChange({ ...settings, echoKey: id })}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="song-list-choice-about">
-            {ECHO_KEY_CHOICES.find((option) => option.id === settings.echoKey)?.about}
-          </p>
-          <div className="song-list-choice" role="group" aria-label="Session length">
-            <span>Length</span>
-            {ECHO_LENGTH_CHOICES.map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                className="song-list-filter"
-                aria-pressed={settings.echoLength === id}
-                onClick={() => onSettingsChange({ ...settings, echoLength: id })}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="song-list-choice-about">
-            {ECHO_LENGTH_CHOICES.find((option) => option.id === settings.echoLength)?.about}
-          </p>
-          <button type="button" id="start-echo" className="song-list-start" onClick={onStartEcho}>
-            <Icon name="play" />
-            Start
-          </button>
-        </div>
+        <EchoStart settings={settings} onSettingsChange={onSettingsChange} onStart={onStartEcho} />
       ) : (
         <>
           <div className="song-list-heading">
@@ -245,5 +162,132 @@ export function SongList({
         </>
       )}
     </section>
+  )
+}
+
+// Set once the player has started Echo Note, after which How it works stays folded away.
+const ECHO_STARTED_KEY = 'one-note:echo-started'
+
+interface EchoStartProps {
+  settings: Settings
+  onSettingsChange: (settings: Settings) => void
+  onStart: () => void
+}
+
+/**
+ * The Echo Note start screen: the current practice and a Start button, with the choices
+ * behind Change practice so most days it's one click to play.
+ */
+function EchoStart({ settings, onSettingsChange, onStart }: EchoStartProps) {
+  const [changing, setChanging] = useState(false)
+  // Explain only the choice just made, rather than every option at once.
+  const [lastPicked, setLastPicked] = useState<'level' | 'key' | 'length'>('level')
+  const [firstVisit] = useState(() => !readFlag(ECHO_STARTED_KEY))
+
+  const level = ECHO_LEVELS.find((option) => option.id === settings.echoLevel) ?? ECHO_LEVELS[0]
+  const key = ECHO_KEY_CHOICES.find((option) => option.id === settings.echoKey) ?? ECHO_KEY_CHOICES[0]
+  const length = ECHO_LENGTH_CHOICES.find((option) => option.id === settings.echoLength) ?? ECHO_LENGTH_CHOICES[0]
+  const about = { level: level.about, key: key.about, length: length.about }[lastPicked]
+
+  const start = () => {
+    writeFlag(ECHO_STARTED_KEY, true)
+    onStart()
+  }
+
+  const choice = <T extends string>(
+    label: string,
+    group: 'level' | 'key' | 'length',
+    options: readonly { id: T; label: string }[],
+    current: T,
+    pick: (id: T) => void,
+  ) => (
+    <div className="song-list-choice" role="group" aria-label={label}>
+      <span>{label}</span>
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          className="song-list-filter"
+          aria-pressed={current === option.id}
+          onClick={() => {
+            pick(option.id)
+            setLastPicked(group)
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  )
+
+  return (
+    <div className="song-list-echo">
+      <div className="song-list-heading">
+        <h2 id="song-list-title" tabIndex={-1}>Echo Note</h2>
+        <SettingsMenu mode="echo-note" settings={settings} onChange={onSettingsChange} />
+      </div>
+      <p>Hear a chord, then a mystery note. Find it on the piano and learn its number in the key.</p>
+
+      <div className="echo-start-card">
+        {changing ? (
+          <div id="echo-practice-choices" className="echo-start-choices">
+            {choice('Notes', 'level', ECHO_LEVELS, settings.echoLevel, (echoLevel) => onSettingsChange({ ...settings, echoLevel }))}
+            {choice('Key', 'key', ECHO_KEY_CHOICES, settings.echoKey, (echoKey) => onSettingsChange({ ...settings, echoKey }))}
+            {choice('Length', 'length', ECHO_LENGTH_CHOICES, settings.echoLength, (echoLength) =>
+              onSettingsChange({ ...settings, echoLength }),
+            )}
+            <p className="echo-start-about" aria-live="polite">
+              {about}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className="echo-start-label">Your practice</p>
+            <p className="echo-start-summary">
+              {level.label} · {key.label} · {length.label}
+            </p>
+          </div>
+        )}
+        <div className="echo-start-actions">
+          <button type="button" id="start-echo" className="echo-start-button" onClick={start}>
+            <Icon name="play" />
+            Start
+          </button>
+          <button
+            type="button"
+            className="echo-start-change"
+            aria-expanded={changing}
+            aria-controls="echo-practice-choices"
+            onClick={() => setChanging(!changing)}
+          >
+            {changing ? 'Done' : 'Change practice'}
+          </button>
+        </div>
+      </div>
+
+      <details className="echo-start-how" open={firstVisit}>
+        <summary>How it works</summary>
+        <div className="song-list-how">
+          <ol>
+            <li>
+              <strong>A chord sets the key.</strong> Its lowest note is home base, the <strong>1</strong>. The other
+              notes of the key are numbered up from there: 1 2 3 4 5 6 7.
+            </li>
+            <li>
+              <strong>A mystery note plays.</strong> Replay the chord and the note as often as you like (Space replays
+              both).
+            </li>
+            <li>
+              <strong>Find it on the piano.</strong> Tap keys to compare, then lock in one answer. You'll see its name
+              and its number, like “C♯, the 3 of A major”.
+            </li>
+            <li>
+              <strong>Keep going.</strong> Your results show which numbers you missed most. Score 4 of 5 or better in a
+              set to unlock the next level.
+            </li>
+          </ol>
+        </div>
+      </details>
+    </div>
   )
 }

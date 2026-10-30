@@ -84,3 +84,18 @@
   .app:has(.song-list) .app-header { flex-wrap: wrap; }
   .app:has(.song-list) .midi-control { max-width: 100%; margin-left: auto; }
 }
+
+.echo-start-card { display: grid; gap: 16px; width: 100%; max-width: 680px; padding: 18px 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.song-list-echo .echo-start-label { font-size: 0.8125rem; color: var(--text-muted); }
+.song-list-echo .echo-start-summary { margin-top: 2px; font-size: 1.0625rem; font-weight: 600; color: var(--text); }
+.echo-start-choices { display: grid; gap: 12px; }
+.song-list-echo .echo-start-about { font-size: 0.875rem; }
+.echo-start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.echo-start-button { min-height: 42px; padding: 0 26px; border-color: var(--accent); background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--accent-edge); font-weight: 700; }
+.echo-start-button:hover:not(:disabled) { border-color: var(--accent-edge); }
+.echo-start-button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--accent-edge); }
+.echo-start-change { border: 0; background: none; padding: 4px 0; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.echo-start-how { width: 100%; }
+.echo-start-how summary { cursor: pointer; width: fit-content; font-size: 0.9375rem; color: var(--text-muted); }
+.echo-start-how summary:hover { color: var(--accent); }
+.echo-start-how .song-list-how { margin-top: 10px; }
