@@ -7,6 +7,8 @@ export interface Note {
   beats: number
   /** Tied into the next note (same pitch): the two sound as one held note. */
   tie?: boolean
+  /** Part of a triplet: written as `writtenBeats` but played in two thirds of that time. */
+  triplet?: boolean
   /** Other pitches sounding with this note, making it a chord. Only used for sound, not the staff. */
   chord?: number[]
   /** Extra beats this note and its chord keep ringing after the next note starts. Only used for sound. */
@@ -79,18 +81,25 @@ export function midiToFrequency(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12)
 }
 
-/** Parses "q", "h.", "e" etc. into beats. A trailing dot adds half the value. */
+/**
+ * Parses "q", "h.", "e" etc. into beats. A trailing dot adds half the value, and a
+ * trailing 3 makes it a triplet, two thirds as long ("e3" is a third of a beat).
+ */
 export function parseDuration(token: string): number {
-  const match = /^([whqes])(\.)?$/.exec(token)
+  const match = /^([whqes])(\.)?(3)?$/.exec(token)
   if (!match) throw new Error(`Invalid duration "${token}"`)
-  const beats = DURATION_BEATS[match[1]]
-  return match[2] ? beats * 1.5 : beats
+  const beats = DURATION_BEATS[match[1]] * (match[2] ? 1.5 : 1)
+  return match[3] ? (beats * 2) / 3 : beats
 }
+
+/** The length a note is written as on the staff: a triplet eighth is drawn as an eighth. */
+export const writtenBeats = (note: Note) => (note.triplet ? note.beats * 1.5 : note.beats)
 
 /**
  * Parses a melody written as space-separated `pitch/duration` tokens, e.g.
  * `E4/q E4/q F4/q G4/q | G4/q F4/q E4/q D4/q`. Use `r` as the pitch for a rest and
- * end a duration with `~` to tie the note into the next one (`C5/s~ C5/q.`).
+ * end a duration with `~` to tie the note into the next one (`C5/s~ C5/q.`). End a duration
+ * with `3` for a triplet: `C4/e3 D4/e3 E4/e3` plays three eighths in one beat.
  * Bar lines (`|`) are only there to make songs readable and are ignored.
  */
 export function parseMelody(text: string): Note[] {
@@ -109,6 +118,7 @@ export function parseMelody(text: string): Note[] {
         beats: parseDuration(duration),
       }
       if (tie) note.tie = true
+      if (duration.endsWith('3')) note.triplet = true
       return note
     })
 }

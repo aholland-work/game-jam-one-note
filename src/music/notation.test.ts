@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { diatonicStep, midiToName, midiToPitch, parseDuration, parseMelody, pitchToMidi, usesFlats } from './notation'
+import {
+  diatonicStep,
+  midiToName,
+  midiToPitch,
+  parseDuration,
+  parseMelody,
+  pitchToMidi,
+  usesFlats,
+  writtenBeats,
+} from './notation'
 
 describe('pitchToMidi', () => {
   it('reads naturals, sharps and flats', () => {
@@ -39,6 +48,16 @@ it('reads durations, including dotted ones', () => {
   expect(parseDuration('h.')).toBe(3)
   expect(parseDuration('s')).toBe(0.25)
   expect(() => parseDuration('x')).toThrow()
+})
+
+it('reads triplets as two thirds of the written value', () => {
+  expect(parseDuration('e3')).toBeCloseTo(1 / 3)
+  expect(parseDuration('q3')).toBeCloseTo(2 / 3)
+  const melody = parseMelody('C4/e3 D4/e3 E4/e3 F4/q')
+  expect(melody[0]).toMatchObject({ midi: 60, triplet: true })
+  expect(writtenBeats(melody[0])).toBeCloseTo(0.5)
+  expect(melody.reduce((sum, note) => sum + note.beats, 0)).toBeCloseTo(2)
+  expect(melody[3].triplet).toBeUndefined()
 })
 
 it('parses a melody with rests, ties and bar lines', () => {

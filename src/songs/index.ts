@@ -9,6 +9,8 @@ import { entertainer } from './entertainer'
 import { frereJacques } from './frereJacques'
 import { furElise } from './furElise'
 import { goodKingWenceslas } from './goodKingWenceslas'
+import { harkTheHerald } from './harkTheHerald'
+import { jesuJoy } from './jesuJoy'
 import { jingleBells } from './jingleBells'
 import { mapleLeafRag } from './mapleLeafRag'
 import { maryLamb } from './maryLamb'
@@ -19,8 +21,10 @@ import { odeToJoy } from './odeToJoy'
 import { ohSusanna } from './ohSusanna'
 import { rondoAllaTurca } from './rondoAllaTurca'
 import { shenandoah } from './shenandoah'
+import { silentNight } from './silentNight'
 import { takeMeOut } from './takeMeOut'
 import { twinkleTwinkle } from './twinkleTwinkle'
+import { weddingMarch } from './weddingMarch'
 import type { Song } from './types'
 
 /** Every song in the game, easiest first. Add a song by writing its file and listing it here. */
@@ -29,9 +33,12 @@ export const songs: Song[] = [
   maryLamb,
   frereJacques,
   goodKingWenceslas,
+  harkTheHerald,
+  weddingMarch,
   odeToJoy,
   jingleBells,
   awayInAManger,
+  silentNight,
   oComeAllYeFaithful,
   comingRoundTheMountain,
   brahmsLullaby,
@@ -45,6 +52,7 @@ export const songs: Song[] = [
   furElise,
   eineKleine,
   rondoAllaTurca,
+  jesuJoy,
   mapleLeafRag,
   mountainKing,
   entertainer,

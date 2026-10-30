@@ -231,6 +231,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, o
         notes={showingChanged ? changedMelody : song.melody}
         beatsPerBar={song.beatsPerBar}
         pickupBeats={song.pickupBeats}
+        beamBeats={song.compound ? 1.5 : undefined}
         revealedCount={revealedCount}
         showAnswer={isOver}
         activeIndex={isOver || settings.oneNoteOffHighlight ? player.activeIndex : null}

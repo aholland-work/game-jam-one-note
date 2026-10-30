@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { diatonicStep, parsePitch, type Note } from '../music/notation'
+import { diatonicStep, parsePitch, writtenBeats, type Note } from '../music/notation'
 import './Staff.css'
 
 /** A highlight on one note: the player's pick, or a right or wrong answer. */
@@ -10,6 +10,8 @@ interface StaffProps {
   beatsPerBar: number
   /** Length of a pickup (anacrusis) before the first full bar, in beats. */
   pickupBeats?: number
+  /** Beats that fast notes are beamed in: 1.5 for 6/8 and 3/8, where they group in threes. */
+  beamBeats?: number
   /** A note drawn as a "?" slot until `showAnswer`. Omit when no note is hidden. */
   gapIndex?: number
   /** How many notes, from the start, sit at their real pitch. The rest sit on the middle line. */
@@ -89,6 +91,7 @@ export function Staff({
   notes,
   beatsPerBar,
   pickupBeats = 0,
+  beamBeats = beatsPerBar === 1.5 ? 1.5 : 1,
   gapIndex = -1,
   revealedCount,
   showAnswer,
@@ -128,13 +131,12 @@ export function Staff({
   const xForUnit = (unit: number) => staffLeft + unit * scale
   const noteX = units.map((unit) => xForUnit(unit) + NOTE_INSET)
 
-  // Beam eighth and sixteenth notes that share a beat (a whole bar in 3/8). Each beam
+  // Beam eighth and sixteenth notes that share a beat (three eighths in 6/8). Each beam
   // follows the notes' current positions, so it moves with them as they're revealed.
-  const beamGroupBeats = beatsPerBar === 1.5 ? 1.5 : 1
   const shownAsGap = (index: number) => index === gapIndex && !showAnswer
   const displayY = (index: number) =>
     index === gapIndex || index < revealedCount ? yFor(diatonicStep(notes[index].pitch as string)) : yFor(MIDDLE_LINE)
-  const beatGroupOf = (index: number) => Math.floor((startBeats[index] - pickupBeats + 0.001) / beamGroupBeats)
+  const beatGroupOf = (index: number) => Math.floor((startBeats[index] - pickupBeats + 0.001) / beamBeats)
   const beamGroups: number[][] = []
   let run: number[] = []
   const flush = () => {
@@ -142,7 +144,7 @@ export function Staff({
     run = []
   }
   notes.forEach((note, index) => {
-    if (note.pitch === null || note.beats >= 1 || shownAsGap(index)) return flush()
+    if (note.pitch === null || writtenBeats(note) >= 1 || shownAsGap(index)) return flush()
     if (run.length > 0 && beatGroupOf(run[0]) !== beatGroupOf(index)) flush()
     run.push(index)
   })
@@ -180,7 +182,7 @@ export function Staff({
       `M${xa} ${beamAt(xa) + offset} L${xb} ${beamAt(xb) + offset} L${xb} ${beamAt(xb) + offset + thickness} L${xa} ${beamAt(xa) + offset + thickness} Z`
     beams.push(bar(stemXs[0], stemXs[last], 0))
     // A second beam joins neighboring sixteenths; a lone sixteenth gets a short stub.
-    const isSixteenth = (k: number) => k >= 0 && k <= last && notes[group[k]].beats <= 0.25
+    const isSixteenth = (k: number) => k >= 0 && k <= last && writtenBeats(notes[group[k]]) <= 0.25
     group.forEach((_, k) => {
       if (!isSixteenth(k)) return
       if (isSixteenth(k + 1)) beams.push(bar(stemXs[k], stemXs[k + 1], -dir * BEAM_GAP))
@@ -189,6 +191,40 @@ export function Staff({
         beams.push(bar(Math.min(stemXs[k], stemXs[k] + stub), Math.max(stemXs[k], stemXs[k] + stub), -dir * BEAM_GAP))
       }
     })
+  }
+
+  // A "3" over each triplet: three notes of the same written length, rests included.
+  const tuplets: { x: number; y: number }[] = []
+  for (let index = 0; index < notes.length; ) {
+    if (!notes[index].triplet) {
+      index++
+      continue
+    }
+    const group = [index]
+    const target = 3 * writtenBeats(notes[index])
+    let written = writtenBeats(notes[index])
+    while (written < target - 0.001 && notes[index + group.length]?.triplet) {
+      written += writtenBeats(notes[index + group.length])
+      group.push(index + group.length)
+    }
+    index += group.length
+    const stems = group.map((i) => beamedStems.get(i))
+    const sounding = group.filter((i) => notes[i].pitch !== null)
+    const beamed = sounding.length > 1 && sounding.every((i) => beamedStems.has(i))
+    const first = noteX[group[0]]
+    const last = noteX[group[group.length - 1]]
+    if (beamed) {
+      // On the beam's side, just beyond it.
+      const { stemUp } = beamedStems.get(sounding[0])!
+      const ends = stems.flatMap((stem) => (stem ? [stem.stemEnd] : []))
+      tuplets.push({
+        x: (first + last) / 2 + (stemUp ? 5.6 : -5.6),
+        y: stemUp ? Math.min(...ends) - 6 : Math.max(...ends) + 14,
+      })
+    } else {
+      const top = Math.min(...sounding.map((i) => displayY(i) - STEM_LENGTH), yFor(TOP_LINE))
+      tuplets.push({ x: (first + last) / 2, y: top - 6 })
+    }
   }
 
   return (
@@ -231,7 +267,7 @@ export function Staff({
           )
         }
         if (note.pitch === null) {
-          return <Rest key={index} beats={note.beats} x={x} />
+          return <Rest key={index} beats={writtenBeats(note)} x={x} />
         }
         const isAnswer = index === gapIndex
         const next = notes[index + 1]
@@ -265,6 +301,13 @@ export function Staff({
           <AnimatedPath key={i} className="staff-beam" d={d} />
         ))}
       </g>
+
+      {tuplets.map(({ x, y }, i) => (
+        // Placed with a transform so it slides along with the notes and beams.
+        <text key={i} className="staff-tuplet" x={x} y={0} textAnchor="middle" style={{ transform: `translateY(${y}px)` }}>
+          3
+        </text>
+      ))}
 
       {onNoteSelect &&
         notes.map((note, index) =>
@@ -318,9 +361,10 @@ interface NoteGlyphProps {
 function NoteGlyph({ note, x, y, middleY, accidental, tieToX, beamedStem, revealed, className }: NoteGlyphProps) {
   const step = diatonicStep(note.pitch as string)
   const stemUp = beamedStem ? beamedStem.stemUp : !revealed || step < MIDDLE_LINE
-  const hollow = note.beats >= 2
-  const dotted = [0.75, 1.5, 3].includes(note.beats)
-  const flags = beamedStem ? 0 : note.beats === 0.25 ? 2 : note.beats < 1 ? 1 : 0
+  const written = writtenBeats(note)
+  const hollow = written >= 2
+  const dotted = [0.75, 1.5, 3].includes(written)
+  const flags = beamedStem ? 0 : written === 0.25 ? 2 : written < 1 ? 1 : 0
   const onLine = (step - BOTTOM_LINE) % 2 === 0
 
   const ledgers: number[] = []
@@ -362,7 +406,7 @@ function NoteGlyph({ note, x, y, middleY, accidental, tieToX, beamedStem, reveal
         stroke="currentColor"
         strokeWidth={1.6}
       />
-      {note.beats < 4 && (
+      {written < 4 && (
         <AnimatedPath className="staff-stem" d={`M${stemX} ${y} L${stemX} ${stemEnd}`} stroke="currentColor" strokeWidth={1.4} />
       )}
       {Array.from({ length: flags }, (_, i) => {

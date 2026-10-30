@@ -62,9 +62,9 @@ npm run build   # type-check and production build
 1. Create a file in `src/songs/` (copy an existing one, such as `odeToJoy.ts`).
 2. Write the melody as space-separated `pitch/duration` tokens:
    - Pitch: `C4`, `F#5`, `Bb3`, or `r` for a rest.
-   - Duration: `w` whole, `h` half, `q` quarter, `e` eighth, `s` sixteenth. Add `.` for dotted (`q.`) and `~` to tie into the next note (`C5/s~ C5/q`).
+   - Duration: `w` whole, `h` half, `q` quarter, `e` eighth, `s` sixteenth. Add `.` for dotted (`q.`), `3` for a triplet (`C4/e3 D4/e3 E4/e3` is three eighths in one beat) and `~` to tie into the next note (`C5/s~ C5/q`).
    - `|` bar lines are optional and only for readability.
-3. Set `missingIndex` to the note players have to find (counting from 0), plus `beatsPerBar` and, for songs that start mid-bar, `pickupBeats`.
+3. Set `missingIndex` to the note players have to find (counting from 0), plus `beatsPerBar` and, for songs that start mid-bar, `pickupBeats`. For 6/8, use `beatsPerBar: 3` and `compound: true` so eighths are beamed in threes.
 4. Add it to the list in `src/songs/index.ts`.
 5. Save a MIDI file of the public-domain source in `song-sources/` (Mutopia and abcnotation.com both offer one) and point the song's `source.midi` at it, with the track that holds the tune.
 6. Run `npm test`. It checks the bars add up, the song fits on one line, the missing note is a real note on the piano, and the melody appears note for note in the source MIDI (allowing a key change and doubled or halved note values).

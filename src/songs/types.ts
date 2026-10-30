@@ -14,6 +14,8 @@ export interface Song {
   beatsPerBar: number
   /** Length of a pickup before the first full bar, in beats. Omit when there is none. */
   pickupBeats?: number
+  /** In 6/8: counted in dotted quarters, so fast notes are beamed in threes. */
+  compound?: boolean
   melody: Note[]
   /** Index into `melody` of the note the player has to find. */
   missingIndex: number

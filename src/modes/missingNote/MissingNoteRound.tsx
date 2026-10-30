@@ -186,6 +186,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
         }
         beatsPerBar={song.beatsPerBar}
         pickupBeats={song.pickupBeats}
+        beamBeats={song.compound ? 1.5 : undefined}
         gapIndex={song.missingIndex}
         revealedCount={revealedCount}
         showAnswer={isOver}
