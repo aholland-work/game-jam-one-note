@@ -53,14 +53,14 @@ export const ECHO_LEVELS: { id: EchoLevel; label: string; about: string; steps: 
   {
     id: 'triad',
     label: 'Chord tones (1, 3, 5)',
-    about: 'The notes of the chord itself, the safest notes to land on when you improvise.',
+    about: 'The mystery note is always the 1, 3 or 5: one of the three notes in the chord you hear.',
     steps: CHORD_TONES,
   },
-  { id: 'scale', label: 'Major scale (1–7)', about: 'All seven notes of the key.', steps: MAJOR_SCALE },
+  { id: 'scale', label: 'Major scale (1–7)', about: 'The mystery note can be any of the key’s 7 notes (the white keys, in C major).', steps: MAJOR_SCALE },
   {
     id: 'all',
     label: 'All 12 notes',
-    about: 'Adds the five notes outside the key, like the bluesy ♭3 and ♭7.',
+    about: 'Any note at all, including the 5 outside the key (the black keys, in C major).',
     steps: Array.from({ length: 12 }, (_, i) => i),
   },
 ]

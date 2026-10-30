@@ -11,6 +11,24 @@ const MODES: { id: GameMode; label: string; blurb: string }[] = [
   { id: 'echo-note', label: 'Echo Note', blurb: 'Ear training: hear a chord, then find one note on the piano.' },
 ]
 
+const ECHO_KEY_CHOICES = [
+  { id: 'c', label: 'C major', about: 'Always C major, so each number stays on the same piano key. Best to start with.' },
+  {
+    id: 'random',
+    label: 'New key each round',
+    about: 'Each round starts in a different key, like G or B♭ major, and the numbers move with it.',
+  },
+] as const
+
+const ECHO_LENGTH_CHOICES = [
+  { id: 'round', label: 'Rounds of 5', about: '5 mystery notes, then your results. Get 4 or more right to unlock the next notes.' },
+  {
+    id: 'endless',
+    label: 'Endless practice',
+    about: 'Notes keep coming until you press Finish. Then you see which numbers you missed most.',
+  },
+] as const
+
 interface SongListProps {
   mode: GameMode
   onModeChange: (mode: GameMode) => void
@@ -105,12 +123,7 @@ export function SongList({
           </p>
           <div className="song-list-choice" role="group" aria-label="Key">
             <span>Key</span>
-            {(
-              [
-                ['c', 'C major'],
-                ['random', 'New key each round'],
-              ] as const
-            ).map(([id, label]) => (
+            {ECHO_KEY_CHOICES.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
@@ -122,14 +135,12 @@ export function SongList({
               </button>
             ))}
           </div>
+          <p className="song-list-choice-about">
+            {ECHO_KEY_CHOICES.find((option) => option.id === settings.echoKey)?.about}
+          </p>
           <div className="song-list-choice" role="group" aria-label="Session length">
             <span>Length</span>
-            {(
-              [
-                ['round', 'Rounds of 5'],
-                ['endless', 'Endless practice'],
-              ] as const
-            ).map(([id, label]) => (
+            {ECHO_LENGTH_CHOICES.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
@@ -141,6 +152,9 @@ export function SongList({
               </button>
             ))}
           </div>
+          <p className="song-list-choice-about">
+            {ECHO_LENGTH_CHOICES.find((option) => option.id === settings.echoLength)?.about}
+          </p>
           <button type="button" className="song-list-start" onClick={onStartEcho}>
             ▶ Start
           </button>
