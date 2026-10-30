@@ -1,6 +1,6 @@
 .app-header-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; min-width: 0; max-width: 75%; }
 .app-header-actions .midi-control { max-width: 100%; }
-.theme-toggle { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 16px; background: var(--surface); color: var(--text-muted); transition: background-color 180ms, color 180ms, transform 140ms, box-shadow 180ms; }
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 16px; background: transparent; color: var(--text-muted); transition: background-color 180ms, color 180ms, transform 140ms, box-shadow 180ms; }
 .theme-toggle:hover:not(:disabled) { border-color: transparent; background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent); }
 .theme-toggle:active:not(:disabled) { transform: scale(0.92); box-shadow: inset 0 2px 4px rgb(0 0 0 / 14%); }
 .theme-toggle-glyph { position: relative; width: 24px; height: 24px; }
