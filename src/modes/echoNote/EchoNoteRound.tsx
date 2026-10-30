@@ -3,7 +3,6 @@ import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { Icon } from '../../components/Icon'
-import { MidiControl } from '../../components/MidiControl'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import {
@@ -319,7 +318,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
           onPress={pressKey}
         />
       </div>
-      <MidiControl />
     </section>
   )
 }

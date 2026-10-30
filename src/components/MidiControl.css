@@ -1,56 +1,63 @@
 .midi-control {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px 16px;
-  font-size: 0.85rem;
+  position: relative;
+}
+
+.midi-button {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
 }
 
-.midi-control button {
-  padding: 0.3rem 0.8rem;
-  font-size: 0.85rem;
+.midi-button.is-on {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
-.midi-control-note {
-  margin: 0;
-  text-align: center;
-}
-
-.midi-control-device {
-  color: var(--text);
+/* The last note heard, to check the instrument is coming through. */
+.midi-heard {
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent-soft);
   font-weight: 600;
 }
 
-.midi-control-heard {
-  margin-left: 8px;
-  font-weight: 400;
-  color: var(--accent);
+.midi-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  width: min(300px, 90vw);
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  font-size: 0.9rem;
 }
 
-.midi-control .midi-control-off {
-  border: none;
-  background: none;
-  padding: 0;
+.midi-panel p {
+  margin: 0;
   color: var(--text-muted);
-  text-decoration: underline;
 }
 
-.midi-details {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.midi-details summary {
+.midi-panel label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   cursor: pointer;
-  text-align: center;
 }
 
-.midi-details summary:hover {
-  color: var(--accent);
+.midi-panel input {
+  margin-top: 0.2rem;
+  accent-color: var(--accent);
 }
 
-.midi-details .midi-control {
-  margin-top: 0.5rem;
+.midi-panel button {
+  justify-self: start;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
 }

@@ -3,7 +3,6 @@ import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { Icon } from '../../components/Icon'
-import { MidiControl } from '../../components/MidiControl'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff, type NoteMark } from '../../components/Staff'
@@ -296,7 +295,6 @@ export function OneNoteOffRound({
           onPress={(midi, fromMidi) => midiInput.playKey(midi, fromMidi)}
         />
       </div>
-      <MidiControl />
     </section>
   )
 }

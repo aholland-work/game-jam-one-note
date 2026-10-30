@@ -3,7 +3,6 @@ import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { Icon } from '../../components/Icon'
-import { MidiControl } from '../../components/MidiControl'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
@@ -289,26 +288,23 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
           onPress={pressKey}
         />
       </div>
-      <div className="round-extras">
-        <details
-          className="round-shortcuts"
-          open={showShortcuts}
-          onToggle={(event) => {
-            const open = event.currentTarget.open
-            setShowShortcuts(open)
-            writeFlag(SHORTCUTS_KEY, open)
-          }}
-        >
-          <summary>Keyboard shortcuts</summary>
-          <ul>
-            <li>Press the letter shown on a piano key to play it.</li>
-            <li>
-              <kbd>Space</kbd> plays, pauses and resumes the melody.
-            </li>
-          </ul>
-        </details>
-        <MidiControl />
-      </div>
+      <details
+        className="round-shortcuts"
+        open={showShortcuts}
+        onToggle={(event) => {
+          const open = event.currentTarget.open
+          setShowShortcuts(open)
+          writeFlag(SHORTCUTS_KEY, open)
+        }}
+      >
+        <summary>Keyboard shortcuts</summary>
+        <ul>
+          <li>Press the letter shown on a piano key to play it.</li>
+          <li>
+            <kbd>Space</kbd> plays, pauses and resumes the melody.
+          </li>
+        </ul>
+      </details>
     </section>
   )
 }

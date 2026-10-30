@@ -155,15 +155,6 @@
   }
 }
 
-/* Small links under the piano: keyboard shortcuts, MIDI. */
-.round-extras {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 8px 28px;
-}
-
 .round-shortcuts {
   justify-self: center;
   font-size: 0.85rem;

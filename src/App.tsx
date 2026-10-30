@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { audioEngine } from './audio/engine'
+import { MidiControl } from './components/MidiControl'
 import { SongList } from './components/SongList'
 import { EchoNoteRound } from './modes/echoNote/EchoNoteRound'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
@@ -40,7 +41,10 @@ function App() {
 
   return (
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-      <h1 style={{ margin: '0 0 1rem' }}>One Note</h1>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', margin: '0 0 1rem' }}>
+        <h1 style={{ margin: 0 }}>One Note</h1>
+        <MidiControl />
+      </header>
       {echoRound !== null ? (
         <EchoNoteRound
           key={echoRound}
