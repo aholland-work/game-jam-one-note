@@ -54,7 +54,7 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
     {
       key: 'oneNoteOffHard',
-      label: 'Hard mode: the changed note stays in the song’s key, and you hear the original only once',
+      label: 'Hard mode: the changed note only moves to the next note in the song’s key (fast notes too), and you hear the original only once',
       nextSong: true,
     },
   ],

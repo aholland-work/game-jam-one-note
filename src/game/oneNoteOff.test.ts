@@ -16,23 +16,26 @@ describe.each(songs)('One Note Off: $title', (song) => {
   const changes = Array.from({ length: 200 }, (_, i) => pickChange(song, { difficulty: 'hard' }, seeded(i + 1)))
   const anyPitch = Array.from({ length: 200 }, (_, i) => pickChange(song, { difficulty: 'easy' }, seeded(i + 1)))
 
-  it('only changes notes long enough to hear, and never a tie', () => {
+  it('never changes a rest or a tie, and on Easy only notes long enough to hear', () => {
+    for (const { index } of anyPitch) expect(song.melody[index].beats).toBeGreaterThanOrEqual(0.5)
     for (const { index } of [...changes, ...anyPitch]) {
       const note = song.melody[index]
       expect(note.midi).not.toBeNull()
-      expect(note.beats).toBeGreaterThanOrEqual(0.5)
       expect(note.tie).toBeFalsy()
       expect(song.melody[index - 1]?.tie).toBeFalsy()
     }
   })
 
-  it('on Hard, moves the note up to 4 half steps, to a note already in the melody, away from its neighbors', () => {
+  it('on Hard, moves the note to the next scale note above or below, away from its neighbors', () => {
     const inKey = melodyPitchClasses(song.melody)
     for (const { index, midi } of changes) {
-      const distance = Math.abs(midi - (song.melody[index].midi as number))
+      const original = song.melody[index].midi as number
+      const distance = Math.abs(midi - original)
       expect(distance).toBeGreaterThanOrEqual(1)
-      expect(distance).toBeLessThanOrEqual(4)
+      expect(distance).toBeLessThanOrEqual(2)
       expect(inKey.has(midi % 12)).toBe(true)
+      // Nothing in key sits between the original and the new pitch.
+      if (distance === 2) expect(inKey.has(((original + midi) / 2) % 12)).toBe(false)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }
