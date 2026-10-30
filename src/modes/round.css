@@ -238,7 +238,9 @@
 .round-lock, .round-next { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--accent-edge); font-weight: 700; padding-left: 22px; padding-right: 22px; }
 .round-piano { max-width: 490px; margin-top: 0; }
 .round-piano.is-wide { max-width: 830px; }
-.round-shortcuts { margin: 4px 0 0; font-size: 0.75rem; }
+/* Left-aligned under the piano, with room below the piano's shadow. */
+.round-shortcuts { justify-self: stretch; width: 100%; max-width: 490px; margin: 14px auto 0; font-size: 0.75rem; }
+.round-shortcuts summary { text-align: left; }
 .round-coach { border-left: 3px solid var(--accent); border-radius: 0 7px 7px 0; font-size: 0.9rem; }
 .round-pending { border-radius: 6px; font-size: 0.85rem; }
 @media (max-width: 600px) {
