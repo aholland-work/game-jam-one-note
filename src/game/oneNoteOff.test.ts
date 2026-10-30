@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { songs } from '../songs'
-import { pickChange, withChange } from './oneNoteOff'
+import { melodyPitchClasses, pickChange, withChange } from './oneNoteOff'
 
 // A small seeded generator (mulberry32) so every run checks the same spread of picks.
 function seeded(seed: number) {
@@ -25,11 +25,13 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('moves the note by 1 to 3 half steps, away from its neighbors', () => {
+  it('moves the note up to 4 half steps, to a note already in the melody, away from its neighbors', () => {
+    const inKey = melodyPitchClasses(song.melody)
     for (const { index, midi } of changes) {
       const distance = Math.abs(midi - (song.melody[index].midi as number))
       expect(distance).toBeGreaterThanOrEqual(1)
-      expect(distance).toBeLessThanOrEqual(3)
+      expect(distance).toBeLessThanOrEqual(4)
+      expect(inKey.has(midi % 12)).toBe(true)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }

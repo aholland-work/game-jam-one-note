@@ -29,8 +29,10 @@ export function OneNoteOffRound({ song, onBack, onNext }: OneNoteOffRoundProps) 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState(
-    'One note in the changed version is off. Listen to both, tap the note that sounds different, then lock in.',
+    'One note in the changed version is off. You can hear the original only once, and the changed version as often as you like. Tap the note that sounds different, then lock in.',
   )
+  // "Only One": while guessing, the original can be heard once (pausing and resuming is fine).
+  const [originalHeard, setOriginalHeard] = useState(false)
   const player = useMelodyPlayer<Version>(song.bpm)
 
   const changedMelody = withChange(song.melody, change)
@@ -42,9 +44,13 @@ export function OneNoteOffRound({ song, onBack, onNext }: OneNoteOffRoundProps) 
     player.playingNotes && player.activeIndex !== null ? player.playingNotes[player.activeIndex]?.midi ?? null : null
 
   const toggle = (version: Version) => {
-    if (player.playing === version) player.pause()
-    else if (player.paused === version) player.resume()
-    else player.play(version, melodyFor(version))
+    if (player.playing === version) return player.pause()
+    if (player.paused === version) return player.resume()
+    if (version === 'original' && !isOver) {
+      if (originalHeard) return
+      setOriginalHeard(true)
+    }
+    player.play(version, melodyFor(version))
   }
 
   const lockIn = () => {
@@ -94,16 +100,34 @@ export function OneNoteOffRound({ song, onBack, onNext }: OneNoteOffRoundProps) 
         </button>
       )
     }
+    // Restarting the original would be a second listen, so it only offers Resume.
+    const limited = version === 'original' && !isOver
     if (player.paused === version) {
       return (
         <>
           <button type="button" onClick={() => player.resume()}>
             ▶ Resume {VERSION_LABELS[version].toLowerCase()}
           </button>
-          <button type="button" onClick={() => player.resume(true)}>
-            ⟲ From the start
-          </button>
+          {!limited && (
+            <button type="button" onClick={() => player.resume(true)}>
+              ⟲ From the start
+            </button>
+          )}
         </>
+      )
+    }
+    if (limited && originalHeard) {
+      return (
+        <button type="button" disabled>
+          Original heard
+        </button>
+      )
+    }
+    if (limited) {
+      return (
+        <button type="button" onClick={() => toggle(version)}>
+          ▶ Original (one listen)
+        </button>
       )
     }
     return (
@@ -129,7 +153,8 @@ export function OneNoteOffRound({ song, onBack, onNext }: OneNoteOffRoundProps) 
         pickupBeats={song.pickupBeats}
         revealedCount={revealedCount}
         showAnswer={isOver}
-        activeIndex={player.activeIndex}
+        // Lighting each note as it plays would point straight at the changed one.
+        activeIndex={isOver ? player.activeIndex : null}
         marks={marks}
         onNoteSelect={isOver ? undefined : setSelectedIndex}
       />
