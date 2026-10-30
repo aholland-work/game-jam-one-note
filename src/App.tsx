@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { audioEngine } from './audio/engine'
 import { MidiControl } from './components/MidiControl'
 import { SongList } from './components/SongList'
+import { ThemeToggle } from './components/ThemeToggle'
 import { EchoNoteRound } from './modes/echoNote/EchoNoteRound'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
@@ -58,7 +59,10 @@ function App() {
       <a className="skip-link" href="#main-content">Skip to game</a>
       <header className="app-header">
         <h1 className="app-brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>One Note</h1>
-        <MidiControl />
+        <div className="app-header-actions">
+          <MidiControl />
+          <ThemeToggle />
+        </div>
       </header>
       <main id="main-content" tabIndex={-1} ref={contentRef}>
         {echoRound !== null ? (

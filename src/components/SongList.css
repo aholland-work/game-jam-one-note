@@ -39,9 +39,7 @@
 .song-card-difficulty.is-hard { color: var(--warning); background: var(--warning-soft); }
 .song-card-solved { color: var(--success); font-weight: 700; }
 .song-card.is-solved::before { color: var(--success); }
-@media (prefers-color-scheme: dark) {
-  .song-card-difficulty.is-medium { color: #ead47d; background: #40371e; }
-}
+:root[data-theme='dark'] .song-card-difficulty.is-medium { color: #ead47d; background: #40371e; }
 .song-list-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 .song-list-random { display: flex; align-items: center; gap: 12px; }
 .song-list-random button { font-size: 0.9375rem; }

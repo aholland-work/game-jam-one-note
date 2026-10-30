@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #fbfaf7;
   --surface: #fffefa;
   --text: #24211f;
@@ -53,8 +53,8 @@
   font-synthesis: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme='dark'] {
+    color-scheme: dark;
     --bg: #1c1b19;
     --surface: #292623;
     --text: #f1efe8;
@@ -70,7 +70,6 @@
     --warning-soft: #443021;
     --focus: #dfc9ff;
     --panel-shadow: 0 12px 28px rgb(0 0 0 / 45%);
-  }
 }
 
 * { box-sizing: border-box; }
