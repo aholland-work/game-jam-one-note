@@ -17,7 +17,6 @@ export const goodKingWenceslas: Song = {
   missingIndex: 3,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/GOODKING/0000',
-    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'First four bars, unchanged (F major).',
     midi: { file: 'good-king-wenceslas.mid', track: 0 },
   },

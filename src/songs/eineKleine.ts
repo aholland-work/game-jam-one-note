@@ -17,7 +17,6 @@ export const eineKleine: Song = {
   missingIndex: 10,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/MozartWA/KV525/eine-kleine-nachtmusik-mvt1/eine-kleine-nachtmusik-mvt1.ly',
-    credit: "Mutopia Project, typeset by Mike Blackstock (public domain)",
     notes: 'First violin, bars 1-4, unchanged (G major).',
     midi: { file: 'eine-kleine-nachtmusik.mid', track: 1 },
   },

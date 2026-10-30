@@ -17,7 +17,6 @@ export const mapleLeafRag: Song = {
   missingIndex: 8,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/JoplinS/maple/maple.ly',
-    credit: "Mutopia Project, typeset by Chris Sawer (public domain)",
     notes: 'Top line of the right hand, A strain bars 1-4, unchanged (A♭ major).',
     midi: { file: 'maple-leaf-rag.mid', track: 1 },
   },

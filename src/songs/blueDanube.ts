@@ -17,7 +17,6 @@ export const blueDanube: Song = {
   missingIndex: 2,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/StraussJJ/O314/blue_danube/blue_danube.ly',
-    credit: "Mutopia Project, typeset by Nikos Kouremenos (CC BY-SA 4.0)",
     notes: 'Melody, pickup and bars 1-4, in C as in the source. The last E is held to end the excerpt.',
     midi: { file: 'blue-danube.mid', track: 1 },
   },

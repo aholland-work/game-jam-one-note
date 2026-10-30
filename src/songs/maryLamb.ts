@@ -16,7 +16,6 @@ export const maryLamb: Song = {
   missingIndex: 11,
   source: {
     url: 'https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/demo/Tunes/MaryHadALittleLamb/0000',
-    credit: "John Chambers' ABC collection, via abcnotation.com",
     notes: 'First four bars, an octave lower and written in 4/4 at double the note values of the 2/4 source.',
     midi: { file: 'mary-had-a-little-lamb.mid', track: 1 },
   },

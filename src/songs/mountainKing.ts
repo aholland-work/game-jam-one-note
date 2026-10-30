@@ -17,7 +17,6 @@ export const mountainKing: Song = {
   missingIndex: 11,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/GriegE/O46/Dans_l_antre_du_roi_de_la_montagne/Dans_l_antre_du_roi_de_la_montagne.ly',
-    credit: "Mutopia Project, typeset by Coyau (public domain)",
     notes: "Melody, bars 2-5, moved up from the bass register to fit the treble staff, and slower than the score's quarter = 138.",
     midi: { file: 'mountain-king.mid', track: 1 },
   },

@@ -16,7 +16,6 @@ export const clementine: Song = {
   missingIndex: 3,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/CLEMENTI/0000',
-    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'First four bars, unchanged (D major).',
     midi: { file: 'clementine.mid', track: 0 },
   },

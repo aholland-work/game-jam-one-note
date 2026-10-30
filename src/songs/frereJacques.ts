@@ -16,7 +16,6 @@ export const frereJacques: Song = {
   missingIndex: 10,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/FRERJACQ/0000',
-    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'First four bars, an octave lower.',
     midi: { file: 'frere-jacques.mid', track: 0 },
   },

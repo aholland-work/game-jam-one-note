@@ -17,7 +17,6 @@ export const furElise: Song = {
   missingIndex: 1,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/BeethovenLv/WoO59/fur_Elise_WoO59/fur_Elise_WoO59.ly',
-    credit: "Mutopia Project, typeset by Stelios Samelis (public domain)",
     notes: "Right hand, pickup and bars 1-4 at the score's tempo (quarter = 72). The final C is held to end the excerpt; in the score it moves on.",
     midi: { file: 'fur-elise.mid', track: 1 },
   },

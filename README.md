@@ -34,35 +34,12 @@ All songs are public-domain melodies. The musical note icon is from [Twemoji](ht
 
 ## Song sources and credits
 
-Every melody is public domain. Each one was copied from, and is checked note for note against, a public-domain score or transcription from the [Mutopia Project](https://www.mutopiaproject.org) or [abcnotation.com](https://abcnotation.com). Thanks to the typesetters and transcribers below.
+Every melody is public domain, copied from and checked note for note against public-domain scores and transcriptions from:
 
-| Song | Genre | Source | Credit |
-| --- | --- | --- | --- |
-| Twinkle, Twinkle, Little Star | Folk and kids | [abcnotation.com](https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/demo/Tunes/AhVousDiraiJeMaman/0000) | Transcribed by Frank Nordberg (Musica Viva), via abcnotation.com |
-| Mary Had a Little Lamb | Folk and kids | [abcnotation.com](https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/demo/Tunes/MaryHadALittleLamb/0000) | John Chambers' ABC collection, via abcnotation.com |
-| Frère Jacques | Folk and kids | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/FRERJACQ/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Good King Wenceslas | Holiday | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/GOODKING/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Ode to Joy | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/BeethovenLv/ode/ode.ly) | Mutopia Project, typeset by Peter Chubb (public domain) |
-| Jingle Bells | Holiday | [abcnotation.com](https://abcnotation.com/tunePage?a=pghardy.net/tunebooks/pgh_xmas_tunebook/0034) | Paul Hardy's Christmas Tunebook, via abcnotation.com |
-| Away in a Manger | Holiday | [abcnotation.com](https://abcnotation.com/tunePage?a=pghardy.net/tunebooks/pgh_xmas_tunebook/0006) | Paul Hardy's Christmas Tunebook, via abcnotation.com |
-| O Come, All Ye Faithful | Holiday | [abcnotation.com](https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/England/xmas/OComeAllYeFaithful_G/0000) | John Chambers' ABC collection, via abcnotation.com |
-| She'll Be Coming 'Round the Mountain | Americana | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/COMRND2/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Brahms' Lullaby | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/BrahmsJ/LullabyBrahms-C/LullabyBrahms-C.ly) | Mutopia Project, typeset by Diego Guillen (public domain) |
-| The Blue Danube | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/StraussJJ/O314/blue_danube/blue_danube.ly) | Mutopia Project, typeset by Nikos Kouremenos (CC BY-SA 4.0) |
-| Take Me Out to the Ball Game | Americana | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/TAKEBALL/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Deck the Halls | Holiday | [abcnotation.com](https://abcnotation.com/tunePage?a=pghardy.net/tunebooks/pgh_xmas_tunebook/0014) | Paul Hardy's Christmas Tunebook, via abcnotation.com |
-| Oh My Darling, Clementine | Americana | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/CLEMENTI/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Oh! Susanna | Americana | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/OSUSANNA/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Shenandoah | Americana | [abcnotation.com](https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/SHENDOAH/0000) | The Digital Tradition folk song collection, via abcnotation.com |
-| Minuet in G | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/BachJS/BWVAnh114/anna-magdalena-04/anna-magdalena-04.ly) | Mutopia Project, typeset by Allen Garvin (public domain) |
-| Für Elise | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/BeethovenLv/WoO59/fur_Elise_WoO59/fur_Elise_WoO59.ly) | Mutopia Project, typeset by Stelios Samelis (public domain) |
-| Eine kleine Nachtmusik | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/MozartWA/KV525/eine-kleine-nachtmusik-mvt1/eine-kleine-nachtmusik-mvt1.ly) | Mutopia Project, typeset by Mike Blackstock (public domain) |
-| Rondo alla Turca | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/MozartWA/KV331/KV331_3_RondoAllaTurca/KV331_3_RondoAllaTurca.ly) | Mutopia Project, typeset by Rune Zedeler and Chris Sawer (public domain) |
-| Maple Leaf Rag | Ragtime | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/JoplinS/maple/maple.ly) | Mutopia Project, typeset by Chris Sawer (public domain) |
-| In the Hall of the Mountain King | Classical | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/GriegE/O46/Dans_l_antre_du_roi_de_la_montagne/Dans_l_antre_du_roi_de_la_montagne.ly) | Mutopia Project, typeset by Coyau (public domain) |
-| The Entertainer | Ragtime | [mutopiaproject.org](https://www.mutopiaproject.org/ftp/JoplinS/entertainer/entertainer.ly) | Mutopia Project, typeset by Chris Sawer (public domain) |
+- [The Mutopia Project](https://www.mutopiaproject.org): free classical and ragtime scores, typeset by volunteers.
+- [abcnotation.com](https://abcnotation.com): an archive of folk, holiday and traditional tunes, including the Digital Tradition folk song collection and Paul Hardy's Christmas Tunebook.
 
-`song-sources/` holds MIDI renderings of these sources, used only by the tests. Each file keeps its source's terms; The Blue Danube's is from a Mutopia edition licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). This table is generated from the song files, and a test fails if it's out of date (see `src/songs/credits.ts`).
+Thanks to everyone who typeset and transcribed them. Each song file links its exact source. `song-sources/` holds MIDI renderings of those sources, used only by the tests; The Blue Danube's comes from a Mutopia edition licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) (typeset by Nikos Kouremenos), and the rest are public domain or traditional.
 
 ## Run it
 
@@ -88,7 +65,7 @@ npm run build   # type-check and production build
    - `|` bar lines are optional and only for readability.
 3. Set `missingIndex` to the note players have to find (counting from 0), plus `beatsPerBar` and, for songs that start mid-bar, `pickupBeats`.
 4. Add it to the list in `src/songs/index.ts`.
-5. Save a MIDI file of the public-domain source in `song-sources/` (Mutopia and abcnotation.com both offer one) and point the song's `source.midi` at it, with the track that holds the tune. Fill in `source.credit` with who typeset or transcribed it and its license, then copy the regenerated row into the credits table above (the test prints the full table if it's out of date).
+5. Save a MIDI file of the public-domain source in `song-sources/` (Mutopia and abcnotation.com both offer one) and point the song's `source.midi` at it, with the track that holds the tune.
 6. Run `npm test`. It checks the bars add up, the song fits on one line, the missing note is a real note on the piano, and the melody appears note for note in the source MIDI (allowing a key change and doubled or halved note values).
 
 ## How it's built
