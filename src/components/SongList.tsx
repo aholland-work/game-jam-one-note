@@ -4,6 +4,7 @@ import type { GameMode, Settings } from '../game/settings'
 import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
 import { Icon } from './Icon'
+import { ModeMark } from './ModeMark'
 import { SettingsMenu } from './SettingsMenu'
 import './SongList.css'
 
@@ -88,7 +89,7 @@ export function SongList({
             onClick={() => onModeChange(option.id)}
           >
             <span className="song-list-mode-mark" aria-hidden="true">
-              <span>0{index + 1}</span><b>{['— ? —', '≠', '1 · 3 · 5'][index]}</b>
+              <span>0{index + 1}</span><ModeMark mode={option.id} />
             </span>
             <span className="song-list-mode-label">{option.label}</span>
             <span className="song-list-mode-blurb">{option.blurb}</span>

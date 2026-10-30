@@ -17,7 +17,7 @@
 .song-list-mode:hover:not(:disabled) { transform: translateY(-3px); }
 .song-list-mode[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
 .song-list-mode-mark { display: flex; justify-content: space-between; align-items: center; font: 0.75rem var(--font-mono); margin: 0 0 8px; }
-.song-list-mode-mark b { font-weight: 400; font-size: 1.5rem; }
+.mode-mark { display: block; width: 88px; height: 40px; flex: none; }
 .song-list-mode[aria-pressed='true'] .song-list-mode-mark { color: var(--accent); }
 .song-list-mode-label { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.04em; }
 .song-list-mode-blurb { font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; }
