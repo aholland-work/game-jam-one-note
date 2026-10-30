@@ -13,9 +13,9 @@ export function ModeMark({ mode }: { mode: GameMode }) {
       </>}
       {mode === 'one-note-off' && <>
         <ellipse cx="12" cy="29" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 12 29)" />
-        <ellipse cx="42" cy="13" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 42 13)" />
-        <ellipse cx="71" cy="25" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 71 25)" />
-        <path d="M17 28V10M47 12V2M76 24V6M33 24 54 3" />
+        <ellipse cx="42" cy="29" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 42 29)" />
+        <ellipse cx="71" cy="29" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 71 29)" />
+        <path d="M17 28V10M47 28V10M76 28V10M33 38 54 17" />
       </>}
       {mode === 'echo-note' && <>
         <ellipse cx="18" cy="28" rx="5" ry="3.5" fill="currentColor" transform="rotate(-20 18 28)" />
