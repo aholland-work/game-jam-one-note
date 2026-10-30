@@ -1,5 +1,5 @@
 .song-list { display: grid; gap: 20px; }
-.song-list h2 { margin: 0; font-size: 1.55rem; letter-spacing: -0.04em; }
+.song-list h2 { margin: 0; font-size: 1.75rem; letter-spacing: -0.04em; }
 .song-list-hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; min-height: 290px; margin: -8px 0 4px; }
 .song-list-wordmark { margin: 0; font-family: var(--font-display); font-size: clamp(4rem, 8vw, 6.5rem); line-height: 0.82; letter-spacing: -0.065em; }
 .song-list-wordmark span { display: block; color: var(--accent); }
@@ -16,24 +16,24 @@
 .song-list-mode { display: grid; align-content: start; gap: 8px; text-align: left; padding: 19px; border-top: 3px solid var(--text); border-radius: 0 0 16px 16px; background: transparent; transition: transform 160ms, border-color 160ms, background-color 160ms; }
 .song-list-mode:hover:not(:disabled) { transform: translateY(-3px); }
 .song-list-mode[aria-pressed='true'] { border-color: var(--accent); background: var(--accent-soft); }
-.song-list-mode-mark { display: flex; justify-content: space-between; align-items: center; font: 0.7rem var(--font-mono); margin: 0 0 8px; }
-.song-list-mode-mark b { font-weight: 400; font-size: 1.25rem; }
+.song-list-mode-mark { display: flex; justify-content: space-between; align-items: center; font: 0.75rem var(--font-mono); margin: 0 0 8px; }
+.song-list-mode-mark b { font-weight: 400; font-size: 1.5rem; }
 .song-list-mode[aria-pressed='true'] .song-list-mode-mark { color: var(--accent); }
-.song-list-mode-label { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.04em; }
-.song-list-mode-blurb { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+.song-list-mode-label { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.04em; }
+.song-list-mode-blurb { font-size: 0.9375rem; color: var(--text-muted); line-height: 1.6; }
 .song-list-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-top: 2px solid var(--text); padding-top: 19px; }
-.song-list-tip { margin: 0; max-width: 76ch; color: var(--text-muted); font-size: 0.9rem; }
+.song-list-tip { margin: 0; max-width: 76ch; color: var(--text-muted); font-size: 1rem; }
 .song-list-filters { display: flex; flex-wrap: wrap; gap: 6px; }
-.song-list-filter { padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.8rem; color: var(--text-muted); background: transparent; }
+.song-list-filter { padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.875rem; color: var(--text-muted); background: transparent; }
 .song-list-filter[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .song-list-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 20px; counter-reset: song; }
 .song-list-cards li { counter-increment: song; }
-.song-card { width: 100%; height: 100%; position: relative; min-height: 95px; text-align: left; display: grid; align-content: center; gap: 9px; padding: 17px 4px 17px 37px; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
-.song-card::before { content: counter(song, decimal-leading-zero); position: absolute; top: 22px; left: 3px; font: 0.7rem var(--font-mono); color: var(--accent); }
+.song-card { width: 100%; height: 100%; position: relative; min-height: 104px; text-align: left; display: grid; align-content: center; gap: 9px; padding: 17px 4px 17px 37px; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+.song-card::before { content: counter(song, decimal-leading-zero); position: absolute; top: 22px; left: 3px; font: 0.75rem var(--font-mono); color: var(--accent); }
 .song-card:hover:not(:disabled) { background: var(--accent-soft); border-bottom-color: var(--accent); }
-.song-card-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 0.88rem; font-weight: 600; }
-.song-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); }
-.song-card-difficulty { display: inline-flex; align-items: center; flex: none; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; line-height: 1.5; }
+.song-card-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 1rem; font-weight: 600; }
+.song-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-muted); }
+.song-card-difficulty { display: inline-flex; align-items: center; flex: none; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; line-height: 1.5; }
 .song-card-difficulty.is-easy { color: var(--success); background: var(--success-soft); }
 .song-card-difficulty.is-medium { color: #765600; background: #f7edbd; }
 .song-card-difficulty.is-hard { color: var(--warning); background: var(--warning-soft); }
@@ -44,22 +44,22 @@
 }
 .song-list-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 .song-list-random { display: flex; align-items: center; gap: 12px; }
-.song-list-random button { font-size: 0.8rem; }
-.song-list-progress { font-size: 0.75rem; color: var(--text-muted); }
+.song-list-random button { font-size: 0.9375rem; }
+.song-list-progress { font-size: 0.875rem; color: var(--text-muted); }
 .song-list-echo { display: grid; gap: 16px; justify-items: start; }
 .song-list-echo p { margin: 0; color: var(--text-muted); max-width: 68ch; }
 .song-list-echo .song-list-heading { width: 100%; }
 .song-list-start { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .song-list-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.song-list-choice > span { min-width: 4rem; font-size: 0.85rem; color: var(--text-muted); }
-.song-list-how { display: grid; gap: 12px; max-width: 72ch; padding: 18px 22px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--accent-soft); font-size: 0.9rem; }
-.song-list-how h3 { margin: 0; font-size: 1rem; }
+.song-list-choice > span { min-width: 4rem; font-size: 0.9375rem; color: var(--text-muted); }
+.song-list-how { display: grid; gap: 12px; max-width: 72ch; padding: 18px 22px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--accent-soft); font-size: 1rem; }
+.song-list-how h3 { margin: 0; font-size: 1.125rem; }
 .song-list-how ol { display: grid; gap: 9px; margin: 0; padding-left: 1.25rem; }
-.song-list-echo .song-list-choice-about { margin: -8px 0 0 calc(4rem + 8px); font-size: 0.8rem; }
+.song-list-echo .song-list-choice-about { margin: -8px 0 0 calc(4rem + 8px); font-size: 0.875rem; }
 @media (max-width: 750px) {
   .song-list-modes { gap: 8px; }
   .song-list-mode { padding: 14px; }
-  .song-list-mode-label { font-size: 1.1rem; }
+  .song-list-mode-label { font-size: 1.25rem; }
   .piano-sculpture { transform: rotate(-24deg) skewY(9deg) scale(0.8); }
   .song-list-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -74,4 +74,20 @@
   .song-list-random { flex-wrap: wrap; }
   .song-list-cards { gap: 0 12px; }
   .song-card { padding-left: 27px; }
+}
+
+/* Larger home controls; keep the round's compact instrument header unchanged. */
+.song-list .icon { width: 1.125rem; height: 1.125rem; vertical-align: -0.2em; }
+.song-list .settings-button { font-size: 0.875rem; }
+.app:has(.song-list) .midi-button { display: inline-flex; align-items: center; gap: 8px; font-size: 0.8125rem; text-align: left; }
+.app:has(.song-list) .midi-button .icon { width: 18px; height: 18px; flex: none; margin: 0; }
+.app:has(.song-list) .midi-heard { margin-left: 0; }
+.app:has(.song-list) .midi-panel { font-size: 0.875rem; }
+.app:has(.song-list) .app-footer { font-size: 0.875rem; }
+@media (min-width: 650px) {
+  .app:has(.song-list) .app-brand { font-size: 1.125rem; }
+}
+@media (max-width: 550px) {
+  .app:has(.song-list) .app-header { flex-wrap: wrap; }
+  .app:has(.song-list) .midi-control { max-width: 100%; margin-left: auto; }
 }
