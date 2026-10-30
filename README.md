@@ -7,7 +7,7 @@ A music puzzle game for the "Only One" game jam, with two modes:
 
 When a round ends, the staff turns into the real sheet music as the melody plays.
 
-All songs are public-domain melodies. The musical note icon is from [Twemoji](https://github.com/twitter/twemoji) (© Twitter, Inc and other contributors), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+All songs are public-domain melodies. The musical note icon is from [Twemoji](https://github.com/twitter/twemoji) (© Twitter, Inc and other contributors), licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The piano sound uses samples from the [Salamander Grand Piano](https://github.com/sfzinstruments/SalamanderGrandPiano) by Alexander Holm, licensed under [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) (MP3 versions from [Tone.js](https://github.com/Tonejs/audio)), in `public/samples/piano/`.
 
 ## The jam theme: "Only One"
 
@@ -62,6 +62,6 @@ npm run build   # type-check and production build
 ## How it's built
 
 - Vite, React and TypeScript, no backend.
-- `src/audio/engine.ts`: a Web Audio synth. Notes are scheduled on the audio clock, and the on-screen highlights follow the same clock.
+- `src/audio/engine.ts`: plays notes with the piano samples (a simple synth until they load). Notes are scheduled on the audio clock, and the on-screen highlights follow the same clock.
 - `src/components/`: the staff (hand-drawn SVG), the one-octave piano and the song list, shared by any game mode.
 - `src/modes/missingNote/` and `src/modes/oneNoteOff/`: one folder per game mode. Shared round styles live in `src/modes/round.css`.

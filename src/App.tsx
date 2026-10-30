@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { audioEngine } from './audio/engine'
 import { SongList } from './components/SongList'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
@@ -54,9 +55,19 @@ function App() {
           songs={songs}
           genre={genre}
           onGenreChange={setGenre}
-          onSelect={setCurrent}
+          onSelect={(song) => {
+            // Opening a song is a click, so audio can start and the piano samples begin loading.
+            audioEngine.warmUp()
+            setCurrent(song)
+          }}
         />
       )}
+      <footer style={{ marginTop: '3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        Songs are public domain. Piano sound:{' '}
+        <a href="https://github.com/sfzinstruments/SalamanderGrandPiano">Salamander Grand Piano</a> by Alexander Holm (
+        <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>). Icon:{' '}
+        <a href="https://github.com/twitter/twemoji">Twemoji</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).
+      </footer>
     </main>
   )
 }
