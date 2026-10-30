@@ -89,38 +89,13 @@ export const noteInKey = (key: EchoKey, step: number) => key.tonic + step
 export const describeNote = (key: EchoKey, step: number) =>
   `${midiToName(noteInKey(key, step), key.flats)}, the ${degreeName(step)} of ${keyName(key)}`
 
-/** A missed note waiting to come back, at question number `due` (counting from 0). */
-export interface Review {
-  step: number
-  due: number
-}
-
 /**
- * Schedules a missed note to come back 2 to 4 questions later. Not straight away: then
- * "the one I just missed is next" would be a giveaway.
+ * Picks the mystery note for the next question, as half steps above the 1. Every note is
+ * equally likely, repeats included (up to MAX_REPEATS in a row), so the last answer rules
+ * nothing out.
  */
-export function scheduleReview(reviews: Review[], step: number, question: number, random: () => number = Math.random): Review[] {
-  return [...reviews, { step, due: question + 2 + Math.floor(random() * 3) }]
-}
-
-/**
- * Picks the mystery note for question number `question`, as half steps above the 1.
- * A missed note that's due comes back first; otherwise every note is equally likely,
- * repeats included (up to MAX_REPEATS in a row), so the last answer rules nothing out.
- */
-export function pickEchoNote(
-  steps: number[],
-  recent: number[],
-  reviews: Review[] = [],
-  question = recent.length,
-  random: () => number = Math.random,
-): { step: number; reviews: Review[] } {
+export function pickEchoNote(steps: number[], recent: number[], random: () => number = Math.random): number {
   const last = recent.slice(-MAX_REPEATS)
-  const allowed = (step: number) => last.length < MAX_REPEATS || last.some((previous) => previous !== step)
-  const dueIndex = reviews.findIndex((review) => review.due <= question && allowed(review.step) && steps.includes(review.step))
-  if (dueIndex !== -1) {
-    return { step: reviews[dueIndex].step, reviews: reviews.filter((_, i) => i !== dueIndex) }
-  }
-  const choices = steps.filter(allowed)
-  return { step: choices[Math.floor(random() * choices.length)], reviews }
+  const choices = steps.filter((step) => last.length < MAX_REPEATS || last.some((previous) => previous !== step))
+  return choices[Math.floor(random() * choices.length)]
 }

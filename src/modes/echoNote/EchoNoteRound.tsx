@@ -21,10 +21,8 @@ import {
   noteInKey,
   pickEchoNote,
   pickKey,
-  scheduleReview,
   stepsForLevel,
   type EchoKey,
-  type Review,
 } from '../../game/echoNote'
 import type { Settings } from '../../game/settings'
 import { midiToName, midiToPitch, type Note } from '../../music/notation'
@@ -80,8 +78,7 @@ interface EchoNoteRoundProps {
 
 /**
  * One Echo Note session, a set of 10 notes or free practice: for each mystery note, hear the
- * key's chord and then the note, find it on the piano, and lock in one answer. A missed note
- * comes back a few questions later.
+ * key's chord and then the note, find it on the piano, and lock in one answer.
  */
 export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onStartWith }: EchoNoteRoundProps) {
   const heading = useRef<HTMLHeadingElement>(null)
@@ -89,14 +86,12 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   const [{ echoLevel: level, echoLength: length, echoKey: keyChoice }] = useState(settings)
   const steps = stepsForLevel(level)
   const [key, setKey] = useState(() => (keyChoice === 'random' ? pickKey(null) : C_MAJOR))
-  const [step, setStep] = useState(() => pickEchoNote(steps, []).step)
+  const [step, setStep] = useState(() => pickEchoNote(steps, []))
   // Bumped for every new mystery note, so it plays as soon as it comes up.
   const [turn, setTurn] = useState(0)
   const [answered, setAnswered] = useState(false)
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [history, setHistory] = useState<Answer[]>([])
-  // Missed notes waiting to come back, by note number, so a tricky 7 returns in any key.
-  const [reviews, setReviews] = useState<Review[]>([])
   const [hint, setHint] = useState<string | null>(null)
   const [newKey, setNewKey] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
@@ -150,7 +145,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     setAnswered(true)
     setNewKey(false)
     setHistory([...history, entry])
-    if (!right) setReviews(scheduleReview(reviews, step, history.length))
     const answer = `${midiToName(target, key.flats)}, the ${degreeName(step)}`
     const picked = `${midiToName(selectedMidi, key.flats)}, the ${degreeName(selectedMidi - key.tonic)}`
     setHint(right ? `Right: ${describeNote(key, step)}.` : `Not quite. It was ${answer}. You picked ${picked}.`)
@@ -163,13 +157,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     const changeKey = endless && keyChoice === 'random' && history.length % NOTES_PER_KEY === 0
     if (changeKey) setKey(pickKey(key))
     setNewKey(changeKey)
-    const next = pickEchoNote(
-      steps,
-      history.map((entry) => entry.step),
-      reviews,
-    )
-    setStep(next.step)
-    setReviews(next.reviews)
+    setStep(pickEchoNote(steps, history.map((entry) => entry.step)))
     setTurn(turn + 1)
     setAnswered(false)
     setSelectedMidi(null)

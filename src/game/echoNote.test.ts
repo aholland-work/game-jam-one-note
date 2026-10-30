@@ -10,7 +10,6 @@ import {
   MAX_REPEATS,
   pickEchoNote,
   pickKey,
-  scheduleReview,
   stepsForLevel,
 } from './echoNote'
 
@@ -19,7 +18,7 @@ describe('pickEchoNote', () => {
     const recent: number[] = []
     let backToBack = 0
     for (let i = 0; i < 600; i++) {
-      const { step } = pickEchoNote(steps, recent)
+      const step = pickEchoNote(steps, recent)
       expect(steps).toContain(step)
       expect(recent.slice(-MAX_REPEATS).every((previous) => previous === step) && recent.length >= MAX_REPEATS).toBe(false)
       if (step === recent.at(-1)) backToBack++
@@ -27,26 +26,6 @@ describe('pickEchoNote', () => {
     }
     // Repeats happen, so the last answer never rules a note out.
     expect(backToBack).toBeGreaterThan(20)
-  })
-
-  it('brings a missed note back 2 to 4 questions later', () => {
-    for (const roll of [0, 0.5, 0.99]) {
-      const reviews = scheduleReview([], 5, 3, () => roll)
-      const due = reviews[0].due
-      expect(due - 3).toBeGreaterThanOrEqual(2)
-      expect(due - 3).toBeLessThanOrEqual(4)
-      // Not before it's due (a random pick could still land on it, which gives nothing away).
-      expect(pickEchoNote([0, 2, 4, 5], [0, 2, 4, 0], reviews, due - 1, () => 0).reviews).toHaveLength(1)
-      const picked = pickEchoNote([0, 2, 4, 5], [0, 2, 4, 0], reviews, due, () => 0)
-      expect(picked.step).toBe(5)
-      expect(picked.reviews).toHaveLength(0)
-    }
-  })
-
-  it('waits with a due review rather than repeat a note a third time', () => {
-    const picked = pickEchoNote([0, 4, 7], [4, 4], [{ step: 4, due: 2 }], 2, () => 0)
-    expect(picked.step).toBe(0)
-    expect(picked.reviews).toEqual([{ step: 4, due: 2 }])
   })
 })
 

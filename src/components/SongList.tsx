@@ -121,7 +121,7 @@ export function SongList({
                 name and its number, like “C♯, the 3 of A major”.
               </li>
               <li>
-                <strong>Keep going.</strong> A note you miss comes back a few notes later. Score 8 of 10 or better in a
+                <strong>Keep going.</strong> Your results show which numbers you missed most. Score 8 of 10 or better in a
                 set to unlock the next level.
               </li>
             </ol>
