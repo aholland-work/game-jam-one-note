@@ -1,3 +1,4 @@
+import { ECHO_LEVELS } from '../game/echoNote'
 import type { GameMode, Settings } from '../game/settings'
 import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
@@ -7,7 +8,7 @@ import './SongList.css'
 const MODES: { id: GameMode; label: string; blurb: string }[] = [
   { id: 'missing-note', label: 'Missing Note', blurb: 'One note is missing. Find it on the piano.' },
   { id: 'one-note-off', label: 'One Note Off', blurb: 'One note has changed. Spot which one.' },
-  { id: 'echo-note', label: 'Echo Note', blurb: 'Hear one note after a C. Find it on the piano.' },
+  { id: 'echo-note', label: 'Echo Note', blurb: 'Ear training: hear a chord, then find one note on the piano.' },
 ]
 
 interface SongListProps {
@@ -58,9 +59,42 @@ export function SongList({
         <div className="song-list-echo">
           <h2 id="song-list-title">Echo Note</h2>
           <p>
-            Each round has five mystery notes. For each one you hear a C first, then the mystery note. Use the C as your
-            guide and find the mystery note on the piano. One answer per note.
+            Train your ear. For each mystery note you hear a C major chord to set the key, then the note. Find it on the
+            piano and lock in one answer. Notes you miss come back more often.
           </p>
+          <div className="song-list-choice" role="group" aria-label="Notes in play">
+            <span>Notes</span>
+            {ECHO_LEVELS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className="song-list-filter"
+                aria-pressed={settings.echoLevel === option.id}
+                onClick={() => onSettingsChange({ ...settings, echoLevel: option.id })}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <div className="song-list-choice" role="group" aria-label="Session length">
+            <span>Length</span>
+            {(
+              [
+                ['round', 'Rounds of 5'],
+                ['endless', 'Endless practice'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="song-list-filter"
+                aria-pressed={settings.echoLength === id}
+                onClick={() => onSettingsChange({ ...settings, echoLength: id })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <button type="button" className="song-list-start" onClick={onStartEcho}>
             ▶ Start a round
           </button>

@@ -1,3 +1,5 @@
+import type { EchoLength, EchoLevel } from './echoNote'
+
 const STORAGE_KEY = 'one-note:settings'
 
 export type GameMode = 'missing-note' | 'one-note-off' | 'echo-note'
@@ -11,11 +13,17 @@ export interface Settings {
    * be heard only once while guessing.
    */
   oneNoteOffHard: boolean
+  /** Echo Note: which notes can come up. */
+  echoLevel: EchoLevel
+  /** Echo Note: five-note rounds, or endless practice. */
+  echoLength: EchoLength
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   oneNoteOffHighlight: true,
   oneNoteOffHard: false,
+  echoLevel: 'triad',
+  echoLength: 'round',
 }
 
 // Storage can be unavailable (private windows, blocked site data); defaults apply then.
@@ -40,8 +48,11 @@ export function saveSettings(settings: Settings): void {
   }
 }
 
+/** The on/off settings, which the Settings menu shows as checkboxes. */
+type ToggleSetting = { [K in keyof Settings]: Settings[K] extends boolean ? K : never }[keyof Settings]
+
 export interface SettingOption {
-  key: keyof Settings
+  key: ToggleSetting
   label: string
   /** True when the setting shapes how a song is set up, so it can't change partway through. */
   nextSong: boolean

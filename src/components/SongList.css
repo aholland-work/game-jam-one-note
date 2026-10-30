@@ -141,3 +141,16 @@
   color: var(--accent);
   font-weight: 600;
 }
+
+.song-list-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.song-list-choice > span {
+  min-width: 4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}

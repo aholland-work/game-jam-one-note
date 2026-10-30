@@ -7,6 +7,8 @@ export interface Note {
   beats: number
   /** Tied into the next note (same pitch): the two sound as one held note. */
   tie?: boolean
+  /** Other pitches sounding with this note, making it a chord. Only used for sound, not the staff. */
+  chord?: number[]
 }
 
 const LETTER_SEMITONES: Record<string, number> = {

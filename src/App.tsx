@@ -35,7 +35,17 @@ function App() {
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <h1 style={{ margin: '0 0 1rem' }}>One Note</h1>
       {echoRound !== null ? (
-        <EchoNoteRound key={echoRound} onBack={() => setEchoRound(null)} onPlayAgain={startEcho} />
+        <EchoNoteRound
+          key={echoRound}
+          level={settings.echoLevel}
+          length={settings.echoLength}
+          onBack={() => setEchoRound(null)}
+          onPlayAgain={startEcho}
+          onLevelUp={(echoLevel) => {
+            changeSettings({ ...settings, echoLevel })
+            startEcho()
+          }}
+        />
       ) : current ? (
         mode === 'one-note-off' ? (
           <OneNoteOffRound
