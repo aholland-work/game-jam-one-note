@@ -25,19 +25,23 @@ function App() {
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <h1 style={{ margin: '0 0 1rem' }}>One Note</h1>
       {current ? (
-        (() => {
-          const Round = mode === 'one-note-off' ? OneNoteOffRound : MissingNoteRound
-          return (
-            <Round
-              key={`${mode}-${current.id}`}
-              song={current}
-              settings={settings}
-              onSettingsChange={changeSettings}
-              onBack={() => setCurrent(null)}
-              onNext={next ? () => setCurrent(next) : null}
-            />
-          )
-        })()
+        mode === 'one-note-off' ? (
+          <OneNoteOffRound
+            key={`${mode}-${current.id}`}
+            song={current}
+            settings={settings}
+            onSettingsChange={changeSettings}
+            onBack={() => setCurrent(null)}
+            onNext={next ? () => setCurrent(next) : null}
+          />
+        ) : (
+          <MissingNoteRound
+            key={`${mode}-${current.id}`}
+            song={current}
+            onBack={() => setCurrent(null)}
+            onNext={next ? () => setCurrent(next) : null}
+          />
+        )
       ) : (
         <SongList
           mode={mode}

@@ -32,6 +32,8 @@ export function SettingsMenu({ mode, settings, onChange, inRound = false }: Sett
     }
   }, [open])
 
+  if (SETTING_OPTIONS[mode].length === 0) return null
+
   return (
     <div className="settings-menu" ref={root}>
       <button type="button" className="settings-button" aria-expanded={open} onClick={() => setOpen(!open)}>

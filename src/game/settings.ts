@@ -2,10 +2,8 @@ const STORAGE_KEY = 'one-note:settings'
 
 export type GameMode = 'missing-note' | 'one-note-off'
 
-/** Optional gameplay rules players can switch on or off from the song list. */
+/** Optional One Note Off rules players can switch on or off. */
 export interface Settings {
-  /** Missing Note: hear your chosen note in the melody (up to 3 times) before locking in. */
-  missingNoteTries: boolean
   /** One Note Off: light up each note on the staff as it plays. */
   oneNoteOffHighlight: boolean
   /** One Note Off: the changed note only becomes a note the song already uses. */
@@ -15,7 +13,6 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  missingNoteTries: false,
   oneNoteOffHighlight: true,
   oneNoteOffInKey: true,
   oneNoteOffOneListen: false,
@@ -25,7 +22,11 @@ export const DEFAULT_SETTINGS: Settings = {
 export function loadSettings(): Settings {
   try {
     const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}') as Partial<Settings>
-    return { ...DEFAULT_SETTINGS, ...saved }
+    // Only keep known keys, so options removed in later versions don't linger.
+    const known = Object.fromEntries(
+      Object.entries(saved).filter(([key]) => key in DEFAULT_SETTINGS),
+    ) as Partial<Settings>
+    return { ...DEFAULT_SETTINGS, ...known }
   } catch {
     return DEFAULT_SETTINGS
   }
@@ -46,11 +47,9 @@ export interface SettingOption {
   nextSong: boolean
 }
 
-/** Each mode's optional rules, in the order they're listed. */
+/** Each mode's optional rules, in the order they're listed. Missing Note has none. */
 export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
-  'missing-note': [
-    { key: 'missingNoteTries', label: 'Try it: hear your note in the melody before locking in (3 tries)', nextSong: true },
-  ],
+  'missing-note': [],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
     { key: 'oneNoteOffInKey', label: 'Harder: the changed note stays in the song’s key', nextSong: true },

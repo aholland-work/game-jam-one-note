@@ -1,10 +1,8 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
-import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
-import type { Settings } from '../../game/settings'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import type { Note } from '../../music/notation'
@@ -31,22 +29,16 @@ const TUTORIAL_TEXT: Record<TutorialStep, string> = {
 
 interface MissingNoteRoundProps {
   song: Song
-  settings: Settings
-  onSettingsChange: (settings: Settings) => void
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
 }
 
 /** One Missing Note puzzle: listen, test keys, use up to three tries, lock in one answer. */
-export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onNext }: MissingNoteRoundProps) {
-  // Settings as they were when the song opened; changes made during the song apply from the next one.
-  const [startSettings] = useState(settings)
-  // "Try it" is an optional setting; without it players have to imagine the note in place.
-  const maxTries = startSettings.missingNoteTries ? MAX_TRIES : 0
+export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
-  const [triesLeft, setTriesLeft] = useState(maxTries)
+  const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
   const [hint, setHint] = useState(DEFAULT_HINT)
@@ -225,10 +217,7 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
       </button>
       <header className="round-header">
         <h2 id="round-title">{song.title}</h2>
-        <div className="round-header-side">
-          <p className="round-genre">{song.genre}</p>
-          <SettingsMenu mode="missing-note" settings={settings} onChange={onSettingsChange} inRound />
-        </div>
+        <p className="round-genre">{song.genre}</p>
       </header>
 
       <Staff
@@ -300,13 +289,13 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
               ▶ Play
             </button>
           )}
-          {maxTries > 0 && (
+          {MAX_TRIES > 0 && (
             <>
               <button type="button" onClick={tryIt}>
                 Try it
               </button>
-              <span className="round-tries" aria-label={`${triesLeft} of ${maxTries} tries left`}>
-                {Array.from({ length: maxTries }, (_, i) => (
+              <span className="round-tries" aria-label={`${triesLeft} of ${MAX_TRIES} tries left`}>
+                {Array.from({ length: MAX_TRIES }, (_, i) => (
                   <span key={i} className={i < triesLeft ? 'is-left' : ''} />
                 ))}
               </span>
