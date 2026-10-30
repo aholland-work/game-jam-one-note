@@ -239,7 +239,7 @@
 .round-piano { max-width: 490px; margin-top: 0; }
 .round-piano.is-wide { max-width: 830px; }
 /* Left-aligned under the piano, with room below the piano's shadow. */
-.round-shortcuts { justify-self: stretch; width: 100%; max-width: 490px; margin: 14px auto 0; font-size: 0.75rem; }
+.round-shortcuts { justify-self: stretch; width: 100%; max-width: 490px; margin: 32px auto 0; font-size: 0.75rem; }
 .round-shortcuts summary { text-align: left; }
 .round-coach { border-left: 3px solid var(--accent); border-radius: 0 7px 7px 0; font-size: 0.9rem; }
 .round-pending { border-radius: 6px; font-size: 0.85rem; }
