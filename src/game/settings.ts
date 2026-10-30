@@ -6,16 +6,16 @@ export type GameMode = 'missing-note' | 'one-note-off'
 export interface Settings {
   /** One Note Off: light up each note on the staff as it plays. */
   oneNoteOffHighlight: boolean
-  /** One Note Off: the changed note only becomes a note the song already uses. */
-  oneNoteOffInKey: boolean
-  /** One Note Off: the original can be heard only once while guessing. */
-  oneNoteOffOneListen: boolean
+  /**
+   * One Note Off on Hard: the changed note stays in the song's key, and the original can
+   * be heard only once while guessing.
+   */
+  oneNoteOffHard: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   oneNoteOffHighlight: true,
-  oneNoteOffInKey: false,
-  oneNoteOffOneListen: false,
+  oneNoteOffHard: false,
 }
 
 // Storage can be unavailable (private windows, blocked site data); defaults apply then.
@@ -52,7 +52,10 @@ export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
   'missing-note': [],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
-    { key: 'oneNoteOffInKey', label: 'Harder: the changed note stays in the song’s key', nextSong: true },
-    { key: 'oneNoteOffOneListen', label: 'Harder: hear the original only once', nextSong: false },
+    {
+      key: 'oneNoteOffHard',
+      label: 'Hard mode: the changed note stays in the song’s key, and you hear the original only once',
+      nextSong: true,
+    },
   ],
 }

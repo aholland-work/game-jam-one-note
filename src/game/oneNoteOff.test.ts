@@ -13,8 +13,8 @@ function seeded(seed: number) {
 }
 
 describe.each(songs)('One Note Off: $title', (song) => {
-  const changes = Array.from({ length: 200 }, (_, i) => pickChange(song, { inKey: true }, seeded(i + 1)))
-  const anyPitch = Array.from({ length: 200 }, (_, i) => pickChange(song, { inKey: false }, seeded(i + 1)))
+  const changes = Array.from({ length: 200 }, (_, i) => pickChange(song, { difficulty: 'hard' }, seeded(i + 1)))
+  const anyPitch = Array.from({ length: 200 }, (_, i) => pickChange(song, { difficulty: 'easy' }, seeded(i + 1)))
 
   it('only changes notes long enough to hear, and never a tie', () => {
     for (const { index } of [...changes, ...anyPitch]) {
@@ -26,7 +26,7 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('moves the note up to 4 half steps, to a note already in the melody, away from its neighbors', () => {
+  it('on Hard, moves the note up to 4 half steps, to a note already in the melody, away from its neighbors', () => {
     const inKey = melodyPitchClasses(song.melody)
     for (const { index, midi } of changes) {
       const distance = Math.abs(midi - (song.melody[index].midi as number))
@@ -38,11 +38,13 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('without the in-key rule, moves the note 1 to 3 half steps to any pitch', () => {
+  it('on Easy, jumps the note 3 to 5 half steps to a pitch the melody never uses', () => {
+    const inKey = melodyPitchClasses(song.melody)
     for (const { index, midi } of anyPitch) {
       const distance = Math.abs(midi - (song.melody[index].midi as number))
-      expect(distance).toBeGreaterThanOrEqual(1)
-      expect(distance).toBeLessThanOrEqual(3)
+      expect(distance).toBeGreaterThanOrEqual(3)
+      expect(distance).toBeLessThanOrEqual(5)
+      expect(inKey.has(midi % 12)).toBe(false)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }

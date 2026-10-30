@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
@@ -27,27 +27,33 @@ interface OneNoteOffRoundProps {
 
 /** One One Note Off puzzle: compare two versions, tap the note that changed, lock in once. */
 export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNext }: OneNoteOffRoundProps) {
-  // A new random change every time the round opens. "Stays in key" shapes this pick, so
-  // changing that setting mid-song applies from the next song; the others apply right away.
-  const [change] = useState(() => pickChange(song, { inKey: settings.oneNoteOffInKey }))
+  // Hard mode shapes how the puzzle is set up, so the song keeps the setting it opened with;
+  // a change made mid-song applies from the next one. Highlighting applies right away.
+  const [hard] = useState(settings.oneNoteOffHard)
+  // A new random change every time the round opens.
+  const [change] = useState(() => pickChange(song, { difficulty: hard ? 'hard' : 'easy' }))
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [revealedCount, setRevealedCount] = useState(0)
-  // Null shows the instructions, which follow the current one-listen setting.
+  // Null shows the instructions.
   const [hint, setHint] = useState<string | null>(null)
-  const oneListen = settings.oneNoteOffOneListen
+  // On Hard, the original can be heard only once while guessing.
+  const oneListen = hard
   const instructions = oneListen
     ? 'One note in the changed version is off. You can hear the original only once, and the changed version as often as you like. Tap the note that sounds different, then lock in.'
     : 'One note in the changed version is off. Compare the two as often as you like, tap the note that sounds different, then lock in.'
-  // Tracked whether or not the one-listen setting is on, so turning it on mid-song counts a
-  // listen that already happened (pausing and resuming is fine).
+  // Pausing and resuming the original still counts as one listen.
   const [originalHeard, setOriginalHeard] = useState(false)
+  // The reveal plays the changed version first (odd note in orange), then the original.
+  const [showingChanged, setShowingChanged] = useState(false)
+  const [awaitingOriginal, setAwaitingOriginal] = useState(false)
+  const originalTimer = useRef(0)
   const player = useMelodyPlayer<Version>(song.bpm)
 
   const changedMelody = withChange(song.melody, change)
   const originalMidi = song.melody[change.index].midi as number
   const isOver = status !== 'guessing'
-  const resultPlaying = isOver && player.playing !== null
+  const resultPlaying = isOver && (player.playing !== null || awaitingOriginal)
   const melodyFor = (version: Version) => (version === 'original' ? song.melody : changedMelody)
   const playingMidi =
     player.playingNotes && player.activeIndex !== null ? player.playingNotes[player.activeIndex]?.midi ?? null : null
@@ -62,22 +68,45 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
     player.play(version, melodyFor(version))
   }
 
+  const originalName = midiToName(originalMidi)
+  const changedName = midiToName(change.midi)
+  const originalBackHint = `…and here's the original, with the ${originalName} back in place (green).`
+
   const lockIn = () => {
     if (selectedIndex === null) return setHint('Tap the note on the staff that sounds different first.')
     const found = selectedIndex === change.index
-    const swap = `${midiToName(originalMidi)} was played as ${midiToName(change.midi)}`
     setStatus(found ? 'found' : 'missed')
-    setHint(found ? `You found it! That ${swap}.` : `Not quite. The green note was the changed one: its ${swap}.`)
-    revealOriginal()
+    setHint(
+      found
+        ? `You found it! Here's the changed version: the orange note played ${changedName} instead of ${originalName}…`
+        : `Not quite (your pick is in purple). Here's the changed version: the orange note played ${changedName} instead of ${originalName}…`,
+    )
+    // First the changed version, with its notes sliding to their real spots…
+    setShowingChanged(true)
+    setAwaitingOriginal(true)
+    setRevealedCount(0)
+    player.play('changed', changedMelody, {
+      onNote: (index) => setRevealedCount(index + 1),
+      onComplete: () => {
+        originalTimer.current = window.setTimeout(playOriginalBack, 700)
+      },
+    })
   }
 
-  const revealOriginal = () => {
-    setRevealedCount(0)
-    player.play('original', song.melody, { onNote: (index) => setRevealedCount(index + 1) })
+  // …then the original, with the changed note back at its real pitch.
+  const playOriginalBack = () => {
+    setShowingChanged(false)
+    setAwaitingOriginal(false)
+    setHint(originalBackHint)
+    player.play('original', song.melody)
   }
 
   const skipReveal = () => {
+    window.clearTimeout(originalTimer.current)
     player.stop()
+    setShowingChanged(false)
+    setAwaitingOriginal(false)
+    setHint(originalBackHint)
     setRevealedCount(song.melody.length)
   }
 
@@ -92,14 +121,17 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
       onSpace()
     }
     window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.clearTimeout(originalTimer.current)
+    }
   }, [])
 
-  const marks: Partial<Record<number, NoteMark>> = isOver
-    ? { ...(status === 'missed' && selectedIndex !== null ? { [selectedIndex]: 'missed' as const } : {}), [change.index]: 'found' }
-    : selectedIndex !== null
-      ? { [selectedIndex]: 'selected' }
-      : {}
+  // While guessing, the pick is purple. In the result, the changed note is orange at its
+  // wrong pitch, then green at its real one; a wrong pick stays purple.
+  const marks: Partial<Record<number, NoteMark>> = {}
+  if (selectedIndex !== null && (!isOver || selectedIndex !== change.index)) marks[selectedIndex] = 'selected'
+  if (isOver) marks[change.index] = showingChanged ? 'missed' : 'found'
 
   const versionButton = (version: Version) => {
     if (player.playing === version) {
@@ -160,7 +192,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
       </header>
 
       <Staff
-        notes={song.melody}
+        notes={showingChanged ? changedMelody : song.melody}
         beatsPerBar={song.beatsPerBar}
         pickupBeats={song.pickupBeats}
         revealedCount={revealedCount}

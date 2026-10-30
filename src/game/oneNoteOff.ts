@@ -18,36 +18,40 @@ export function melodyPitchClasses(melody: Note[]): Set<number> {
   return new Set(melody.flatMap((note) => (note.midi === null ? [] : [note.midi % 12])))
 }
 
+export type Difficulty = 'easy' | 'hard'
+
 /**
  * Picks one note to move for a One Note Off round. It never matches the notes on either
  * side, so the change can't hide in a repeat.
  *
- * - `inKey` (harder): the new pitch is within 4 half steps and uses only notes the melody
- *   already contains, so the changed version still sounds plausible.
- * - Otherwise: the note moves 1 to 3 half steps to any pitch, which often clashes.
+ * - Easy: the note jumps 3 to 5 half steps to a pitch the melody never uses, so the
+ *   changed version clearly clashes.
+ * - Hard: the note moves up to 4 half steps to a pitch the melody already uses, so the
+ *   changed version still sounds plausible.
  */
 export function pickChange(
   song: Song,
-  { inKey = true }: { inKey?: boolean } = {},
+  { difficulty = 'easy' }: { difficulty?: Difficulty } = {},
   random: () => number = Math.random,
 ): NoteChange {
   const { melody } = song
   const pitchClasses = melodyPitchClasses(melody)
-  const maxDistance = inKey ? 4 : 3
+  const [minDistance, maxDistance] = difficulty === 'hard' ? [1, 4] : [3, 5]
+  const fits = (midi: number) => (difficulty === 'hard' ? pitchClasses.has(midi % 12) : !pitchClasses.has(midi % 12))
   const options: NoteChange[] = []
   melody.forEach((note, index) => {
     if (note.midi === null || note.beats < MIN_BEATS) return
     if (note.tie || melody[index - 1]?.tie) return
-    for (let offset = -maxDistance; offset <= maxDistance; offset++) {
-      const midi = note.midi + offset
-      if (offset === 0 || (inKey && !pitchClasses.has(midi % 12))) continue
-      if (midi < LOWEST || midi > HIGHEST) continue
-      if (midi === melody[index - 1]?.midi || midi === melody[index + 1]?.midi) continue
-      options.push({ index, midi })
+    for (let distance = minDistance; distance <= maxDistance; distance++) {
+      for (const midi of [note.midi - distance, note.midi + distance]) {
+        if (!fits(midi) || midi < LOWEST || midi > HIGHEST) continue
+        if (midi === melody[index - 1]?.midi || midi === melody[index + 1]?.midi) continue
+        options.push({ index, midi })
+      }
     }
   })
   if (options.length === 0) throw new Error(`${song.id}: no note can be changed`)
-  // Choose the note first, then the offset, so notes with more options aren't favored.
+  // Choose the note first, then the new pitch, so notes with more options aren't favored.
   const indices = [...new Set(options.map((option) => option.index))]
   const index = indices[Math.floor(random() * indices.length)]
   const forNote = options.filter((option) => option.index === index)
