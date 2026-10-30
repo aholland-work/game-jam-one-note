@@ -1,0 +1,32 @@
+.is-missing-note .round-mode {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.is-missing-note .round-back {
+  min-height: 42px;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.is-missing-note .round-back:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.is-missing-note .round-next {
+  transition: transform 140ms, box-shadow 140ms, border-color 140ms;
+}
+
+.is-missing-note .round-next:is(:hover, :focus-visible):not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 var(--accent-edge), 0 0 0 3px var(--accent-soft), inset 0 1px 0 color-mix(in srgb, var(--accent-ink) 25%, transparent);
+}
+
+.is-missing-note .round-next:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--accent-edge), inset 0 2px 3px rgb(0 0 0 / 16%);
+}

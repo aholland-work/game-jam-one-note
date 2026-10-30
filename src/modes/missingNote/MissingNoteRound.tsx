@@ -11,6 +11,7 @@ import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import { usesFlats } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import '../round.css'
+import './MissingNoteRound.css'
 
 type Status = 'guessing' | 'found' | 'missed'
 // What's playing: the melody with its gap, a try with the player's note, or the result.
@@ -173,7 +174,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
   }, [])
 
   return (
-    <section className="round" aria-labelledby="round-title">
+    <section className="round is-missing-note" aria-labelledby="round-title">
       <button type="button" className="round-back" onClick={onBack}>
         ← Songs
       </button>
