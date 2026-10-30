@@ -254,6 +254,9 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
         Key: <strong>{keyName(key)}</strong>
         {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
       </p>
+      {level === 'all' && (
+        <p className="echo-tip">Tip: on this level the mystery note can also be one of the 5 notes outside the key.</p>
+      )}
 
       {!endless && (
         <ol className="echo-progress" aria-label="Round progress">

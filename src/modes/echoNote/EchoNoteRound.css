@@ -7,6 +7,12 @@
   font-size: 1.1rem;
 }
 
+.echo-tip {
+  margin: -0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
 .echo-new-key {
   font-size: 0.9rem;
   font-weight: 600;
