@@ -6,32 +6,3 @@
   margin-bottom: 3px;
 }
 
-.round-navigation :is(.round-back, .settings-button) {
-  min-height: 42px;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 0.85rem;
-  transition: transform 140ms, box-shadow 140ms, border-color 140ms, background-color 140ms, color 140ms;
-}
-
-.round-navigation :is(.round-back, .settings-button):is(:hover, :focus-visible, [aria-expanded='true']):not(:disabled) {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 30%, var(--border));
-}
-
-.round-navigation :is(.round-back, .settings-button):active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: inset 0 2px 4px rgb(0 0 0 / 22%);
-  transition-duration: 40ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .round-navigation :is(.round-back, .settings-button):is(:hover, :focus-visible, [aria-expanded='true'], :active):not(:disabled) {
-    transform: none;
-  }
-}

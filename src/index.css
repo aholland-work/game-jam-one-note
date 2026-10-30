@@ -1,3 +1,5 @@
+@import './components/OutlinedButton.css';
+
 :root {
   color-scheme: light;
   --bg: #fbfaf7;

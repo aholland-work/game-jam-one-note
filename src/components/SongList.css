@@ -47,7 +47,6 @@
 .song-list-echo { display: grid; gap: 16px; justify-items: start; }
 .song-list-echo p { margin: 0; color: var(--text-muted); max-width: 68ch; }
 .song-list-echo .song-list-heading { width: 100%; }
-.song-list-start { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .song-list-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .song-list-choice > span { min-width: 4rem; font-size: 0.9375rem; color: var(--text-muted); }
 .song-list-how { display: grid; gap: 12px; max-width: 72ch; padding: 18px 22px; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--accent-soft); font-size: 1rem; }
