@@ -1,0 +1,88 @@
+.version-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 0.45rem 0.9rem 0.45rem 0.6rem;
+}
+
+.version-icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--surface);
+}
+
+.version-text {
+  display: grid;
+}
+
+.version-title {
+  font-weight: 600;
+}
+
+.version-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Changed: the one to hunt in, in the accent color. */
+.version-button.is-changed {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.is-changed .version-icon,
+.now-playing.is-changed .now-playing-icon {
+  background: var(--accent);
+}
+
+/* Original: the real tune, in green. */
+.version-button.is-original {
+  border-color: var(--success);
+}
+
+.is-original .version-icon,
+.now-playing.is-original .now-playing-icon {
+  background: var(--success);
+}
+
+.version-button.is-playing.is-changed {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.version-button.is-playing.is-original {
+  box-shadow: 0 0 0 2px var(--success);
+}
+
+.now-playing {
+  margin: 0;
+  min-height: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.now-playing.is-changed {
+  color: var(--accent);
+}
+
+.now-playing.is-original {
+  color: var(--success);
+}
+
+.now-playing-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: var(--surface);
+}

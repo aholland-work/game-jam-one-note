@@ -10,11 +10,15 @@ import type { Settings } from '../../game/settings'
 import { midiToName } from '../../music/notation'
 import type { Song } from '../../songs/types'
 import '../round.css'
+import './OneNoteOffRound.css'
 
 type Status = 'guessing' | 'found' | 'missed'
 type Version = 'original' | 'changed'
 
-const VERSION_LABELS: Record<Version, string> = { original: 'Original', changed: 'Changed' }
+const VERSIONS: Record<Version, { icon: string; title: string; caption: string }> = {
+  changed: { icon: '≠', title: 'Changed', caption: 'One note is off' },
+  original: { icon: '✓', title: 'Original', caption: 'How the tune really goes' },
+}
 
 interface OneNoteOffRoundProps {
   song: Song
@@ -133,50 +137,44 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
   if (selectedIndex !== null && (!isOver || selectedIndex !== change.index)) marks[selectedIndex] = 'selected'
   if (isOver) marks[change.index] = showingChanged ? 'missed' : 'found'
 
+  // Each version gets its own icon, color and caption so they're hard to mix up.
   const versionButton = (version: Version) => {
-    if (player.playing === version) {
-      return (
-        <button type="button" onClick={player.pause}>
-          ⏸ Pause
-        </button>
-      )
-    }
-    // Restarting the original would be a second listen, so it only offers Resume.
+    const meta = VERSIONS[version]
+    const playing = player.playing === version
+    const paused = player.paused === version
+    // On Hard, restarting the original would be a second listen, so it only offers Resume.
     const limited = version === 'original' && !isOver && oneListen
-    if (player.paused === version) {
-      return (
-        <>
-          <button type="button" onClick={() => player.resume()}>
-            ▶ Resume {VERSION_LABELS[version].toLowerCase()}
-          </button>
-          {!limited && (
-            <button type="button" onClick={() => player.resume(true)}>
-              ⟲ From the start
-            </button>
-          )}
-        </>
-      )
-    }
-    if (limited && originalHeard) {
-      return (
-        <button type="button" disabled>
-          Original heard
-        </button>
-      )
-    }
-    if (limited) {
-      return (
-        <button type="button" onClick={() => toggle(version)}>
-          ▶ Original (one listen)
-        </button>
-      )
-    }
+    const used = limited && originalHeard && !playing && !paused
+    const action = playing ? '⏸ Pause' : paused ? '▶ Resume' : '▶ Play'
+    const caption = used ? 'Already heard' : limited && !playing && !paused ? 'One listen only' : meta.caption
     return (
-      <button type="button" onClick={() => toggle(version)} disabled={resultPlaying}>
-        ▶ {VERSION_LABELS[version]}
-      </button>
+      <>
+        <button
+          type="button"
+          className={`version-button is-${version}${playing ? ' is-playing' : ''}`}
+          onClick={playing ? player.pause : paused ? () => player.resume() : () => toggle(version)}
+          disabled={used || (resultPlaying && !playing && !paused)}
+        >
+          <span className="version-icon" aria-hidden="true">
+            {meta.icon}
+          </span>
+          <span className="version-text">
+            <span className="version-title">
+              {action} {meta.title.toLowerCase()}
+            </span>
+            <span className="version-caption">{caption}</span>
+          </span>
+        </button>
+        {paused && !limited && (
+          <button type="button" onClick={() => player.resume(true)}>
+            ⟲ From the start
+          </button>
+        )}
+      </>
     )
   }
+
+  const nowPlaying = player.playing ?? player.paused
 
   return (
     <section className="round" aria-labelledby="round-title">
@@ -190,6 +188,16 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
           <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
         </div>
       </header>
+
+      {/* Says which version is sounding, so the two can't be confused. */}
+      <p className={`now-playing${nowPlaying ? ` is-${nowPlaying}` : ''}`} aria-hidden={!nowPlaying}>
+        {nowPlaying && (
+          <>
+            <span className="now-playing-icon">{VERSIONS[nowPlaying].icon}</span>
+            {player.playing ? 'Now playing' : 'Paused'}: {VERSIONS[nowPlaying].title.toLowerCase()} version
+          </>
+        )}
+      </p>
 
       <Staff
         notes={showingChanged ? changedMelody : song.melody}
@@ -209,8 +217,8 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
       <div className="round-controls">
         {isOver ? (
           <>
-            {versionButton('original')}
             {versionButton('changed')}
+            {versionButton('original')}
             {resultPlaying && (
               <button type="button" onClick={skipReveal}>
                 Skip
@@ -224,8 +232,8 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
           </>
         ) : (
           <>
-            {versionButton('original')}
             {versionButton('changed')}
+            {versionButton('original')}
             <span className="round-spacer" />
             <button type="button" className="round-lock" onClick={lockIn}>
               Lock in

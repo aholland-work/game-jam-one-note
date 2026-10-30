@@ -38,9 +38,11 @@ describe.each(songs)('One Note Off: $title', (song) => {
     }
   })
 
-  it('on Easy, always moves the note up exactly 3 half steps', () => {
+  it('on Easy, moves the note 1 to 3 half steps up or down', () => {
     for (const { index, midi } of anyPitch) {
-      expect(midi - (song.melody[index].midi as number)).toBe(3)
+      const distance = Math.abs(midi - (song.melody[index].midi as number))
+      expect(distance).toBeGreaterThanOrEqual(1)
+      expect(distance).toBeLessThanOrEqual(3)
       expect(midi).not.toBe(song.melody[index - 1]?.midi)
       expect(midi).not.toBe(song.melody[index + 1]?.midi)
     }

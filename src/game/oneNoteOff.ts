@@ -24,7 +24,7 @@ export type Difficulty = 'easy' | 'hard'
  * Picks one note to move for a One Note Off round. It never matches the notes on either
  * side, so the change can't hide in a repeat.
  *
- * - Easy: the note always moves up exactly 3 half steps, to any pitch.
+ * - Easy: the note moves 1 to 3 half steps up or down, to any pitch.
  * - Hard: the note moves up to 4 half steps to a pitch the melody already uses, so the
  *   changed version still sounds plausible.
  */
@@ -38,7 +38,7 @@ export function pickChange(
   const candidates = (midi: number) =>
     difficulty === 'hard'
       ? [-4, -3, -2, -1, 1, 2, 3, 4].map((offset) => midi + offset).filter((pitch) => pitchClasses.has(pitch % 12))
-      : [midi + 3]
+      : [-3, -2, -1, 1, 2, 3].map((offset) => midi + offset)
   const options: NoteChange[] = []
   melody.forEach((note, index) => {
     if (note.midi === null || note.beats < MIN_BEATS) return
