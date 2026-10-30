@@ -239,7 +239,9 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
 
   return (
     <section className="round" aria-labelledby="round-title">
-      <RoundNavigation onBack={onBack} backLabel="Home" />
+      <RoundNavigation onBack={onBack} backLabel="Home">
+        <SettingsMenu mode="echo-note" settings={settings} onChange={onSettingsChange} inRound />
+      </RoundNavigation>
       <p className="round-mode">Ear training</p>
       <header className="round-header">
         <h2 id="round-title" ref={heading} tabIndex={-1}>Echo Note</h2>
@@ -250,7 +252,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
               ? `${correctCount} of ${history.length} right`
               : `Note ${Math.min(history.length + (answered ? 0 : 1), ROUND_LENGTH)} of ${ROUND_LENGTH}`}
           </p>
-          <SettingsMenu mode="echo-note" settings={settings} onChange={onSettingsChange} inRound />
         </div>
       </header>
 
