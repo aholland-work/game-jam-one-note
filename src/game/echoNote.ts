@@ -53,7 +53,7 @@ export const ECHO_LEVELS: { id: EchoLevel; label: string; about: string; steps: 
   {
     id: 'triad',
     label: 'Chord tones (1, 3, 5)',
-    about: 'The mystery note is always the 1, 3 or 5: one of the three notes in the chord you hear.',
+    about: 'The mystery note is always the 1, 3 or 5 of the chord you hear.',
     steps: CHORD_TONES,
   },
   { id: 'scale', label: 'Major scale (1–7)', about: 'The mystery note can be any of the key’s 7 notes (the white keys, in C major).', steps: MAJOR_SCALE },

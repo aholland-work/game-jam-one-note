@@ -16,7 +16,7 @@ const ECHO_KEY_CHOICES = [
   {
     id: 'random',
     label: 'New key each round',
-    about: 'Each round starts in a different key, like G or B♭ major, and the numbers move with it.',
+    about: 'Each round starts in a different key and the numbers move with it.',
   },
 ] as const
 
