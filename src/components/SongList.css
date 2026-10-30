@@ -90,6 +90,10 @@
 }
 
 .song-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
   font-weight: 600;
 }
 
@@ -183,4 +187,32 @@
 .song-list-echo .song-list-choice-about {
   margin: -0.25rem 0 0 calc(4rem + 8px);
   font-size: 0.9rem;
+}
+
+.song-list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.song-list-random {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.song-list-progress {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.song-card-solved {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.song-card.is-solved {
+  border-color: var(--success);
 }

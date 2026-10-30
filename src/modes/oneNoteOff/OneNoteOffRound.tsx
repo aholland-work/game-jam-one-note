@@ -30,10 +30,20 @@ interface OneNoteOffRoundProps {
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
+  /** Called when the player spots the changed note. */
+  onSolved: () => void
 }
 
 /** One One Note Off puzzle: compare two versions, tap the note that changed, lock in once. */
-export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, onBack, onNext }: OneNoteOffRoundProps) {
+export function OneNoteOffRound({
+  song,
+  settings,
+  onSettingsChange,
+  onRestart,
+  onBack,
+  onNext,
+  onSolved,
+}: OneNoteOffRoundProps) {
   // Hard mode shapes how the puzzle is set up, so the song keeps the setting it opened with;
   // a change made mid-song applies from the next one. Highlighting applies right away.
   const [hard] = useState(settings.oneNoteOffHard)
@@ -84,6 +94,7 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, o
     if (selectedIndex === null) return setHint('Tap the note on the staff that sounds different first.')
     const found = selectedIndex === change.index
     setStatus(found ? 'found' : 'missed')
+    if (found) onSolved()
     setHint(
       found
         ? `You found it! Here's the changed version: the orange note played ${changedName} instead of ${originalName}…`

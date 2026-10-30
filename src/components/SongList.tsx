@@ -1,4 +1,5 @@
 import { ECHO_LEVELS } from '../game/echoNote'
+import { pickRandomSong } from '../game/progress'
 import type { GameMode, Settings } from '../game/settings'
 import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
@@ -35,6 +36,8 @@ interface SongListProps {
   settings: Settings
   onSettingsChange: (settings: Settings) => void
   songs: Song[]
+  /** Songs already solved in the current mode. */
+  solvedIds: string[]
   genre: Genre | null
   onGenreChange: (genre: Genre | null) => void
   onSelect: (song: Song) => void
@@ -49,6 +52,7 @@ export function SongList({
   settings,
   onSettingsChange,
   songs,
+  solvedIds,
   genre,
   onGenreChange,
   onSelect,
@@ -56,6 +60,11 @@ export function SongList({
 }: SongListProps) {
   const genres = [...new Set(songs.map((song) => song.genre))]
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
+  const solvedCount = visible.filter((song) => solvedIds.includes(song.id)).length
+  const playRandom = () => {
+    const song = pickRandomSong(visible, solvedIds)
+    if (song) onSelect(song)
+  }
 
   return (
     <section className="song-list" aria-labelledby="song-list-title">
@@ -171,24 +180,45 @@ export function SongList({
               Twinkle, Twinkle is a gentle place to start.
             </p>
           )}
-          <div className="song-list-filters" role="group" aria-label="Filter by genre">
-            {[null, ...genres].map((option) => (
-              <button
-                key={option ?? 'all'}
-                type="button"
-                className="song-list-filter"
-                aria-pressed={genre === option}
-                onClick={() => onGenreChange(option)}
-              >
-                {option ?? 'All'}
+          <div className="song-list-toolbar">
+            <div className="song-list-filters" role="group" aria-label="Filter by genre">
+              {[null, ...genres].map((option) => (
+                <button
+                  key={option ?? 'all'}
+                  type="button"
+                  className="song-list-filter"
+                  aria-pressed={genre === option}
+                  onClick={() => onGenreChange(option)}
+                >
+                  {option ?? 'All'}
+                </button>
+              ))}
+            </div>
+            <div className="song-list-random">
+              <span className="song-list-progress">
+                {solvedCount} of {visible.length} solved
+              </span>
+              <button type="button" onClick={playRandom}>
+                🎲 Random song
               </button>
-            ))}
+            </div>
           </div>
           <ul className="song-list-cards">
             {visible.map((song) => (
               <li key={song.id}>
-                <button type="button" className="song-card" onClick={() => onSelect(song)}>
-                  <span className="song-card-title">{song.title}</span>
+                <button
+                  type="button"
+                  className={`song-card${solvedIds.includes(song.id) ? ' is-solved' : ''}`}
+                  onClick={() => onSelect(song)}
+                >
+                  <span className="song-card-title">
+                    {song.title}
+                    {solvedIds.includes(song.id) && (
+                      <span className="song-card-solved" role="img" aria-label="solved" title="Solved in this mode">
+                        ✓
+                      </span>
+                    )}
+                  </span>
                   <span className="song-card-meta">
                     {song.genre}
                     <span className={`song-card-difficulty is-${song.difficulty.toLowerCase()}`}>{song.difficulty}</span>

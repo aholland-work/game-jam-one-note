@@ -4,6 +4,7 @@ import { SongList } from './components/SongList'
 import { EchoNoteRound } from './modes/echoNote/EchoNoteRound'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
+import { loadSolved, saveSolved, withSolved } from './game/progress'
 import { loadSettings, saveSettings, type GameMode, type Settings } from './game/settings'
 import { songs } from './songs'
 import type { Genre, Song } from './songs/types'
@@ -15,6 +16,12 @@ function App() {
   const changeSettings = (next: Settings) => {
     setSettings(next)
     saveSettings(next)
+  }
+  const [solved, setSolved] = useState(loadSolved)
+  const markSolved = (song: Song) => {
+    const next = withSolved(solved, mode, song.id)
+    setSolved(next)
+    saveSolved(next)
   }
   const [genre, setGenre] = useState<Genre | null>(null)
   const [current, setCurrent] = useState<Song | null>(null)
@@ -56,6 +63,7 @@ function App() {
             onRestart={() => setAttempt((n) => n + 1)}
             onBack={() => setCurrent(null)}
             onNext={next ? () => setCurrent(next) : null}
+            onSolved={() => markSolved(current)}
           />
         ) : (
           <MissingNoteRound
@@ -63,6 +71,7 @@ function App() {
             song={current}
             onBack={() => setCurrent(null)}
             onNext={next ? () => setCurrent(next) : null}
+            onSolved={() => markSolved(current)}
           />
         )
       ) : (
@@ -72,6 +81,7 @@ function App() {
           settings={settings}
           onSettingsChange={changeSettings}
           songs={songs}
+          solvedIds={solved[mode] ?? []}
           genre={genre}
           onGenreChange={setGenre}
           onSelect={(song) => {

@@ -36,10 +36,12 @@ interface MissingNoteRoundProps {
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
+  /** Called when the player finds the missing note. */
+  onSolved: () => void
 }
 
 /** One Missing Note puzzle: listen, test keys on the piano, lock in one answer. */
-export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps) {
+export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNoteRoundProps) {
   const [status, setStatus] = useState<Status>('guessing')
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [triesLeft, setTriesLeft] = useState(MAX_TRIES)
@@ -129,6 +131,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
     if (selectedMidi === answer) {
       setStatus('found')
       setHint('You found it!')
+      onSolved()
       playComplete()
       return
     }
