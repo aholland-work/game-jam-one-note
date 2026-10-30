@@ -35,10 +35,13 @@
 .song-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); }
 .song-card-difficulty { display: inline-flex; align-items: center; flex: none; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; line-height: 1.5; }
 .song-card-difficulty.is-easy { color: var(--success); background: var(--success-soft); }
-.song-card-difficulty.is-medium { color: var(--accent); background: var(--accent-soft); }
+.song-card-difficulty.is-medium { color: #765600; background: #f7edbd; }
 .song-card-difficulty.is-hard { color: var(--warning); background: var(--warning-soft); }
 .song-card-solved { color: var(--success); font-weight: 700; }
 .song-card.is-solved::before { color: var(--success); }
+@media (prefers-color-scheme: dark) {
+  .song-card-difficulty.is-medium { color: #ead47d; background: #40371e; }
+}
 .song-list-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 .song-list-random { display: flex; align-items: center; gap: 12px; }
 .song-list-random button { font-size: 0.8rem; }
