@@ -1,5 +1,5 @@
-/* Shared neutral action treatment for round navigation and Echo Start. */
-:is(.round-navigation .round-back, .round-navigation .settings-button, .song-list-start) {
+/* Shared neutral action treatment for round navigation and Echo Note's Change practice. */
+:is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change) {
   min-height: 42px;
   padding: 0.55rem 1rem;
   border: 1px solid var(--border);
@@ -9,7 +9,7 @@
   transition: transform 140ms, box-shadow 140ms, border-color 140ms, background-color 140ms, color 140ms;
 }
 
-:is(.round-navigation .round-back, .round-navigation .settings-button, .song-list-start):is(:hover, :focus-visible, [aria-expanded='true']):not(:disabled) {
+:is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change):is(:hover, :focus-visible, [aria-expanded='true']):not(:disabled) {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
@@ -17,14 +17,14 @@
   box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
-:is(.round-navigation .round-back, .round-navigation .settings-button, .song-list-start):active:not(:disabled) {
+:is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change):active:not(:disabled) {
   transform: translateY(2px);
   box-shadow: inset 0 2px 4px rgb(0 0 0 / 22%);
   transition-duration: 40ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.round-navigation .round-back, .round-navigation .settings-button, .song-list-start):is(:hover, :focus-visible, [aria-expanded='true'], :active):not(:disabled) {
+  :is(.round-navigation .round-back, .round-navigation .settings-button, .echo-start-change):is(:hover, :focus-visible, [aria-expanded='true'], :active):not(:disabled) {
     transform: none;
   }
 }
