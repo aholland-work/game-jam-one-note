@@ -16,6 +16,7 @@ export const deckTheHalls: Song = {
   missingIndex: 15,
   source: {
     url: 'https://abcnotation.com/tunePage?a=pghardy.net/tunebooks/pgh_xmas_tunebook/0014',
+    credit: "Paul Hardy's Christmas Tunebook, via abcnotation.com",
     notes: 'First four bars, unchanged (D major).',
     midi: { file: 'deck-the-halls.mid', track: 1 },
   },

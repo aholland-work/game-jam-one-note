@@ -17,6 +17,7 @@ export const ohSusanna: Song = {
   missingIndex: 6,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/OSUSANNA/0000',
+    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'Pickup and bars 1-4, unchanged (G major). The last A is held to end the excerpt.',
     midi: { file: 'oh-susanna.mid', track: 0 },
   },

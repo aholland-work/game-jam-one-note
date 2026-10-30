@@ -20,6 +20,8 @@ export interface Song {
   /** The public-domain transcription this melody was checked against, note by note. */
   source: {
     url: string
+    /** Who typeset or transcribed the source, and its license, for the README's credits. */
+    credit: string
     /** Which bars were used and anything changed from the source (key, octave, rhythm). */
     notes: string
     /**

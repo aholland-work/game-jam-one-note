@@ -16,6 +16,7 @@ export const takeMeOut: Song = {
   missingIndex: 1,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/TAKEBALL/0000',
+    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: "Chorus, bars 1-4, transposed from D major to C major.",
     midi: { file: 'take-me-out.mid', track: 0 },
   },

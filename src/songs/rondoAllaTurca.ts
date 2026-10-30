@@ -18,6 +18,7 @@ export const rondoAllaTurca: Song = {
   missingIndex: 9,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/MozartWA/KV331/KV331_3_RondoAllaTurca/KV331_3_RondoAllaTurca.ly',
+    credit: "Mutopia Project, typeset by Rune Zedeler and Chris Sawer (public domain)",
     notes: 'Right hand, pickup and bars 1-4, unchanged (A minor).',
     midi: { file: 'rondo-alla-turca.mid', track: 1 },
   },

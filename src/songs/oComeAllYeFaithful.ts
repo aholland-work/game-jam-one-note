@@ -17,6 +17,7 @@ export const oComeAllYeFaithful: Song = {
   missingIndex: 9,
   source: {
     url: 'https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/England/xmas/OComeAllYeFaithful_G/0000',
+    credit: "John Chambers' ABC collection, via abcnotation.com",
     notes: 'Pickup and bars 1-4, unchanged (G major).',
     midi: { file: 'o-come-all-ye-faithful.mid', track: 1 },
   },

@@ -63,7 +63,9 @@ function App() {
         />
       )}
       <footer style={{ marginTop: '3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        Songs are public domain. Piano sound:{' '}
+        Songs are public domain (
+        <a href="https://github.com/aholland-work/game-jam-one-note#song-sources-and-credits">sources and credits</a>).
+        Piano sound:{' '}
         <a href="https://github.com/sfzinstruments/SalamanderGrandPiano">Salamander Grand Piano</a> by Alexander Holm (
         <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>). Icon:{' '}
         <a href="https://github.com/twitter/twemoji">Twemoji</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).

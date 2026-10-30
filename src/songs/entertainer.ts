@@ -18,6 +18,7 @@ export const entertainer: Song = {
   missingIndex: 18,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/JoplinS/entertainer/entertainer.ly',
+    credit: "Mutopia Project, typeset by Chris Sawer (public domain)",
     notes: "A strain, pickup and bars 5-8, top line of the right hand, at the score's quarter = 72. The last C is cut short to end the excerpt.",
     midi: { file: 'the-entertainer.mid', track: 1 },
   },

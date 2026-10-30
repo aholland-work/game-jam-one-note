@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { parseMidi } from '../music/midi'
 import { songs } from '.'
+import { songCreditsTable } from './credits'
 import { closestMismatch, findInSource, soundingNotes, topLine } from './sourceMatch'
 
 // Each song's melody must appear, note for note, in a MIDI rendering of the public-domain
@@ -19,4 +20,10 @@ describe.each(songs)('$title matches its source', (song) => {
     }
     expect(match).not.toBeNull()
   })
+})
+
+it('credits every song in the README', () => {
+  const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8')
+  const table = songCreditsTable(songs)
+  expect(readme.includes(table), `Update the README's song credits table to:\n\n${table}`).toBe(true)
 })

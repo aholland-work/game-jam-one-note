@@ -17,6 +17,7 @@ export const brahmsLullaby: Song = {
   missingIndex: 8,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/BrahmsJ/LullabyBrahms-C/LullabyBrahms-C.ly',
+    credit: "Mutopia Project, typeset by Diego Guillen (public domain)",
     notes: 'Melody, pickup and bars 1-4, in C as in the source. The last G is held to end the excerpt; in the source the next phrase starts on its last beat.',
     midi: { file: 'brahms-lullaby.mid', track: 1 },
   },

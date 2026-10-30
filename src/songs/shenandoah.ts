@@ -17,6 +17,7 @@ export const shenandoah: Song = {
   missingIndex: 9,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/SHENDOAH/0000',
+    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'Pickup and bars 1-4, unchanged (D major).',
     midi: { file: 'shenandoah.mid', track: 0 },
   },

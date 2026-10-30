@@ -17,6 +17,7 @@ export const comingRoundTheMountain: Song = {
   missingIndex: 6,
   source: {
     url: 'https://abcnotation.com/tunePage?a=sniff.numachi.com/~rickheit/dtrad/abc_dtrad.tar.gz/abc_dtrad/COMRND2/0000',
+    credit: "The Digital Tradition folk song collection, via abcnotation.com",
     notes: 'Pickup and bars 1-3, unchanged (C major). The last C is held to end the excerpt.',
     midi: { file: 'coming-round-the-mountain.mid', track: 0 },
   },

@@ -17,6 +17,7 @@ export const minuetInG: Song = {
   missingIndex: 12,
   source: {
     url: 'https://www.mutopiaproject.org/ftp/BachJS/BWVAnh114/anna-magdalena-04/anna-magdalena-04.ly',
+    credit: "Mutopia Project, typeset by Allen Garvin (public domain)",
     notes: 'Right hand, bars 1-4, unchanged (G major).',
     midi: { file: 'minuet-in-g.mid', track: 1 },
   },
