@@ -22,5 +22,10 @@ export interface Song {
     url: string
     /** Which bars were used and anything changed from the source (key, octave, rhythm). */
     notes: string
+    /**
+     * A MIDI rendering of the source in `song-sources/`, and the track holding the tune.
+     * A test checks the melody against it note by note.
+     */
+    midi: { file: string; track: number }
   }
 }

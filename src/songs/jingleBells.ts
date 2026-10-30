@@ -17,5 +17,6 @@ export const jingleBells: Song = {
   source: {
     url: 'https://abcnotation.com/tunePage?a=pghardy.net/tunebooks/pgh_xmas_tunebook/0034',
     notes: "Chorus, bars 1-4, transposed from G to C and written in 4/4 at double the note values of the 2/4 source. Colin Hume's ABC transcription agrees.",
+    midi: { file: 'jingle-bells.mid', track: 1 },
   },
 }

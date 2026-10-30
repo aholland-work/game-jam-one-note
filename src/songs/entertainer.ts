@@ -19,5 +19,6 @@ export const entertainer: Song = {
   source: {
     url: 'https://www.mutopiaproject.org/ftp/JoplinS/entertainer/entertainer.ly',
     notes: "A strain, pickup and bars 5-8, top line of the right hand, at the score's quarter = 72. The last C is cut short to end the excerpt.",
+    midi: { file: 'the-entertainer.mid', track: 1 },
   },
 }

@@ -17,5 +17,6 @@ export const twinkleTwinkle: Song = {
   source: {
     url: 'https://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/abc/demo/Tunes/AhVousDiraiJeMaman/0000',
     notes: "First four bars, unchanged (Musica Viva ABC transcription of \"Ah! vous dirai-je, maman\").",
+    midi: { file: 'twinkle-twinkle.mid', track: 0 },
   },
 }

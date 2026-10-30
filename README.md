@@ -56,7 +56,8 @@ npm run build   # type-check and production build
    - `|` bar lines are optional and only for readability.
 3. Set `missingIndex` to the note players have to find (counting from 0), plus `beatsPerBar` and, for songs that start mid-bar, `pickupBeats`.
 4. Add it to the list in `src/songs/index.ts`.
-5. Run `npm test`. It checks the bars add up, the song fits on one line, and the missing note is a real note on the piano.
+5. Save a MIDI file of the public-domain source in `song-sources/` (Mutopia and abcnotation.com both offer one) and point the song's `source.midi` at it, with the track that holds the tune.
+6. Run `npm test`. It checks the bars add up, the song fits on one line, the missing note is a real note on the piano, and the melody appears note for note in the source MIDI (allowing a key change and doubled or halved note values).
 
 ## How it's built
 

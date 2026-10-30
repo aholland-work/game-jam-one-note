@@ -17,5 +17,6 @@ export const odeToJoy: Song = {
   source: {
     url: 'https://www.mutopiaproject.org/ftp/BeethovenLv/ode/ode.ly',
     notes: "Soprano, bars 1-4, transposed from G major to C major.",
+    midi: { file: 'ode-to-joy.mid', track: 1 },
   },
 }
