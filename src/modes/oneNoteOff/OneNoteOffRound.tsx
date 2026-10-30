@@ -193,7 +193,7 @@ export function OneNoteOffRound({
         {paused && !limited && (
           <button type="button" onClick={() => player.resume(true)}>
             <Icon name="restart" />
-            From the start
+            Restart
           </button>
         )}
       </>

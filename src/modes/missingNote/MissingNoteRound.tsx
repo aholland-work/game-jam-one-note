@@ -248,7 +248,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
               </button>
               <button type="button" onClick={() => player.resume(true)}>
                 <Icon name="restart" />
-                {player.paused === 'try' ? 'Restart try' : 'From the start'}
+                {player.paused === 'try' ? 'Restart try' : 'Restart'}
               </button>
             </>
           ) : (
