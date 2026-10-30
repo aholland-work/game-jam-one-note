@@ -1,0 +1,52 @@
+.echo-progress {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.echo-progress li {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+.echo-progress li.is-current {
+  border: 2px solid var(--accent);
+}
+
+.echo-progress li.is-found {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.echo-progress li.is-missed {
+  background: var(--warning);
+  border-color: var(--warning);
+}
+
+.echo-score {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.echo-results {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.echo-results .is-found {
+  color: var(--success);
+}
+
+.echo-results .is-missed {
+  color: var(--warning);
+}
+
+.echo-guess {
+  color: var(--text-muted);
+}

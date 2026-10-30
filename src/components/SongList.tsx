@@ -7,6 +7,7 @@ import './SongList.css'
 const MODES: { id: GameMode; label: string; blurb: string }[] = [
   { id: 'missing-note', label: 'Missing Note', blurb: 'One note is missing. Find it on the piano.' },
   { id: 'one-note-off', label: 'One Note Off', blurb: 'One note has changed. Spot which one.' },
+  { id: 'echo-note', label: 'Echo Note', blurb: 'Hear one note after a C. Find it on the piano.' },
 ]
 
 interface SongListProps {
@@ -18,6 +19,8 @@ interface SongListProps {
   genre: Genre | null
   onGenreChange: (genre: Genre | null) => void
   onSelect: (song: Song) => void
+  /** Starts an Echo Note round, which doesn't use songs. */
+  onStartEcho: () => void
 }
 
 /** Song cards with a genre filter. `genre` null means all genres. */
@@ -30,6 +33,7 @@ export function SongList({
   genre,
   onGenreChange,
   onSelect,
+  onStartEcho,
 }: SongListProps) {
   const genres = [...new Set(songs.map((song) => song.genre))]
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
@@ -50,42 +54,57 @@ export function SongList({
           </button>
         ))}
       </div>
-      <div className="song-list-heading">
-        <h2 id="song-list-title">Pick a song</h2>
-        <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
-      </div>
-      {mode === 'missing-note' && !hasSeenTutorial() && (
-        <p className="song-list-tip">
-          New here? Each melody is missing one note, and your first song walks you through finding it.
-          Twinkle, Twinkle is a gentle place to start.
-        </p>
-      )}
-      <div className="song-list-filters" role="group" aria-label="Filter by genre">
-        {[null, ...genres].map((option) => (
-          <button
-            key={option ?? 'all'}
-            type="button"
-            className="song-list-filter"
-            aria-pressed={genre === option}
-            onClick={() => onGenreChange(option)}
-          >
-            {option ?? 'All'}
+      {mode === 'echo-note' ? (
+        <div className="song-list-echo">
+          <h2 id="song-list-title">Echo Note</h2>
+          <p>
+            Each round has five mystery notes. For each one you hear a C first, then the mystery note. Use the C as your
+            guide and find the mystery note on the piano. One answer per note.
+          </p>
+          <button type="button" className="song-list-start" onClick={onStartEcho}>
+            ▶ Start a round
           </button>
-        ))}
-      </div>
-      <ul className="song-list-cards">
-        {visible.map((song) => (
-          <li key={song.id}>
-            <button type="button" className="song-card" onClick={() => onSelect(song)}>
-              <span className="song-card-title">{song.title}</span>
-              <span className="song-card-meta">
-                {song.genre}
-                <span className={`song-card-difficulty is-${song.difficulty.toLowerCase()}`}>{song.difficulty}</span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+        </div>
+      ) : (
+        <>
+          <div className="song-list-heading">
+            <h2 id="song-list-title">Pick a song</h2>
+            <SettingsMenu mode={mode} settings={settings} onChange={onSettingsChange} />
+          </div>
+          {mode === 'missing-note' && !hasSeenTutorial() && (
+            <p className="song-list-tip">
+              New here? Each melody is missing one note, and your first song walks you through finding it.
+              Twinkle, Twinkle is a gentle place to start.
+            </p>
+          )}
+          <div className="song-list-filters" role="group" aria-label="Filter by genre">
+            {[null, ...genres].map((option) => (
+              <button
+                key={option ?? 'all'}
+                type="button"
+                className="song-list-filter"
+                aria-pressed={genre === option}
+                onClick={() => onGenreChange(option)}
+              >
+                {option ?? 'All'}
+              </button>
+            ))}
+          </div>
+          <ul className="song-list-cards">
+            {visible.map((song) => (
+              <li key={song.id}>
+                <button type="button" className="song-card" onClick={() => onSelect(song)}>
+                  <span className="song-card-title">{song.title}</span>
+                  <span className="song-card-meta">
+                    {song.genre}
+                    <span className={`song-card-difficulty is-${song.difficulty.toLowerCase()}`}>{song.difficulty}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   )
 }

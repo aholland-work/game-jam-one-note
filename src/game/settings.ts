@@ -1,6 +1,6 @@
 const STORAGE_KEY = 'one-note:settings'
 
-export type GameMode = 'missing-note' | 'one-note-off'
+export type GameMode = 'missing-note' | 'one-note-off' | 'echo-note'
 
 /** Optional One Note Off rules players can switch on or off. */
 export interface Settings {
@@ -47,9 +47,10 @@ export interface SettingOption {
   nextSong: boolean
 }
 
-/** Each mode's optional rules, in the order they're listed. Missing Note has none. */
+/** Each mode's optional rules, in the order they're listed. Missing Note and Echo Note have none. */
 export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
   'missing-note': [],
+  'echo-note': [],
   'one-note-off': [
     { key: 'oneNoteOffHighlight', label: 'Highlight notes on the staff as they play', nextSong: false },
     {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { audioEngine } from './audio/engine'
 import { SongList } from './components/SongList'
+import { EchoNoteRound } from './modes/echoNote/EchoNoteRound'
 import { MissingNoteRound } from './modes/missingNote/MissingNoteRound'
 import { OneNoteOffRound } from './modes/oneNoteOff/OneNoteOffRound'
 import { loadSettings, saveSettings, type GameMode, type Settings } from './game/settings'
@@ -19,6 +20,12 @@ function App() {
   const [current, setCurrent] = useState<Song | null>(null)
   // Bumped to restart the current song from scratch (for example to apply Hard mode now).
   const [attempt, setAttempt] = useState(0)
+  // Echo Note rounds don't use songs; this is set while one is open.
+  const [echoRound, setEchoRound] = useState<number | null>(null)
+  const startEcho = () => {
+    audioEngine.warmUp()
+    setEchoRound((n) => (n ?? 0) + 1)
+  }
 
   // "Next song" follows the list the player was looking at.
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
@@ -27,7 +34,9 @@ function App() {
   return (
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
       <h1 style={{ margin: '0 0 1rem' }}>One Note</h1>
-      {current ? (
+      {echoRound !== null ? (
+        <EchoNoteRound key={echoRound} onBack={() => setEchoRound(null)} onPlayAgain={startEcho} />
+      ) : current ? (
         mode === 'one-note-off' ? (
           <OneNoteOffRound
             key={`${mode}-${current.id}-${attempt}`}
@@ -60,10 +69,11 @@ function App() {
             audioEngine.warmUp()
             setCurrent(song)
           }}
+          onStartEcho={startEcho}
         />
       )}
       {/* Credits belong on the home page, not inside a song. */}
-      {!current && (
+      {!current && echoRound === null && (
         <footer style={{ marginTop: '3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           Songs are public domain (
           <a href="https://github.com/aholland-work/game-jam-one-note#song-sources-and-credits">sources and credits</a>).

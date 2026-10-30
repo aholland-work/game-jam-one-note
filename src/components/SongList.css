@@ -123,3 +123,21 @@
   color: var(--warning);
   border-color: var(--warning);
 }
+
+.song-list-echo {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.song-list-echo p {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 60ch;
+}
+
+.song-list-start {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
