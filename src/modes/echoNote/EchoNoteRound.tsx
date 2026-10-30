@@ -54,15 +54,12 @@ interface Answer {
 
 const isRight = (entry: Answer) => samePitchClass(entry.guess, noteInKey(entry.key, entry.step))
 
-/** One answer in a trail: a mark that doesn't rely on color, and a label for screen readers. */
+/** One answer in a trail: a colored bar, with a label for screen readers. */
 function TrailMark({ entry, number }: { entry: Answer; number: number }) {
   const right = isRight(entry)
   return (
     <li className={right ? 'is-found' : 'is-missed'}>
       <span className="sr-only">{`Note ${number}: ${right ? 'right' : 'missed'}, the ${degreeName(entry.step)}`}</span>
-      <span className="echo-progress-mark" aria-hidden="true">
-        {right ? '✓' : '×'}
-      </span>
     </li>
   )
 }
@@ -77,7 +74,7 @@ interface EchoNoteRoundProps {
 }
 
 /**
- * One Echo Note session, a set of 10 notes or free practice: for each mystery note, hear the
+ * One Echo Note session, a set of 5 notes or free practice: for each mystery note, hear the
  * key's chord and then the note, find it on the piano, and lock in one answer.
  */
 export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain, onStartWith }: EchoNoteRoundProps) {
@@ -211,7 +208,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       })
       .sort((a, b) => a.right / a.total - b.right / b.total || a.asked - b.asked)
     return (
-      <section className="round" aria-labelledby="round-title">
+      <section className="round echo-round" aria-labelledby="round-title">
         <RoundNavigation onBack={onBack} backLabel="Home" />
         <p className="round-mode">Ear training</p>
         <header className="round-header">
@@ -308,7 +305,7 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   const trailStart = endless ? Math.max(0, history.length - TRAIL_LENGTH) : 0
 
   return (
-    <section className="round" aria-labelledby="round-title">
+    <section className="round echo-round" aria-labelledby="round-title">
       <RoundNavigation onBack={onBack} backLabel="Home">
         <SettingsMenu mode="echo-note" settings={settings} onChange={onSettingsChange} inRound />
       </RoundNavigation>

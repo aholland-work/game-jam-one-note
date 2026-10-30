@@ -1,9 +1,9 @@
 import { midiToName } from '../music/notation'
 
 /** How many mystery notes make up a set (free practice has no limit). */
-export const ROUND_LENGTH = 10
+export const ROUND_LENGTH = 5
 /** Right answers in a full set that unlock the next level. */
-export const LEVEL_UP_SCORE = 8
+export const LEVEL_UP_SCORE = 4
 /** The most times in a row the same note can come up. */
 export const MAX_REPEATS = 2
 /** In endless practice with random keys, the key changes after this many notes. */

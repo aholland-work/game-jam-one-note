@@ -94,18 +94,14 @@
 .echo-progress li { width: 26px; height: 6px; border: 0; border-radius: 0; background: var(--border); }
 .echo-progress li.is-current { border: 0; background: var(--accent); }
 .echo-progress li.is-found { background: var(--success); }
-.echo-progress li.is-missed { background: var(--warning); }
+.echo-progress li.is-missed { background: var(--miss); }
 .echo-results { list-style: none; padding: 0; gap: 0; }
 .echo-results li { border-bottom: 1px solid var(--border); padding: 12px 0; }
 .echo-score { font-size: 1.15rem; }
 @media (max-width: 550px) { .round-piano.is-wide .piano { height: 155px; } .round-piano.is-wide .piano-label { font-size: 10px; } .round-piano.is-wide .piano-degree { font-size: 11px; } }
-.echo-progress li { position: relative; margin-bottom: 12px; }
 .echo-context { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; border-top: 3px solid var(--text); padding-top: 18px; }
 .echo-context .echo-key { border: 0; padding-top: 0; }
 .echo-context .echo-progress { flex: none; }
-.echo-progress-mark { position: absolute; top: 4px; left: 0; width: 100%; text-align: center; font-size: 10px; font-weight: 700; }
-.echo-progress .is-found .echo-progress-mark { color: var(--success); }
-.echo-progress .is-missed .echo-progress-mark { color: var(--warning); }
 
 .echo-position { display: flex; align-items: center; gap: 14px; }
 .echo-position-text { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
@@ -114,7 +110,10 @@
 .echo-by-step th, .echo-by-step td { text-align: left; padding: 6px 24px 6px 0; border-bottom: 1px solid var(--border); }
 .echo-by-step thead th { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
 .echo-by-step tbody th { font-weight: 600; }
-.echo-by-step tr.is-missed td { color: var(--warning); font-weight: 600; }
+.echo-by-step tr.is-missed td { color: var(--miss); font-weight: 600; }
 .echo-each summary { cursor: pointer; font-size: 0.9rem; color: var(--text-muted); }
 .echo-each summary:hover { color: var(--accent); }
 .echo-practice-note { margin: 0; color: var(--text-muted); }
+
+.echo-round .round-hint.is-missed,
+.echo-results .is-missed { color: var(--miss); }

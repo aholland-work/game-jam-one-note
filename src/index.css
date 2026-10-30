@@ -16,6 +16,8 @@
   --success-soft: #e4eddc;
   --warning: #9a480d;
   --warning-soft: #f9e7d8;
+  /* A missed answer in Echo Note: a clear red, easier to tell from green than orange. */
+  --miss: #c0352b;
   --focus: #43258f;
   --panel-shadow: 0 12px 28px rgb(33 26 36 / 14%);
   --font-display: 'Archivo Black', system-ui, sans-serif;
@@ -72,6 +74,7 @@
     --success-soft: #2c3825;
     --warning: #f0a35e;
     --warning-soft: #443021;
+    --miss: #ff8a7a;
     --focus: #dfc9ff;
     --panel-shadow: 0 12px 28px rgb(0 0 0 / 45%);
 }
