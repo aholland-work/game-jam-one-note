@@ -3,12 +3,11 @@ import { midiInput } from '../../audio/midi'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
 import { RoundNavigation } from '../../components/RoundNavigation'
-import { SettingsMenu } from '../../components/SettingsMenu'
 import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
-import type { Settings } from '../../game/settings'
+import { LETTERS_ANYWHERE, type Settings } from '../../game/settings'
 import { readFlag, writeFlag } from '../../game/storage'
 import { hasSeenTutorial, markTutorialSeen } from '../../game/tutorial'
 import { usesFlats } from '../../music/notation'
@@ -180,9 +179,7 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
 
   return (
     <section className="round is-missing-note" aria-labelledby="round-title">
-      <RoundNavigation onBack={onBack}>
-        <SettingsMenu mode="missing-note" settings={settings} onChange={onSettingsChange} inRound />
-      </RoundNavigation>
+      <RoundNavigation onBack={onBack} />
       <p className="round-mode">Missing Note</p>
       <header className="round-header">
         <h2 id="round-title" tabIndex={-1}>{song.title}</h2>
@@ -312,6 +309,14 @@ export function MissingNoteRound({ song, settings, onSettingsChange, onBack, onN
             <kbd>Space</kbd> plays, pauses and resumes the melody.
           </li>
         </ul>
+        <label className="round-shortcuts-option">
+          <input
+            type="checkbox"
+            checked={settings.lettersAnywhere}
+            onChange={(event) => onSettingsChange({ ...settings, lettersAnywhere: event.target.checked })}
+          />
+          {LETTERS_ANYWHERE.label}
+        </label>
       </details>
     </section>
   )

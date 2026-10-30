@@ -71,15 +71,18 @@ export interface SettingOption {
 }
 
 // Voice control and some screen readers send single letters, which could play notes by accident.
-const LETTERS_ANYWHERE: SettingOption = {
+export const LETTERS_ANYWHERE: SettingOption = {
   key: 'lettersAnywhere',
   label: 'Letter keys (A, W, S…) play the piano from anywhere on the page. Turn off if you use voice control or a screen reader',
   nextSong: false,
 }
 
-/** Each mode's optional rules, in the order they're listed. */
+/**
+ * Each mode's optional rules, in the order they're listed. Missing Note has no Settings menu,
+ * so its letter keys switch sits in the Keyboard shortcuts panel under the piano instead.
+ */
 export const SETTING_OPTIONS: Record<GameMode, SettingOption[]> = {
-  'missing-note': [LETTERS_ANYWHERE],
+  'missing-note': [],
   'echo-note': [
     { key: 'echoShowScale', label: 'Show the key’s notes and their numbers on the piano', nextSong: false },
     {

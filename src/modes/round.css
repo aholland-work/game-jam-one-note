@@ -163,6 +163,20 @@
   padding-left: 1.2rem;
 }
 
+.round-shortcuts-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 34rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.round-shortcuts-option input {
+  margin: 0.2rem 0 0;
+  accent-color: var(--accent);
+}
+
 .round-shortcuts kbd {
   font-family: inherit;
   font-size: 0.8rem;
