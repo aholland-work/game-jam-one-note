@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff, type NoteMark } from '../../components/Staff'
@@ -160,7 +161,7 @@ export function OneNoteOffRound({
     // On Hard, restarting the original would be a second listen, so it only offers Resume.
     const limited = version === 'original' && !isOver && oneListen
     const used = limited && originalHeard && !playing && !paused
-    const action = playing ? '⏸ Pause' : paused ? '▶ Resume' : '▶ Play'
+    const action = playing ? 'Pause' : paused ? 'Resume' : 'Play'
     const caption = used ? 'Already heard' : limited && !playing && !paused ? 'One listen only' : meta.caption
     return (
       <>
@@ -175,6 +176,7 @@ export function OneNoteOffRound({
           </span>
           <span className="version-text">
             <span className="version-title">
+              <Icon name={playing ? 'pause' : 'play'} />
               {action} {meta.title.toLowerCase()}
             </span>
             <span className="version-caption">
@@ -190,7 +192,8 @@ export function OneNoteOffRound({
         </button>
         {paused && !limited && (
           <button type="button" onClick={() => player.resume(true)}>
-            ⟲ From the start
+            <Icon name="restart" />
+            From the start
           </button>
         )}
       </>

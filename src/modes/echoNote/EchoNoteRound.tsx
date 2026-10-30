@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import {
@@ -148,11 +149,13 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   const playButton = (kind: Playback, label: string, onClick: () => void) =>
     player.playing === kind ? (
       <button type="button" onClick={player.stop}>
-        ■ Stop <PlayingBars />
+        <Icon name="stop" />
+        Stop <PlayingBars />
       </button>
     ) : (
-      <button type="button" onClick={onClick}>
-        ▶ {label}
+      <button type="button" className={kind === 'both' ? 'round-play' : undefined} onClick={onClick}>
+        <Icon name="play" />
+        {label}
       </button>
     )
 

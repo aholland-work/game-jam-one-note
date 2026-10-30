@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { Icon } from '../../components/Icon'
 import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
@@ -218,6 +219,7 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
       {isOver ? (
         <div className="round-controls">
           <button type="button" onClick={playComplete} disabled={resultPlaying}>
+            <Icon name="play" />
             Play the whole song
           </button>
           {resultPlaying && (
@@ -235,20 +237,24 @@ export function MissingNoteRound({ song, onBack, onNext, onSolved }: MissingNote
         <div className="round-controls">
           {guessPlaying ? (
             <button type="button" onClick={player.pause}>
-              ⏸ Pause <PlayingBars />
+              <Icon name="pause" />
+              Pause <PlayingBars />
             </button>
           ) : player.paused ? (
             <>
-              <button type="button" onClick={() => player.resume()}>
-                {player.paused === 'try' ? '▶ Resume try' : '▶ Resume'}
+              <button type="button" className="round-play" onClick={() => player.resume()}>
+                <Icon name="play" />
+                {player.paused === 'try' ? 'Resume try' : 'Resume'}
               </button>
               <button type="button" onClick={() => player.resume(true)}>
-                {player.paused === 'try' ? '⟲ Restart try' : '⟲ From the start'}
+                <Icon name="restart" />
+                {player.paused === 'try' ? 'Restart try' : 'From the start'}
               </button>
             </>
           ) : (
-            <button type="button" className={coached('play')} onClick={playWithGap}>
-              ▶ Play
+            <button type="button" className={`round-play ${coached('play')}`} onClick={playWithGap}>
+              <Icon name="play" />
+              Play
             </button>
           )}
           {MAX_TRIES > 0 && (

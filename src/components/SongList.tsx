@@ -3,6 +3,7 @@ import { pickRandomSong } from '../game/progress'
 import type { GameMode, Settings } from '../game/settings'
 import { hasSeenTutorial } from '../game/tutorial'
 import type { Genre, Song } from '../songs/types'
+import { Icon } from './Icon'
 import { SettingsMenu } from './SettingsMenu'
 import './SongList.css'
 
@@ -165,7 +166,8 @@ export function SongList({
             {ECHO_LENGTH_CHOICES.find((option) => option.id === settings.echoLength)?.about}
           </p>
           <button type="button" className="song-list-start" onClick={onStartEcho}>
-            ▶ Start
+            <Icon name="play" />
+            Start
           </button>
         </div>
       ) : (
