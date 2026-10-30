@@ -24,7 +24,6 @@ import { shenandoah } from './shenandoah'
 import { silentNight } from './silentNight'
 import { takeMeOut } from './takeMeOut'
 import { twinkleTwinkle } from './twinkleTwinkle'
-import { weddingMarch } from './weddingMarch'
 import type { Song } from './types'
 
 /** Every song in the game, easiest first. Add a song by writing its file and listing it here. */
@@ -34,7 +33,6 @@ export const songs: Song[] = [
   frereJacques,
   goodKingWenceslas,
   harkTheHerald,
-  weddingMarch,
   odeToJoy,
   jingleBells,
   awayInAManger,
