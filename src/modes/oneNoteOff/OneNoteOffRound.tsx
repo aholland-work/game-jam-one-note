@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { useMelodyPlayer } from '../../audio/useMelodyPlayer'
 import { Piano } from '../../components/Piano'
+import { PlayingBars } from '../../components/PlayingBars'
 import { SettingsMenu } from '../../components/SettingsMenu'
 import { Staff, type NoteMark } from '../../components/Staff'
 import { pickChange, withChange } from '../../game/oneNoteOff'
@@ -24,13 +25,15 @@ interface OneNoteOffRoundProps {
   song: Song
   settings: Settings
   onSettingsChange: (settings: Settings) => void
+  /** Starts this song over with the current settings. */
+  onRestart: () => void
   onBack: () => void
   /** Goes to the next song, or null when this is the last one in the list. */
   onNext: (() => void) | null
 }
 
 /** One One Note Off puzzle: compare two versions, tap the note that changed, lock in once. */
-export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNext }: OneNoteOffRoundProps) {
+export function OneNoteOffRound({ song, settings, onSettingsChange, onRestart, onBack, onNext }: OneNoteOffRoundProps) {
   // Hard mode shapes how the puzzle is set up, so the song keeps the setting it opened with;
   // a change made mid-song applies from the next one. Highlighting applies right away.
   const [hard] = useState(settings.oneNoteOffHard)
@@ -162,7 +165,15 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
             <span className="version-title">
               {action} {meta.title.toLowerCase()}
             </span>
-            <span className="version-caption">{caption}</span>
+            <span className="version-caption">
+              {playing ? (
+                <>
+                  Playing <PlayingBars />
+                </>
+              ) : (
+                caption
+              )}
+            </span>
           </span>
         </button>
         {paused && !limited && (
@@ -188,6 +199,22 @@ export function OneNoteOffRound({ song, settings, onSettingsChange, onBack, onNe
           <SettingsMenu mode="one-note-off" settings={settings} onChange={onSettingsChange} inRound />
         </div>
       </header>
+
+      {/* Hard mode can't change partway through a song, so say so plainly and offer a restart. */}
+      {settings.oneNoteOffHard !== hard && (
+        <div className="round-pending" role="status">
+          <span className="round-pending-icon" aria-hidden="true">
+            ⏭
+          </span>
+          <p>
+            <strong>{settings.oneNoteOffHard ? 'Hard mode' : 'Easy mode'} starts on the next song.</strong> This song
+            stays on {hard ? 'Hard' : 'Easy'}.
+          </p>
+          <button type="button" onClick={onRestart}>
+            Restart this song in {settings.oneNoteOffHard ? 'Hard' : 'Easy'} mode
+          </button>
+        </div>
+      )}
 
       {/* Says which version is sounding, so the two can't be confused. */}
       <p className={`now-playing${nowPlaying ? ` is-${nowPlaying}` : ''}`} aria-hidden={!nowPlaying}>

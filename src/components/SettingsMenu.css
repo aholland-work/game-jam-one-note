@@ -43,6 +43,12 @@
 
 .settings-note {
   display: block;
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  width: fit-content;
+  margin-top: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
 }

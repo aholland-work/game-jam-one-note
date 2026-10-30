@@ -178,3 +178,29 @@
     display: none;
   }
 }
+
+.round-pending {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--warning);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+}
+
+.round-pending p {
+  margin: 0;
+  flex: 1 1 260px;
+}
+
+.round-pending-icon {
+  font-size: 1.1rem;
+}
+
+.round-pending button {
+  border-color: var(--warning);
+  color: var(--warning);
+  font-weight: 600;
+}

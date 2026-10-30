@@ -50,7 +50,7 @@ export function SettingsMenu({ mode, settings, onChange, inRound = false }: Sett
               />
               <span>
                 {label}
-                {inRound && nextSong && <span className="settings-note">Takes effect on the next song</span>}
+                {inRound && nextSong && <span className="settings-note">⏭ Starts on the next song</span>}
               </span>
             </label>
           ))}

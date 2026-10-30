@@ -16,6 +16,8 @@ function App() {
   }
   const [genre, setGenre] = useState<Genre | null>(null)
   const [current, setCurrent] = useState<Song | null>(null)
+  // Bumped to restart the current song from scratch (for example to apply Hard mode now).
+  const [attempt, setAttempt] = useState(0)
 
   // "Next song" follows the list the player was looking at.
   const visible = genre === null ? songs : songs.filter((song) => song.genre === genre)
@@ -27,10 +29,11 @@ function App() {
       {current ? (
         mode === 'one-note-off' ? (
           <OneNoteOffRound
-            key={`${mode}-${current.id}`}
+            key={`${mode}-${current.id}-${attempt}`}
             song={current}
             settings={settings}
             onSettingsChange={changeSettings}
+            onRestart={() => setAttempt((n) => n + 1)}
             onBack={() => setCurrent(null)}
             onNext={next ? () => setCurrent(next) : null}
           />

@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { audioEngine } from '../../audio/engine'
 import { Piano } from '../../components/Piano'
+import { PlayingBars } from '../../components/PlayingBars'
 import { Staff } from '../../components/Staff'
 import { MAX_TRIES, answerMidi, pianoStartMidi, withGap, withGuess } from '../../game/puzzle'
 import { readFlag, writeFlag } from '../../game/storage'
@@ -273,7 +274,7 @@ export function MissingNoteRound({ song, onBack, onNext }: MissingNoteRoundProps
         <div className="round-controls">
           {guessPlaying ? (
             <button type="button" onClick={pause}>
-              ⏸ Pause
+              ⏸ Pause <PlayingBars />
             </button>
           ) : paused ? (
             <>

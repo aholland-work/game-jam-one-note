@@ -86,3 +86,11 @@
   font-size: 0.75rem;
   color: var(--surface);
 }
+
+.version-button.is-changed .version-caption .playing-bars {
+  color: var(--accent);
+}
+
+.version-button.is-original .version-caption .playing-bars {
+  color: var(--success);
+}
