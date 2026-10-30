@@ -94,8 +94,9 @@ export function Piano({
 
   const renderKey = (color: 'white' | 'black', midi: number, whiteIndex: number) => {
     const semitone = (midi - startMidi) % 12
-    // A scale degree names a pitch class, so repeat it across the visible octaves.
-    const degree = degrees[midi] ?? Object.entries(degrees).find(([note]) => (midi - Number(note)) % 12 === 0)?.[1]
+    // Numbers go only on the keys given, so a scale reads 1 to 7 from its 1 upward. Repeating
+    // them in every octave would put the 4 to 7 before the 1 in most keys.
+    const degree = degrees[midi]
     const className = [
       `piano-key piano-${color}`,
       degree?.inPlay && 'is-in-key',
