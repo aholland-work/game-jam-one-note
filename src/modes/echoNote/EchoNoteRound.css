@@ -17,12 +17,6 @@
   font-style: italic;
 }
 
-.echo-new-key {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
 .echo-progress {
   display: flex;
   gap: 8px;

@@ -4,7 +4,7 @@ A music puzzle game for the "Only One" game jam, with three modes:
 
 - **Missing Note:** a short, well-known melody is missing one note. Listen, test notes on the piano, then lock in your one answer.
 - **One Note Off:** one note in the melody has been changed. Compare the original with the changed version, tap the note that's off, then lock in.
-- **Echo Note:** ear training for playing by ear and improvising. A chord sets the key, a mystery note plays, and you find it on the piano and learn its number in the key ("C♯, the 3 of A major"). Start with the chord tones (1, 3, 5), move up to the major scale, then all 12 notes. Stay in C major or get a new key each round, and play sets of 5 (4 right unlocks the next level) or free practice. The results show which numbers you missed most.
+- **Echo Note:** ear training for playing by ear and improvising. A chord sets the key, a mystery note plays, and you find it on the piano and learn its number in the key ("C♯, the 3 of A major"). Start with the chord tones (1, 3, 5), move up to the major scale, then all 12 notes. Stay in C major or get a new key for every note, and play sets of 5 (4 right unlocks the next level) or free practice. The results show which numbers you missed most.
 
 When a round ends, the staff turns into the real sheet music as the melody plays.
 

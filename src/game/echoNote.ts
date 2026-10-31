@@ -6,8 +6,6 @@ export const ROUND_LENGTH = 5
 export const LEVEL_UP_SCORE = 4
 /** The most times in a row the same note can come up. */
 export const MAX_REPEATS = 2
-/** In endless practice with random keys, the key changes after this many notes. */
-export const NOTES_PER_KEY = 10
 
 export type EchoLevel = 'triad' | 'scale' | 'all'
 export type EchoLength = 'round' | 'endless'

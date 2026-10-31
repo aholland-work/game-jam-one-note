@@ -12,7 +12,6 @@ import {
   ECHO_LEVELS,
   LEVEL_UP_SCORE,
   MAJOR_SCALE,
-  NOTES_PER_KEY,
   ROUND_LENGTH,
   degreeName,
   describeNote,
@@ -90,7 +89,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   const [selectedMidi, setSelectedMidi] = useState<number | null>(null)
   const [history, setHistory] = useState<Answer[]>([])
   const [hint, setHint] = useState<string | null>(null)
-  const [newKey, setNewKey] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const player = useMelodyPlayer<Playback>(BPM)
   const lockButton = useRef<HTMLButtonElement>(null)
@@ -140,7 +138,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
     const entry = { key, step, guess: selectedMidi }
     const right = isRight(entry)
     setAnswered(true)
-    setNewKey(false)
     setHistory([...history, entry])
     const answer = `${midiToName(target, key.flats)}, the ${degreeName(step)}`
     const picked = `${midiToName(selectedMidi, key.flats)}, the ${degreeName(selectedMidi - key.tonic)}`
@@ -150,10 +147,8 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
   }
 
   const nextNote = () => {
-    // Endless practice with random keys moves to a new key every so often.
-    const changeKey = endless && keyChoice === 'random' && history.length % NOTES_PER_KEY === 0
-    if (changeKey) setKey(pickKey(key))
-    setNewKey(changeKey)
+    // With random keys, every mystery note comes in a new key, set by its own chord.
+    if (keyChoice === 'random') setKey(pickKey(key))
     setStep(pickEchoNote(steps, history.map((entry) => entry.step)))
     setTurn(turn + 1)
     setAnswered(false)
@@ -320,7 +315,6 @@ export function EchoNoteRound({ settings, onSettingsChange, onBack, onPlayAgain,
       <div className="echo-context">
         <p className="echo-key">
           Key: <strong>{keyName(key)}</strong>
-          {newKey && <span className="echo-new-key">New key! Listen to the chord for the new 1.</span>}
         </p>
         <div className="echo-position">
           <span className="echo-position-text">{position}</span>

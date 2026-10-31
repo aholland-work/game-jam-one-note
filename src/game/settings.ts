@@ -17,7 +17,7 @@ export interface Settings {
   echoLevel: EchoLevel
   /** Echo Note: five-note rounds, or endless practice. */
   echoLength: EchoLength
-  /** Echo Note: always C major, or a new key each round. */
+  /** Echo Note: always C major, or a new key for every mystery note. */
   echoKey: EchoKeyChoice
   /** Echo Note: tint the key's notes on the piano and show their numbers. */
   echoShowScale: boolean

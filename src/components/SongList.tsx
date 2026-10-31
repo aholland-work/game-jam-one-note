@@ -20,8 +20,8 @@ const ECHO_KEY_CHOICES = [
   { id: 'c', label: 'C major', about: 'Always C major, so each number stays on the same piano key. Best to start with.' },
   {
     id: 'random',
-    label: 'New key each round',
-    about: 'Each round starts in a different key and the numbers move with it.',
+    label: 'New key every note',
+    about: 'Every mystery note comes in a different key, so listen to each chord for the new 1. Harder, and closer to playing with a band.',
   },
 ] as const
 
