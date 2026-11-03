@@ -1,5 +1,7 @@
 # One Note
 
+![One Note landing page showing the sculpted piano keys, three game modes, and song filters.](docs/images/landing-page.png)
+
 A music puzzle game for the "Only One" game jam, with three modes:
 
 - **Missing Note:** a short, well-known melody is missing one note. Listen, test notes on the piano, then lock in your one answer.
